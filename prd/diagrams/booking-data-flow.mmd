@@ -23,7 +23,9 @@ sequenceDiagram
 
     Astro-->>Browser: JSON: ["09:00", "09:30", "10:00", ...]
 
-    Note over Browser: User selects slot, fills form
+    Note over Browser: Background async poll every 15s via setInterval<br/>silently updates slot state — no page reload needed
+
+    Browser->>Astro: GET /api/slots?hostId=X&eventTypeId=Y&date=...
 
     Browser->>Astro: POST /api/bookings { eventTypeId, startTime, clientName, clientEmail, notes }
 

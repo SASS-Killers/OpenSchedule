@@ -176,6 +176,7 @@ graph TB
 | **ORM** | Drizzle | Prisma | Drizzle compiles to raw SQL with no runtime — critical for edge Workers. Prisma has a heavier runtime. |
 | **Email** | Brevo transactional via REST API | SMTP relay | SMTP requires port 25 (blocked by Cloudflare). Brevo's REST API is a single HTTP POST. 3× free capacity vs Resend (300/day vs 100/day). |
 | **Cache** | In-memory (Worker) + D1 reads | Redis / Upstash | At our QPS (peak 5/s), Worker memory cache is sufficient. Redis adds cost and complexity. |
+| **Real-time slot sync** | Client-side polling (15s interval) | WebSockets + Durable Objects | Polling hits D1 every 15s per viewer (~1.5 reads/min). WebSockets need DO infra, connection management, and reconnection logic. For < 10 concurrent viewers, polling is simpler and free-tier friendly. The race check at booking time provides final consistency regardless of sync method. |
 
 ---
 
@@ -213,7 +214,9 @@ sequenceDiagram
 
     Astro-->>Browser: JSON: ["09:00", "09:30", "10:00", ...]
 
-    Note over Browser: User selects slot, fills form
+    Note over Browser: Background async poll every 15s via setInterval<br/>silently updates slot state — no page reload needed
+
+    Browser->>Astro: GET /api/slots?hostId=X&eventTypeId=Y&date=...
 
     Browser->>Astro: POST /api/bookings { eventTypeId, startTime, clientName, clientEmail, notes }
 

@@ -52,6 +52,15 @@ Slice the remaining available start/end times into discrete intervals spaced by 
 3. **Difference Operation**: Remove any sliced intervals that overlap with any padded blocked windows.
 4. **Timezone Shift**: Convert the remaining valid slots to the client's local timezone (`TZ_client`) and render them.
 
+### Step 5: Real-Time Slot Updates (Background Polling)
+To prevent clients from seeing stale slots while browsing, the client-side React date picker runs a lightweight background poll: every **15 seconds**, a `setInterval` fires an async `fetch()` to `GET /api/slots` and updates the available slots state in React. This means:
+* **No page reload** — the polling is entirely async, invisible to the user. The slot grid just updates silently.
+* If another client books a slot, it disappears from the picker within 15 seconds.
+* If a Host adds an exception, it takes effect within 15 seconds.
+* **No WebSocket infrastructure required** — works entirely on the free tier.
+
+The final double-booking race check (Step 4 in section 4) provides a hard guarantee even if the 15s window misses a booking.
+
 ---
 
 ## 3. Client Auto-Signup Logic
