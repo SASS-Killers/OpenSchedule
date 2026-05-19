@@ -25,7 +25,7 @@ This PRD is modularized into dedicated domain files for clarity, ease of mainten
 Click any functional requirement to jump directly to its complete architectural specification, schema, and implementation logic.
 
 * **[FR-1] Local Setup & Service Installer**:
-  * *Description*: A user-friendly local web wizard (`http://localhost:3000`) guides non-technical staff step-by-step through creating free Cloudflare, Google, and Brevo accounts, then automatically provisions the D1 database, applies Drizzle schema migrations, sets environment secrets, deploys edge cron triggers, and publishes the live site.
+  * *Description*: A user-friendly local web wizard (`http://localhost:3000`) guides non-technical staff step-by-step through creating free Cloudflare and Brevo accounts, then automatically provisions the D1 database, applies Drizzle schema migrations, sets environment secrets, deploys edge cron triggers, and publishes the live site.
   * *Deep Link*: **[Local Setup & Service Installer](./installation.md)**
 * **[FR-2] Passwordless OTP Authentication**:
   * *Description*: Users (Admin/Hosts) authenticate using secure 6-digit magic codes delivered via transactional emails.
@@ -37,7 +37,7 @@ Click any functional requirement to jump directly to its complete architectural 
   * *Description*: Hosts manage default weekly shifts and date-specific blockouts (vacation, split shifts) via their profile settings.
   * *Deep Link*: **[Shift Management & Booking Engine](./booking-flow.md)**
 * **[FR-5] Dynamic Double-Booking Prevention**:
-  * *Description*: Real-time overlap calculations combining internal D1 reservations and active Google Calendar API `freeBusy` blocks.
+  * *Description*: Real-time overlap calculations combining internal D1 reservations with Host-defined availability rules.
   * *Deep Link*: **[Conflict Resolution Algorithm](./booking-flow.md)**
 * **[FR-6] Client Auto-Signup**:
   * *Description*: Booking a meeting automatically registers Clients in D1, linking their chronological meeting history without requiring login credentials.
@@ -100,9 +100,9 @@ To ensure alignment across all components, the following roles and terms are str
 * **Host**: A registered user (e.g., team member, consultant) who owns schedules, date overrides, and event types. Hosts log in to configure their weekly grids and inspect their bookings ledger.
 * **Client**: An external visitor booking appointments with a Host. Clients do not log in; they register automatically upon their first booking.
 * **Administrator (Admin)**: The single super-user who boots up the platform, configures universal options, and provisions Host accounts. Standard user signups are disabled.
-* **Local Setup Wizard**: A specialized, first-run local web tool designed to guide non-technical users to hook up external credentials and automatically build, provision, and deploy the entire Cloudflare Pages & D1 architecture securely.
+* **Local Setup Wizard**: A specialized, first-run local web tool designed to guide non-technical users to create Cloudflare and Brevo accounts and automatically build, provision, and deploy the entire Cloudflare Pages & D1 architecture securely.
 * **OTP (One-Time Passcode)**: A highly secure, short-lived 6-digit numeric login code delivered via email. Used instead of passwords.
-* **Conflict Merging**: The process of cross-referencing internal D1 reservations and external calendars (Google) before presenting free slot intervals.
+* **Conflict Merging**: The process of cross-referencing D1 reservations against schedules and overrides before presenting free slot intervals.
 
 ---
 

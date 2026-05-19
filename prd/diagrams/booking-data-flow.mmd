@@ -3,7 +3,6 @@ sequenceDiagram
     participant Astro as Astro SSR @ Edge
     participant D1 as Cloudflare D1
     participant Brevo as Brevo API
-    participant Google as Google Calendar API
 
     Browser->>Astro: GET /{hostSlug}/{eventSlug}
     Astro->>D1: Fetch host profile + event type
@@ -20,12 +19,7 @@ sequenceDiagram
     Astro->>D1: Check existing bookings
     D1-->>Astro: Internal busy windows
 
-    alt OAuth connected
-        Astro->>Google: freeBusy API
-        Google-->>Astro: External busy windows
-    end
-
-    Note over Astro: Compute available slots:<br/>merge + pad buffers + filter
+    Note over Astro: Compute available slots:<br/>merge D1 bookings + pad buffers
 
     Astro-->>Browser: JSON: ["09:00", "09:30", "10:00", ...]
 
@@ -45,9 +39,5 @@ sequenceDiagram
     D1-->>Astro: Booking confirmed
 
     Astro->>Brevo: Send confirmation emails (client + host)
-
-    alt Google connected
-        Astro->>Google: Create calendar event
-    end
 
     Astro-->>Browser: Confirmation page + .ics link + cancellation URL

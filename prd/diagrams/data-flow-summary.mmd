@@ -4,7 +4,7 @@ flowchart LR
         B -->|"D1 queries"| C["HTML page"]
         
         A2["Client"] -->|"GET /api/slots"| D["Pages Function"]
-        D -->|"D1 + Google API"| E["JSON slots"]
+        D -->|"D1 query"| E["JSON slots"]
         
         A3["Client"] -->|"POST /api/bookings"| F["Pages Function"]
         F -->|"D1 write + Brevo email"| G["Confirmation page"]

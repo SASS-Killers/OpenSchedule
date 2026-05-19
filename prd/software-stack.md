@@ -36,12 +36,11 @@ To achieve a 100% free-tier, self-hosted, enterprise-grade scheduling platform, 
                         |      (Pages SSR & Pages Functions)        |
                         +----+------------------+----------------+--+
                              |                  |                |
-     Read/Write SQL Queries  |                  | Auth Email     | Sync & FreeBusy
-                             v                  v                v
-                 +-----------+-----------+  +---+---+  +---------+---------+
-                  |     Cloudflare D1     |  |Brevo |  |  Google/Microsoft |
-                 |    (SQLite Engine)    |  +-------+  |   Calendar APIs   |
-                 +-----------------------+             +-------------------+
+      Read/Write SQL Queries  |                  | Auth Email     
+                  v                  v
+      +-----------+-----------+  +---+---+
+      |     Cloudflare D1     |  |Brevo |
+      |    (SQLite Engine)    |  +-------+
 ```
 
 ### Cloudflare Pages
@@ -71,10 +70,6 @@ To achieve a 100% free-tier, self-hosted, enterprise-grade scheduling platform, 
 * **Role**: Scheduled task scheduler to kick off the daily alert notifier worker.
 * **Free Tier Allocation**: Up to 3 Cron Triggers per account, utilizing standard execution limits.
 
-### Google Developer Console (Calendar API)
-* **Role**: External sync endpoint for checking Host busy events and inserting new client meetings.
-* **Free Tier Allocation**: 1,000,000 Google API queries per day.
-
 ---
 
 ## 4. Wrangler Edge Configuration Layout
@@ -94,5 +89,5 @@ To bind these Edge services natively under Cloudflare without Node-related runti
   compatibility_date = "2026-05-19"
   compatibility_flags = [ "nodejs_compat" ]
   ```
-* **Variables & Secrets**: Non-sensitive settings (like `PUBLIC_APP_NAME`) are defined in standard parameters, while sensitive credentials (Brevo API Keys, Google Client Secrets, JWT Signing Seeds) are written securely via command wrappers directly into the Cloudflare dashboard as encrypted secrets.
+* **Variables & Secrets**: Non-sensitive settings (like `PUBLIC_APP_NAME`) are defined in standard parameters, while sensitive credentials (Brevo API Key, JWT Signing Seed) are written securely via command wrappers directly into the Cloudflare dashboard as encrypted secrets.
 

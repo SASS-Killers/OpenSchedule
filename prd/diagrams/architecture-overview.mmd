@@ -9,15 +9,13 @@ graph TB
         CDN --> SSR
     end
 
-    subgraph Services["Service Layer"]
+    subgraph Services["Services"]
         D1[("Cloudflare D1<br/>(SQLite Primary DB)")]
         Brevo["Brevo API<br/>(Transactional Email)"]
-        Google["Google Calendar API<br/>(External Sync)"]
         Cron["Workers Cron Trigger<br/>(Daily Reminders @ 08:00 UTC)"]
     end
 
     Browser -- "HTTPS" --> CDN
     SSR -- "SQL Queries" --> D1
     SSR -- "REST API" --> Brevo
-    SSR -- "OAuth 2.0 / freeBusy" --> Google
     Cron -- "Secure Internal Call" --> SSR

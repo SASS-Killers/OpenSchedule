@@ -60,21 +60,6 @@ One-time codes generated for passwordless logins. Wiped immediately on verificat
 }
 ```
 
-### Table: `oauth_connections`
-Stores encrypted OAuth credentials for connecting external calendars (Google Calendar).
-* **FK Rule**: `ON DELETE CASCADE` ensures that deleting a Host automatically purges their external calendar integration tokens.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  user_id: "TEXT" (Not Null, Foreign Key -> users.id, ON DELETE CASCADE),
-  provider: "TEXT" (Not Null - 'google' | 'microsoft'),
-  access_token: "TEXT" (Not Null, Encrypted String),
-  refresh_token: "TEXT" (Not Null, Encrypted String),
-  expires_at: "INTEGER" (Not Null, Unix Timestamp),
-  updated_at: "INTEGER" (Not Null, Unix Timestamp)
-}
-```
-
 ### Table: `schedules` (Default Weekly Hours)
 Defines default weekly availability blocks for Hosts. Multiple shifts per day are supported as separate rows (e.g. a morning shift and an afternoon shift for the same day), satisfying 1NF.
 * **FK Rule**: `ON DELETE CASCADE` ensures deleting a Host purges their schedules.
@@ -201,7 +186,6 @@ Individual scheduled appointments reserved by Clients.
   end_time: "INTEGER" (Not Null, UTC Unix Timestamp),
   status: "TEXT" (Not Null - 'confirmed' | 'cancelled', Default: 'confirmed'),
   client_notes: "TEXT",
-  google_event_id: "TEXT" (Allows Null - referenced to external event),
   cancellation_token: "TEXT" (Not Null, Unique - cryptographically secure UUID),
   reminder_sent: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 0),
   created_at: "INTEGER" (Not Null, Unix Timestamp)

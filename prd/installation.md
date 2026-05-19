@@ -43,13 +43,10 @@ The wizard UI is designed specifically for **non-technical staff**, complete wit
                            (Runs background CLI migrations)
                                    |
             [Step 3]  ---> Integrate Brevo API Key for Email
-                                   |
-            [Step 4]  ---> Set up Google Calendar OAuth App
-                           (Exhaustive instructions on Google Console)
-                                   |
-            [Step 5]  ---> Define Admin Profile (Name & Email)
-                                   |
-            [Step 6]  ---> Automate Pages Build & Edge Deployment
+                                    |
+            [Step 4]  ---> Define Admin Profile (Name & Email)
+                                    |
+            [Step 5]  ---> Automate Pages Build & Edge Deployment
 ```
 
 ### Step 1: Cloudflare Infrastructure Configuration
@@ -75,15 +72,7 @@ The wizard UI is designed specifically for **non-technical staff**, complete wit
 * **Fields**: Brevo API Key, Verified Sending Domain (e.g. `booking@mycompany.com`).
 * **Validation**: Sends a test validation email to the Admin's address to verify delivery in real-time.
 
-### Step 4: Google Developer OAuth Credentials Setup
-* **User Experience**: An exhaustive, visual, non-technical walkthrough for establishing Google API keys.
-* **Instruction details**:
-  * Guarantees non-technical personnel can create a Google Cloud Project for free.
-  * Shows how to click "Enable APIs" and search for **Google Calendar API**.
-  * Explains how to set up the OAuth Consent Screen (Internal vs. External) and add the Redirect URI (e.g., `https://your-app.pages.dev/api/auth/callback/google`).
-* **Fields Collected**: Google Client ID and Google Client Secret.
-
-### Step 5: Primary Administrator Setup
+### Step 4: Primary Administrator Setup
 * **User Experience**: The installer collects the Admin's Name, Email address, and local timezone.
 * **Database Seed**: The local installer writes this record directly to the remote D1 database:
   ```sql

@@ -15,7 +15,6 @@
 | FR3 | Clients can book a meeting; system prevents double-booking | P0 |
 | FR4 | Client receives confirmation email with `.ics` attachment and cancellation link | P0 |
 | FR5 | Host receives email notification when a booking is made | P0 |
-| FR6 | Hosts can connect Google Calendar for external conflict detection | P1 |
 | FR7 | System sends daily automated reminders to Clients for upcoming meetings | P1 |
 | FR8 | Admin provisions Host accounts; no public signup | P1 |
 | FR9 | Admin dashboard shows email usage quota | P2 |
@@ -53,7 +52,8 @@ Before estimating traffic, we must establish what our **free-tier limits actuall
 | Cloudflare D1 reads | 5,000,000/day | ~250× our need (20K/day) | **250×** |
 | Cloudflare D1 writes | 100,000/day | ~833× our need (120/day) | **833×** |
 | Pages Functions | 100,000/day | ~31× our need (3,200/day) | **31×** |
-| Google Calendar API | 1,000,000/day | Effectively unlimited | **→10,000×** |
+
+> **Email is the bottleneck that defines our scale.** D1 and compute have 31× to 833× headroom. No external APIs required — everything runs off D1.
 
 > **Email is the bottleneck that defines our scale.** Brevo's 300/day cap is 3× better than Resend's 100/day, but it's still the tightest constraint. All other resources have 31× to 10,000× headroom.
 
@@ -96,7 +96,6 @@ Working backward from the **300 email/day** cap (Brevo free plan):
 | Schedules | 100 B | 900 | 270 KB |
 | Date Overrides | 200 B | 1,800 | 1.1 MB |
 | Recurring Exceptions | 180 B | 150 | 81 KB |
-| OAuth Tokens | 500 B | 27 | 40 KB |
 | Email Logs | 100 B | 109,500 | 32.8 MB |
 | Verification Codes | 150 B | 5,000 | 2.2 MB |
 | Sessions (transient) | negligible | — | — |
@@ -144,23 +143,17 @@ graph TB
         CDN --> SSR
     end
 
-    subgraph Services["Service Layer"]
+    subgraph Services["Services"]
         D1[("Cloudflare D1<br/>(SQLite Primary DB)")]
         Brevo["Brevo API<br/>(Transactional Email)"]
-        Google["Google Calendar API<br/>(External Sync)"]
         Cron["Workers Cron Trigger<br/>(Daily Reminders @ 08:00 UTC)"]
     end
 
     Browser -- "HTTPS" --> CDN
     SSR -- "SQL Queries" --> D1
     SSR -- "REST API" --> Brevo
-    SSR -- "OAuth 2.0 / freeBusy" --> Google
     Cron -- "Secure Internal Call" --> SSR
 ```
-
-> 💡 **Rendered PNG**: [`diagrams/architecture-overview.png`](./diagrams/architecture-overview.png) — for use in presentations or offline viewing.
-
-> **Legend**: Rounded boxes = processes, cylinders = databases, solid arrows = API calls, dashed arrows = background jobs.
 
 ### Component Roles
 
@@ -190,7 +183,7 @@ graph TB
 
 ### 4.1 The Booking Engine (Core Complexity)
 
-This is the **most algorithmically complex** component. It must compute available slots in real-time while merging internal and external calendars.
+This is the **most algorithmically complex** component. It must compute available slots in real-time by merging Host schedules, overrides, and existing D1 bookings.
 
 #### Data Flow: Client Books a Meeting
 
@@ -200,7 +193,6 @@ sequenceDiagram
     participant Astro as Astro SSR @ Edge
     participant D1 as Cloudflare D1
     participant Brevo as Brevo API
-    participant Google as Google Calendar API
 
     Browser->>Astro: GET /{hostSlug}/{eventSlug}
     Astro->>D1: Fetch host profile + event type
@@ -217,12 +209,7 @@ sequenceDiagram
     Astro->>D1: Check existing bookings
     D1-->>Astro: Internal busy windows
 
-    alt OAuth connected
-        Astro->>Google: freeBusy API
-        Google-->>Astro: External busy windows
-    end
-
-    Note over Astro: Compute available slots:<br/>merge + pad buffers + filter
+    Note over Astro: Compute available slots:<br/>merge D1 bookings + pad buffers
 
     Astro-->>Browser: JSON: ["09:00", "09:30", "10:00", ...]
 
@@ -242,10 +229,6 @@ sequenceDiagram
     D1-->>Astro: Booking confirmed
 
     Astro->>Brevo: Send confirmation emails (client + host)
-
-    alt Google connected
-        Astro->>Google: Create calendar event
-    end
 
     Astro-->>Browser: Confirmation page + .ics link + cancellation URL
 ```
@@ -276,15 +259,14 @@ function computeSlots(hostId, eventTypeId, date):
         for t = start; t + eventType.duration <= end; t += eventType.duration:
             candidates.push(t)
 
-    // 3. Get busy windows
-    internal = db.bookings.findConfirmedByHostAndRange(hostId, dateStart, dateEnd)
-    external = host.oauthToken
-        ? googleCalendar.freeBusy(host, dateStart, dateEnd)
-        : []
+    // 3. Get busy windows from D1 bookings only
+    busyWindows = db.bookings.findConfirmedByHostAndRange(hostId, dateStart, dateEnd)
 
-    // 4. Merge busy + pad with buffers
-    busyWindows = mergeAndPad(internal ++ external,
-                    eventType.bufferBefore, eventType.bufferAfter)
+    // 4. Pad with buffers
+    busyWindows = busyWindows.map(b => ({
+        start: b.start - eventType.bufferBefore,
+        end:   b.end   + eventType.bufferAfter
+    }))
 
     // 5. Filter + apply notice boundary
     return candidates.filter(t =>
@@ -293,7 +275,7 @@ function computeSlots(hostId, eventTypeId, date):
     )
 ```
 
-**Time complexity**: O(n × m) — n = intervals (~48 max for 30-min slots over 8 hours), m = busy windows (~20 on a busy day). Runs in **~10-30ms** at the edge.
+**Time complexity**: O(n × m) — n = intervals (~48 max for 30-min slots over 8 hours), m = busy windows (~20 on a busy day). Runs in **~10-30ms** at the edge. Only depends on D1 — no external APIs.
 
 #### API Contract
 
@@ -603,13 +585,12 @@ function computeSlots(hostId, eventTypeId, date):
         for t = start; t + eventType.duration <= end; t += eventType.duration:
             candidates.push(t)
     
-    // ── PHASE 5: Overlay busy windows (bookings + Google Calendar) ──
-    internal = db.bookings.findConfirmedByHostAndRange(hostId, dateStart, dateEnd)
-    external = host.oauthToken
-        ? googleCalendar.freeBusy(host, dateStart, dateEnd)
-        : []
-    busyWindows = mergeAndPad(internal ++ external,
-                    eventType.bufferBefore, eventType.bufferAfter)
+    // ── PHASE 5: Overlay busy windows (bookings from D1) ──
+    busyWindows = db.bookings.findConfirmedByHostAndRange(hostId, dateStart, dateEnd)
+    busyWindows = busyWindows.map(b => ({
+        start: b.start - eventType.bufferBefore,
+        end:   b.end   + eventType.bufferAfter
+    }))
     
     // ── PHASE 6: Final filter ──
     return candidates.filter(t =>
@@ -823,8 +804,7 @@ The Host can then:
 | B1 | **D1 read quota** | Slot computation queries D1 on every date selection. Exception system adds 2 extra queries per check (date_overrides + recurring_exceptions). At 5M/day cap, 250× headroom, but caching prevents waste. | Negligible at 8-Host scale |
 | B2 | **Brevo email cap** | 300 emails/day is the defining constraint. 125 bookings consume 250 emails just for confirmations. | **~25 Hosts / 125 bookings/day** |
 | B3 | **Single D1 writer** | All writes serialize through one D1 endpoint. At 0.001 avg WQPS (125 bookings/day), this is irrelevant for years. | ~50,000 writes/day |
-| B4 | **Google API quota** | Each slot check calls Google freeBusy if OAuth is connected. 1M/day limit is effectively unlimited at our scale. | Always latent |
-| B5 | **Cold start** | First request after idle period may be slow (~100ms) as Worker initializes. | Occasional |
+| B4 | **Cold start** | First request after idle period may be slow (~100ms) as Worker initializes. | Occasional |
 
 ### 5.2 Iterative Scaling (FAANG Whiteboard Style)
 
@@ -909,7 +889,6 @@ Phase 2 (100-1,000× scale, 800+ Hosts, exceeding D1 free tier):
 | Book a slot | **Strong** | Race check + D1 single-writer serializes concurrent writes |
 | Cancel a booking | **Strong** | Token lookup + D1 UPDATE in one transaction |
 | Email quota count | **Eventual** (~1 min lag) | 5-email reserve buffer absorbs overage |
-| OAuth token refresh | **Strong** | Refresh + write before API call |
 
 ### 5.4 Failure Modes
 
@@ -917,7 +896,6 @@ Phase 2 (100-1,000× scale, 800+ Hosts, exceeding D1 free tier):
 | :--- | :--- | :--- |
 | D1 unavailable | 5xx from API | "Try again" error message |
 | Brevo down | Booking completes; email queued in-app | "Save your .ics file" fallback |
-| Google API down | Slots computed from internal D1 only | Full functionality; Host warned |
 | D1 write fails mid-booking | Atomic rollback; no partial state | "Booking failed, please retry" |
 | Cron worker misses run | Next day's run picks up unreminded bookings | Delayed reminders at most |
 | JWT secret compromised | Rotate secret → all sessions invalidated | Users re-authenticate via OTP |
@@ -935,7 +913,7 @@ flowchart LR
         B -->|"D1 queries"| C["HTML page"]
         
         A2["Client"] -->|"GET /api/slots"| D["Pages Function"]
-        D -->|"D1 + Google API"| E["JSON slots"]
+        D -->|"D1 query"| E["JSON slots"]
         
         A3["Client"] -->|"POST /api/bookings"| F["Pages Function"]
         F -->|"D1 write + Brevo email"| G["Confirmation page"]

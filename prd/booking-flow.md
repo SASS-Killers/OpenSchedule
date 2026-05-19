@@ -44,13 +44,10 @@ Slice the remaining available start/end times into discrete intervals spaced by 
 
 ### Step 3: Fetching Conflicts (Busy Windows)
 1. **Internal Conflicts (D1)**: Query `bookings` in D1 matching the Host ID, where the booking state is `confirmed` and overlaps with Date `D`.
-2. **External Conflicts (Google Calendar)**:
-   * Retrieve the Host’s encrypted Google OAuth refresh token.
-   * Exchange it for a fresh access token.
-   * Call the **Google Calendar `freeBusy` API** for the start and end of Date `D`. This returns an array of absolute UTC `[start, end]` ranges when the Host is busy on their personal calendar.
+2. **Note**: The system only checks conflicts against its own D1 database. No external calendar API calls are required.
 
 ### Step 4: Merging and Filtering
-1. **Apply Buffers**: For each active block (internal or external), inflate the blocked window: `[start_time - buffer_before, end_time + buffer_after]`.
+1. **Apply Buffers**: For each active booking, inflate the blocked window: `[start_time - buffer_before, end_time + buffer_after]`.
 2. **Notice Boundary**: Remove any potential slots where the start time is earlier than `current_time + minimum_notice` (e.g., preventing same-day bookings within 4 hours).
 3. **Difference Operation**: Remove any sliced intervals that overlap with any padded blocked windows.
 4. **Timezone Shift**: Convert the remaining valid slots to the client's local timezone (`TZ_client`) and render them.
@@ -77,7 +74,7 @@ To avoid forcing clients to create passwords or perform dedicated registration l
 
 To prevent two clients from booking the exact same slot simultaneously:
 1. Immediately upon clicking "Confirm Booking" and before writing to D1, the API runs a rapid re-verification.
-2. It re-checks internal D1 bookings and does an atomic Google `freeBusy` call specifically for the selected slot `[selected_start, selected_end]`.
+2. It re-checks internal D1 bookings to ensure the selected slot `[selected_start, selected_end]` is still free.
 3. If a conflict is discovered, it terminates the write operation and alerts the client: "This slot is no longer available. Please select another time."
 
 ---
@@ -137,33 +134,20 @@ Confirmations must include standard-compliant calendar additions so clients can 
 
 ---
 
-## 6. OAuth Token Auto-Refresh Sequence
-
-External APIs (Google Calendar) provide short-lived `access_token` attributes that expire every 60 minutes. To prevent silent integration sync failures:
-1. Every time the booking engine performs a `freeBusy` API scan or schedules an appointment, the system compares the current time against the connection's `expires_at` Unix timestamp in D1.
-2. **If Expired (or within 5 minutes of expiration)**:
-   * The server executes a background HTTP `POST` to Google's OAuth endpoint: `https://oauth2.googleapis.com/token`.
-   * Passes the securely stored, decrypted `refresh_token` and client ID credentials.
-   * Retrieves a new `access_token` and lifetime.
-   * Updates the `oauth_connections` row in D1 immediately before carrying out the calendar operation.
-3. This sequence operates transparently at the edge in a fraction of a second, keeping integration channels alive indefinitely.
-
----
-
-## 7. Frictionless Secure Client Cancellation
+## 6. Frictionless Secure Client Cancellation
 
 To permit Clients to reschedule or cancel a booking without requiring them to log in or remember credentials, the system incorporates a **Secure Cancellation Token** mechanism:
 1. Every booking generated in D1 includes a uniquely generated cryptographically secure, random UUID stored in the `cancellation_token` column on the `bookings` table.
 2. The booking confirmation email contains a secure, direct link:
    `https://openschedule.pages.dev/cancel/[cancellation_token]`
 3. When clicked, the server queries D1 for the matching `cancellation_token`:
-   * **If token is found and booking status is active**: Marks the booking as `cancelled`, updates the host's connected calendar (via Google API event deletion), writes the cancellation email trigger to the telemetry log, and sends confirmations to both parties.
+   * **If token is found and booking status is active**: Marks the booking as `cancelled`, writes the cancellation email trigger to the telemetry log, and sends confirmations to both parties.
    * **If not found**: Renders a 404 or invalid token warning.
 4. This ensures total security against booking hijacks while maintaining zero friction for Clients.
 
 ---
 
-## 8. Client-Side Timezone Resolution & UTC Synchronization
+## 7. Client-Side Timezone Resolution & UTC Synchronization
 
 To eliminate timezone errors:
 1. The public calendar picker (hydrated React island) automatically detects the Client's timezone using browser native capabilities:

@@ -50,7 +50,7 @@ The testing matrix is divided into three distinct layers to balance execution sp
 * **Key Targets**:
   * **Admin/Host Dashboard Journey (Local Astro Server)**: Verifies host credentials verification via OTP logic and dynamic weekly grid updates on a locally-hosted production server.
   * **Booking Journey (Local Astro Server)**: Client navigates to `/[host]/[event]`, selects a slot, fills out the booking form, and verifies completion (and `.ics` downloads) without internet connectivity.
-* **Tooling**: **Playwright** (runs headlessly in CI, supports cross-browser testing across Chromium, Firefox, and WebKit). External APIs (like Google Calendar API or Brevo API) are mocked at the network layer in Playwright to keep tests deterministic.
+* **Tooling**: **Playwright** (runs headlessly in CI, supports cross-browser testing across Chromium, Firefox, and WebKit). External APIs (like Brevo API) are mocked at the network layer in Playwright to keep tests deterministic.
 
 ---
 
