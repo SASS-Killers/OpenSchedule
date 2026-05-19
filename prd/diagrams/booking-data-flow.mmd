@@ -1,0 +1,53 @@
+sequenceDiagram
+    participant Browser as Client Browser
+    participant Astro as Astro SSR @ Edge
+    participant D1 as Cloudflare D1
+    participant Brevo as Brevo API
+    participant Google as Google Calendar API
+
+    Browser->>Astro: GET /{hostSlug}/{eventSlug}
+    Astro->>D1: Fetch host profile + event type
+    D1-->>Astro: Host profile, event config
+    Astro-->>Browser: Static HTML shell (SEO-friendly, fast FCP)
+
+    Note over Browser: React date picker hydrates<br/>User selects a date
+
+    Browser->>Astro: GET /api/slots?hostId=X&eventTypeId=Y&date=...
+
+    Astro->>D1: Check date_overrides + schedules
+    D1-->>Astro: Base blocks for that day
+
+    Astro->>D1: Check existing bookings
+    D1-->>Astro: Internal busy windows
+
+    alt OAuth connected
+        Astro->>Google: freeBusy API
+        Google-->>Astro: External busy windows
+    end
+
+    Note over Astro: Compute available slots:<br/>merge + pad buffers + filter
+
+    Astro-->>Browser: JSON: ["09:00", "09:30", "10:00", ...]
+
+    Note over Browser: User selects slot, fills form
+
+    Browser->>Astro: POST /api/bookings { eventTypeId, startTime, clientName, clientEmail, notes }
+
+    Astro->>D1: Re-verify slot (race condition check)
+    D1-->>Astro: Slot still available
+
+    Astro->>D1: SELECT id FROM clients WHERE email = ?
+    alt New client
+        Astro->>D1: INSERT INTO clients (name, email)
+    end
+
+    Astro->>D1: INSERT INTO bookings
+    D1-->>Astro: Booking confirmed
+
+    Astro->>Brevo: Send confirmation emails (client + host)
+
+    alt Google connected
+        Astro->>Google: Create calendar event
+    end
+
+    Astro-->>Browser: Confirmation page + .ics link + cancellation URL

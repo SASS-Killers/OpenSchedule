@@ -1,0 +1,23 @@
+graph TB
+    subgraph Client["Client Layer"]
+        Browser["Client Browser<br/>(Booking Page / Admin Dashboard)"]
+    end
+
+    subgraph Cloudflare["Cloudflare Edge Network"]
+        CDN["CDN<br/>(Static Assets: CSS/JS/Images)"]
+        SSR["Astro SSR + Pages Functions<br/>(Edge Rendering + API Layer)"]
+        CDN --> SSR
+    end
+
+    subgraph Services["Service Layer"]
+        D1[("Cloudflare D1<br/>(SQLite Primary DB)")]
+        Brevo["Brevo API<br/>(Transactional Email)"]
+        Google["Google Calendar API<br/>(External Sync)"]
+        Cron["Workers Cron Trigger<br/>(Daily Reminders @ 08:00 UTC)"]
+    end
+
+    Browser -- "HTTPS" --> CDN
+    SSR -- "SQL Queries" --> D1
+    SSR -- "REST API" --> Brevo
+    SSR -- "OAuth 2.0 / freeBusy" --> Google
+    Cron -- "Secure Internal Call" --> SSR

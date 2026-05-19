@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph Public["Public (Unauthenticated)"]
+        A["Client"] -->|"GET /{host}"| B["Astro SSR"]
+        B -->|"D1 queries"| C["HTML page"]
+        
+        A2["Client"] -->|"GET /api/slots"| D["Pages Function"]
+        D -->|"D1 + Google API"| E["JSON slots"]
+        
+        A3["Client"] -->|"POST /api/bookings"| F["Pages Function"]
+        F -->|"D1 write + Brevo email"| G["Confirmation page"]
+    end
+
+    subgraph Auth["Authenticated (Admin/Host)"]
+        H["User"] -->|"POST /api/auth/send-code"| I["Pages Function"]
+        I -->|"D1 + Brevo"| J["OTP email"]
+    end
+
+    subgraph Background["Background"]
+        K["Cron @ 08:00 UTC"] -->|"Secure internal call"| L["Worker"]
+        L -->|"D1 query + Brevo"| M["Reminder emails"]
+    end

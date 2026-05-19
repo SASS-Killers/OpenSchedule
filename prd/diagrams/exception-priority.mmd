@@ -1,0 +1,12 @@
+flowchart LR
+    A["1. full_day_block<br/>(Vacation, sick day)"] -->|Highest priority| Z["Day fully blocked"]
+    B["2. Date-specific custom_hours<br/>(WFH day 10-4)"] -->|Replaces schedule| Y["Use custom hours"]
+    C["3. Date-specific window_block<br/>(Dentist 2-3pm)"] -->|Carves holes| X["Remove window from schedule"]
+    D["4. Recurring custom_hours<br/>(Summer hours Mon-Thu)"] -->|Applies to default| W["Modify base schedule"]
+    E["5. Recurring window_block<br/>(Weekly standup Tue 10-11)"] -->|Carves holes| V["Remove recurring window"]
+    
+    style A fill:#f44336,color:#fff
+    style B fill:#ff9800,color:#fff
+    style C fill:#2196f3,color:#fff
+    style D fill:#4caf50,color:#fff
+    style E fill:#9e9e9e,color:#fff

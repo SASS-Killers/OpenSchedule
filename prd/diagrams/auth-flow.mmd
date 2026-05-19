@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant User as Host/Admin Browser
+    participant API as Astro API Endpoint
+    participant D1 as Cloudflare D1
+    participant Brevo as Brevo API
+
+    User->>API: POST /api/auth/send-code<br/>{ email: "user@example.com" }
+    API->>D1: SELECT id FROM users WHERE email = ?
+    alt Email not found
+        D1-->>API: No result
+        API-->>User: Generic "code sent" (prevents enumeration)
+    else Email found
+        D1-->>API: User exists
+        API->>API: Generate 6-digit code (crypto.randomInt)
+        API->>D1: INSERT INTO verification_codes<br/>(email, code, expires_at=now+10m, attempts=0)
+        API->>Brevo: POST /emails "Your code: 849201"
+        Brevo-->>API: Email delivered
+        API-->>User: "Check your email for the login code"
+    end
+
+    User->>API: POST /api/auth/verify-code<br/>{ email, code: "849201" }
+    API->>D1: SELECT * FROM verification_codes<br/>WHERE email = ? AND code = ?
+    
+    alt Code not found
+        D1-->>API: No result
+        API-->>User: "Invalid code"
+    else Code expired (now > expires_at)
+        D1-->>API: Expired record
+        API-->>User: "Code expired. Request a new one."
+    else Attempts >= 5
+        D1-->>API: Locked record
+        API-->>User: "Too many attempts. Request a new code."
+    else Code valid
+        D1-->>API: Valid code
+        API->>D1: DELETE verification code
+        API->>API: Generate JWT { userId, email, role, exp: now+7d }
+        API->>User: Set HttpOnly Secure SameSite=Lax cookie
+        User->>User: Redirect to dashboard
+    end

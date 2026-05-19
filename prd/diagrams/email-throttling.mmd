@@ -1,0 +1,20 @@
+flowchart TD
+    Trigger["Email Trigger<br/>(booking / OTP / cron)"] --> Checker
+    
+    Checker["Quota Checker<br/>SELECT COUNT(*) FROM sent_emails_log<br/>WHERE sent_at > today_start"] --> Decision
+    
+    Decision{Emails sent today?}
+    
+    Decision -->|Less than 240| SendNormal["Send normally"]
+    Decision -->|240 to 284| SoftAlert["Soft Alert<br/>Skip reminders<br/>Send confirmations + OTPs"]
+    Decision -->|285 to 299| HardStop["Hard Stop<br/>Skip all except OTPs"]
+    Decision -->|300 or more| Blocked["All Sends Blocked"]
+    
+    SoftAlert --> WarnBanner["Show warning on Admin Dashboard"]
+    HardStop --> ICSFallback["Booking succeeds with in-app .ics fallback"]
+    Blocked --> ICSFallback
+    
+    style SendNormal fill:#4caf50,color:#ffffff
+    style SoftAlert fill:#ff9800,color:#ffffff
+    style HardStop fill:#f44336,color:#ffffff
+    style Blocked fill:#9e9e9e,color:#ffffff

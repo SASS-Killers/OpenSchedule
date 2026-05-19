@@ -158,6 +158,8 @@ graph TB
     Cron -- "Secure Internal Call" --> SSR
 ```
 
+> 💡 **Rendered PNG**: [`diagrams/architecture-overview.png`](./diagrams/architecture-overview.png) — for use in presentations or offline viewing.
+
 > **Legend**: Rounded boxes = processes, cylinders = databases, solid arrows = API calls, dashed arrows = background jobs.
 
 ### Component Roles
@@ -248,6 +250,8 @@ sequenceDiagram
     Astro-->>Browser: Confirmation page + .ics link + cancellation URL
 ```
 
+> 💡 **Rendered PNG**: [`diagrams/booking-data-flow.png`](./diagrams/booking-data-flow.png)
+
 #### Slot Computation Algorithm (Pseudocode)
 
 ```
@@ -335,20 +339,22 @@ flowchart TD
     
     Decision{Emails sent today?}
     
-    Decision -->|< 240 (80%)| SendNormal["✅ Send normally"]
-    Decision -->|240–284 (80-95%)| SoftAlert["⚠ Soft Alert<br/>Skip reminders<br/>Send confirmations + OTPs"]
-    Decision -->|285–299 (95-99%)| HardStop["⛔ Hard Stop<br/>Skip all except OTPs<br/>(reserve for Admin/Host login)"]
-    Decision -->|≥ 300| Blocked["🚫 All Sends Blocked"]
+    Decision -->|Less than 240| SendNormal["Send normally"]
+    Decision -->|240 to 284| SoftAlert["Soft Alert<br/>Skip reminders<br/>Send confirmations + OTPs"]
+    Decision -->|285 to 299| HardStop["Hard Stop<br/>Skip all except OTPs"]
+    Decision -->|300 or more| Blocked["All Sends Blocked"]
     
     SoftAlert --> WarnBanner["Show warning on Admin Dashboard"]
     HardStop --> ICSFallback["Booking succeeds with in-app .ics fallback"]
     Blocked --> ICSFallback
     
-    style SendNormal fill:#4caf50,color:#fff
-    style SoftAlert fill:#ff9800,color:#fff
-    style HardStop fill:#f44336,color:#fff
-    style Blocked fill:#9e9e9e,color:#fff
+    style SendNormal fill:#4caf50,color:#ffffff
+    style SoftAlert fill:#ff9800,color:#ffffff
+    style HardStop fill:#f44336,color:#ffffff
+    style Blocked fill:#9e9e9e,color:#ffffff
 ```
+
+> ![Email throttling flowchart](./diagrams/email-throttling.png)
 
 #### Email Types & Priority
 
@@ -404,6 +410,8 @@ sequenceDiagram
         User->>User: Redirect to dashboard
     end
 ```
+
+> 💡 **Rendered PNG**: [`diagrams/auth-flow.png`](./diagrams/auth-flow.png)
 
 ---
 
@@ -632,6 +640,8 @@ flowchart LR
     style D fill:#4caf50,color:#fff
     style E fill:#9e9e9e,color:#fff
 ```
+
+> 💡 **Rendered PNG**: [`diagrams/exception-priority.png`](./diagrams/exception-priority.png)
 
 If two exceptions of the same type overlap (e.g., two `window_block` entries for 2–3pm on the same day), the block is idempotent — applying it twice has no extra effect.
 
@@ -941,6 +951,8 @@ flowchart LR
         L -->|"D1 query + Brevo"| M["Reminder emails"]
     end
 ```
+
+> 💡 **Rendered PNG**: [`diagrams/data-flow-summary.png`](./diagrams/data-flow-summary.png)
 
 ### Key Interview Talking Points
 
