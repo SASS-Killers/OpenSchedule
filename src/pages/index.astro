@@ -96,27 +96,29 @@ import AppLayout from "@/layouts/AppLayout.astro";
 
   <!-- Section divider: tinted background -->
   <div style="background: rgba(255,255,255,0.015);">
-    <section style="padding: 5rem 1.5rem; max-width: 600px; margin: 0 auto; text-align: center;">
-      <div style="margin-bottom: 1.5rem;">
-        <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-text-muted); margin-bottom: 0.5rem;">Open Source</div>
-        <p style="font-size: 1rem; color: var(--app-text-muted); margin: 0 auto; max-width: 480px; line-height: 1.7;">
-          Built with PostgreSQL, PostgREST, and Astro. No Redis. No Elasticsearch. No vendor lock-in.
-        </p>
-      </div>
-      <a href="https://github.com/SASS-Killers/OpenSchedule" target="_blank" class="app-btn" style="padding: 0.75rem 1.5rem; gap: 0.5rem; display: inline-flex; align-items: center;">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        View on GitHub
-      </a>
-      <div style="margin-top: 1.25rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; font-size: 0.8rem; color: var(--app-text-muted);">
-        <span>Neon PostgreSQL</span>
-        <span>·</span>
-        <span>PostgREST</span>
-        <span>·</span>
-        <span>Astro</span>
-        <span>·</span>
-        <span>Cloudflare Pages</span>
-        <span>·</span>
-        <span>React</span>
+    <section style="padding: 5rem 1.5rem; max-width: 960px; margin: 0 auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center;">
+        <div>
+          <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.75rem;">Open Source</div>
+          <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 0.75rem; line-height: 1.3;">
+            One database.<br/>No lock-in.
+          </h2>
+          <p style="font-size: 0.92rem; color: var(--app-text-muted); margin: 0 0 1.5rem; line-height: 1.7; max-width: 400px;">
+            No Redis, Elasticsearch, or message queues. PostgreSQL with extensions replaces them all. You own your data and your code.
+          </p>
+          <a href="https://github.com/SASS-Killers/OpenSchedule" target="_blank" class="app-btn" style="padding: 0.75rem 1.5rem; gap: 0.5rem; display: inline-flex; align-items: center; transition: all 0.2s;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
+          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(99,102,241,0.2); background: rgba(99,102,241,0.06); font-size: 0.82rem; font-weight: 500; color: var(--app-primary);">Neon PostgreSQL</span>
+          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">PostgREST</span>
+          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">Astro</span>
+          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">Cloudflare Pages</span>
+          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">React</span>
+          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">Brevo</span>
+        </div>
       </div>
     </section>
   </div>
