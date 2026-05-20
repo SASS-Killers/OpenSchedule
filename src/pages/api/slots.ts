@@ -16,11 +16,32 @@ export const GET: APIRoute = async ({ url }) => {
   ` as any[];
   if (!evt) return new Response(JSON.stringify({ slots: [], date }));
 
+  // Get host timezone
+  const [host] = await query`
+    SELECT timezone FROM users WHERE id = ${hostId} AND is_active = true LIMIT 1
+  ` as any[];
+  if (!host) return new Response(JSON.stringify({ slots: [], date }));
+
+  // Compute UTC offset for the host's timezone on this date
+  let offsetMin = 0;
+  try {
+    const opts: Intl.DateTimeFormatOptions = { timeZone: host.timezone, timeZoneName: "shortOffset" };
+    const parts = new Intl.DateTimeFormat("en", opts).formatToParts(new Date(date + "T12:00:00Z"));
+    const tz = parts.find(p => p.type === "timeZoneName")?.value || "";
+    const m = tz.match(/GMT([+-]\d+)(?::(\d+))?/);
+    if (m) {
+      const h = parseInt(m[1]);
+      const min = m[2] ? parseInt(m[2]) : 0;
+      offsetMin = h * 60 + (h < 0 ? -min : min);
+    }
+  } catch { /* fallback to 0 */ }
+
   const nowUnix = Math.floor(Date.now() / 1000);
-  const dateStart = Math.floor(new Date(date + "T00:00:00").getTime() / 1000);
+  // dateStart = midnight in the host's timezone (as UTC timestamp)
+  const dateStart = Math.floor(new Date(date + "T00:00:00Z").getTime() / 1000) - offsetMin * 60;
   const dateEnd = dateStart + 86400;
 
-  const jsDay = new Date(date + "T12:00:00").getDay();
+  const jsDay = new Date(date + "T12:00:00Z").getDay();
   const dbDay = jsDay === 0 ? 6 : jsDay - 1;
 
   const blocks = await query`
