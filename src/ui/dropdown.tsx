@@ -24,7 +24,7 @@ export function Dropdown({ trigger, children, open: controlled, onOpenChange }: 
   }, [open]);
 
   return (
-    <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
+    <div ref={ref} style={{ position: "relative", display: "block" }}>
       <div onClick={() => setOpen(!open)}>{trigger}</div>
       {open && (
         <div
