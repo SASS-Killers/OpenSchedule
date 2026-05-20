@@ -7,50 +7,63 @@ const session = await requireSession(Astro.request);
 if (!session || session.role !== "admin") return Astro.redirect("/login");
 
 const hosts = await query`
-  SELECT id, email, name, role, is_active, created_at FROM users ORDER BY created_at ASC
+  SELECT id, email, name, role, timezone, is_active, created_at, slug FROM users ORDER BY created_at ASC
 ` as any[];
 ---
 
 <AppLayout title="Admin — OpenSchedule">
-  <section style="padding: 2rem 1.5rem; max-width: 720px; margin: 0 auto;">
-    <h1 style="margin: 0 0 1.5rem; font-size: 1.25rem; font-weight: 700;">Admin</h1>
-
-    <div style="display: grid; gap: 0.75rem;">
-      <div style="padding: 1.25rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-        <h2 style="margin: 0 0 0.75rem; font-size: 1rem; font-weight: 700;">Users ({hosts.length})</h2>
-        <div style="display: grid; gap: 0.5rem;">
-          {hosts.map((u: any) => (
-            <div style={{
-              display: "flex", alignItems: "center", gap: "0.75rem",
-              padding: "0.65rem 0.85rem", borderRadius: "0.6rem",
-              border: "1px solid var(--app-border)",
-              background: u.is_active ? "transparent" : "rgba(255,255,255,0.01)",
-              opacity: u.is_active ? 1 : 0.5,
-            }}>
-              <div style={{
-                width: "2rem", height: "2rem", borderRadius: "999px",
-                background: "linear-gradient(135deg, var(--app-primary), var(--app-primary-2))",
-                display: "grid", placeItems: "center",
-                fontWeight: 700, fontSize: "0.8rem", color: "#fff", flexShrink: 0,
-              }}>{u.name.charAt(0)}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 600, fontSize: "0.88rem" }}>{u.name}</div>
-                <div style={{ fontSize: "0.78rem", color: "var(--app-text-muted)" }}>
-                  {u.email} · {u.role}
-                </div>
-              </div>
-              <span style={{
-                fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase",
-                padding: "0.2rem 0.5rem", borderRadius: "999px",
-                background: u.is_active ? "rgba(52,211,153,0.12)" : "rgba(148,163,184,0.1)",
-                color: u.is_active ? "#34d399" : "var(--app-text-muted)",
-              }}>
-                {u.is_active ? "Active" : "Inactive"}
-              </span>
-            </div>
-          ))}
-        </div>
+  <div style="display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 74px);">
+    <!-- Sidebar -->
+    <div style="border-right: 1px solid var(--app-border); padding: 1.5rem 0;">
+      <div style="padding: 0.5rem 1rem; margin: 0 0.5rem; border-radius: 0.5rem; background: rgba(99,102,241,0.1); color: var(--app-primary); font-weight: 600; font-size: 0.88rem;">
+        Hosts
+      </div>
+      <div style="padding: 0.5rem 1rem; margin: 0.25rem 0.5rem; border-radius: 0.5rem; color: var(--app-text-muted); font-size: 0.88rem; cursor: default;">
+        Settings
       </div>
     </div>
-  </section>
+
+    <!-- Main content -->
+    <section style="padding: 1.5rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Hosts ({hosts.length})</h1>
+        <a href="/admin/hosts/new" class="app-btn app-btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; min-height: 0;">+ Add Host</a>
+      </div>
+
+      <div style="display: grid; gap: 0.5rem;">
+        {hosts.map((u: any) => (
+          <div style={{
+            display: "flex", alignItems: "center", gap: "0.75rem",
+            padding: "0.7rem 0.85rem", borderRadius: "0.6rem",
+            border: "1px solid var(--app-border)",
+            opacity: u.is_active ? 1 : 0.45,
+          }}>
+            <div style={{
+              width: "2.2rem", height: "2.2rem", borderRadius: "999px", flexShrink: 0,
+              background: "linear-gradient(135deg, var(--app-primary), var(--app-primary-2))",
+              display: "grid", placeItems: "center",
+              fontWeight: 700, fontSize: "0.8rem", color: "#fff",
+            }}>{u.name.charAt(0)}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 600, fontSize: "0.88rem" }}>{u.name}</div>
+              <div style={{ fontSize: "0.78rem", color: var("--app-text-muted") }}>
+                {u.email} · {u.role}
+              </div>
+            </div>
+            <div style={{ fontSize: "0.78rem", color: "var(--app-text-muted)" }}>
+              {u.slug?.slice(0, 8)}…
+            </div>
+            <span style={{
+              fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase",
+              padding: "0.2rem 0.5rem", borderRadius: "999px",
+              background: u.is_active ? "rgba(52,211,153,0.12)" : "rgba(148,163,184,0.1)",
+              color: u.is_active ? "#34d399" : "var(--app-text-muted)",
+            }}>
+              {u.is_active ? "Active" : "Off"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
 </AppLayout>
