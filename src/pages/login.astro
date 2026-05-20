@@ -3,57 +3,28 @@ import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
 <AppLayout title="Sign In — OpenSchedule">
-  <section style="
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 6rem 1.5rem;
-    gap: 1.5rem;
-  ">
-    <div style="
-      background: rgba(255, 200, 0, 0.1);
-      border: 1px solid rgba(255, 200, 0, 0.3);
-      border-radius: 0.85rem;
-      padding: 0.75rem 1.25rem;
-      font-size: 0.85rem;
-      color: #fbbf24;
-      max-width: 400px;
-    ">⚡ Dev mode — codes shown on screen. No email sent.</div>
+  <section style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6rem 1.5rem; gap: 1.5rem;">
+    <div style="background: rgba(255, 200, 0, 0.1); border: 1px solid rgba(255, 200, 0, 0.3); border-radius: 0.85rem; padding: 0.75rem 1.25rem; font-size: 0.85rem; color: #fbbf24; max-width: 400px;">
+      ⚡ Dev mode — codes shown on screen. No email sent.
+    </div>
 
     <h1 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0;">Sign In</h1>
 
     <div id="step-email" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 320px;">
-      <form method="POST" action="/api/auth/send-code" id="email-form">
-        <input
-          type="email" name="email" placeholder="you@example.com" required
-          style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 0.95rem; outline: none; margin-bottom: 0.75rem;"
-        />
-        <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; width: 100%;">
-          Send Login Code
-        </button>
+      <form id="email-form">
+        <input type="email" id="email-input" placeholder="you@example.com" required
+          style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 0.95rem; outline: none; margin-bottom: 0.75rem;" />
+        <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; width: 100%;">Send Login Code</button>
       </form>
     </div>
 
     <div id="step-code" style="display: none; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 320px;">
-      <div id="code-display" style="
-        font-size: 2rem; font-weight: 800; letter-spacing: 0.3em;
-        background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 0.85rem; padding: 1rem;
-        color: #a5b4fc; font-family: monospace;
-      ">------</div>
+      <div id="code-display" style="font-size: 2rem; font-weight: 800; letter-spacing: 0.3em; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 0.85rem; padding: 1rem; color: #a5b4fc; font-family: monospace;">------</div>
       <p style="font-size: 0.85rem; color: var(--app-text-muted); margin: 0;">Enter the code above to sign in</p>
-      <form method="POST" action="/api/auth/verify-code" id="verify-form">
-        <input type="hidden" name="email" id="verify-email" />
-        <input
-          type="text" name="code" id="code-input" placeholder="000000" required maxlength="6"
-          inputmode="numeric" pattern="[0-9]{6}"
-          style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 1.5rem; text-align: center; font-family: monospace; letter-spacing: 0.3em; outline: none; margin-bottom: 0.75rem;"
-        />
-        <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; width: 100%;">
-          Verify & Sign In
-        </button>
+      <form id="verify-form">
+        <input type="text" id="code-input" placeholder="000000" required maxlength="6" inputmode="numeric" pattern="[0-9]{6}"
+          style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 1.5rem; text-align: center; font-family: monospace; letter-spacing: 0.3em; outline: none; margin-bottom: 0.75rem;" />
+        <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; width: 100%;">Verify & Sign In</button>
       </form>
       <button id="back-btn" class="app-btn" style="justify-content: center; width: 100%;">Use a different email</button>
     </div>
@@ -63,58 +34,90 @@ import AppLayout from "@/layouts/AppLayout.astro";
 </AppLayout>
 
 <script>
-  const emailForm = document.getElementById("email-form")!;
-  const verifyForm = document.getElementById("verify-form")!;
-  const stepEmail = document.getElementById("step-email")!;
-  const stepCode = document.getElementById("step-code")!;
-  const stepError = document.getElementById("step-error")!;
-  const codeDisplay = document.getElementById("code-display")!;
-  const verifyEmail = document.getElementById("verify-email") as HTMLInputElement;
-  const codeInput = document.getElementById("code-input") as HTMLInputElement;
-  const backBtn = document.getElementById("back-btn")!;
+const PGRST = "http://localhost:3001";
 
-  emailForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    stepError.style.display = "none";
-    const form = new FormData(emailForm);
-    const email = form.get("email") as string;
+const emailForm = document.getElementById("email-form")!;
+const verifyForm = document.getElementById("verify-form")!;
+const stepEmail = document.getElementById("step-email")!;
+const stepCode = document.getElementById("step-code")!;
+const stepError = document.getElementById("step-error")!;
+const codeDisplay = document.getElementById("code-display")!;
+const codeInput = document.getElementById("code-input") as HTMLInputElement;
+const emailInput = document.getElementById("email-input") as HTMLInputElement;
+const backBtn = document.getElementById("back-btn")!;
 
-    const res = await fetch("/api/auth/send-code", { method: "POST", body: form });
-    const data = await res.json();
+let currentEmail = "";
 
-    if (data.devCode) {
-      codeDisplay.textContent = data.devCode;
-      verifyEmail.value = email;
-      codeInput.value = "";
-      stepEmail.style.display = "none";
-      stepCode.style.display = "flex";
-      codeInput.focus();
+emailForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  stepError.style.display = "none";
+  currentEmail = emailInput.value;
+
+  const res = await fetch(`${PGRST}/rpc/send_code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ p_email: currentEmail }),
+  });
+  const data = await res.json();
+
+  if (data.devCode || data.devcode) {
+    const code = data.devCode || data.devcode;
+    codeDisplay.textContent = code;
+    codeInput.value = "";
+    codeInput.focus();
+    stepEmail.style.display = "none";
+    stepCode.style.display = "flex";
+  } else {
+    stepError.textContent = "Email not recognized or rate limited.";
+    stepError.style.display = "block";
+  }
+});
+
+verifyForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  stepError.style.display = "none";
+  const code = codeInput.value;
+
+  const res = await fetch(`${PGRST}/rpc/verify_code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ p_email: currentEmail, p_code: code }),
+  });
+  const data = await res.json();
+
+  if (data.token) {
+    // Store JWT in cookie and redirect
+    document.cookie = `session=${data.token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
+    window.location.href = "/hosts/me";
+  } else if (data.userId) {
+    // PostgREST returned user data — exchange it for a session JWT
+    const sessRes = await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        userId: data.userId,
+        email: data.email,
+        name: data.name,
+        role: data.role,
+      }),
+    });
+    const sess = await sessRes.json();
+    if (sess.token) {
+      document.cookie = `session=${sess.token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
+      window.location.href = "/hosts/me";
     } else {
-      // Email not recognized or rate limited — show generic message
-      stepError.textContent = "Check your email for the login code (dev mode shows it if account exists)";
+      stepError.textContent = "Session creation failed";
       stepError.style.display = "block";
     }
-  });
+  } else {
+    stepError.textContent = data.error || "Verification failed";
+    stepError.style.display = "block";
+  }
+});
 
-  verifyForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    stepError.style.display = "none";
-    const form = new FormData(verifyForm);
-
-    const res = await fetch("/api/auth/verify-code", { method: "POST", body: form });
-
-    if (res.redirected) {
-      window.location.href = res.url;
-    } else {
-      const data = await res.json();
-      stepError.textContent = data.error || "Verification failed";
-      stepError.style.display = "block";
-    }
-  });
-
-  backBtn.addEventListener("click", () => {
-    stepEmail.style.display = "flex";
-    stepCode.style.display = "none";
-    stepError.style.display = "none";
-  });
+backBtn.addEventListener("click", () => {
+  stepEmail.style.display = "flex";
+  stepCode.style.display = "none";
+  stepError.style.display = "none";
+});
 </script>

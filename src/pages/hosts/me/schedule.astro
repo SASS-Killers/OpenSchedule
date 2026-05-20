@@ -1,0 +1,30 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { requireSession } from "@/lib/auth-guard";
+import { query } from "@/db/neon";
+import { ScheduleEditor } from "@/components/ScheduleEditor";
+
+const session = await requireSession(Astro.request);
+if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
+
+const rows = await query`
+  SELECT day_of_week, start_time, end_time FROM schedules WHERE user_id = ${session.userId} ORDER BY day_of_week
+` as any[];
+const initial = rows.map((r: any) => ({ dayOfWeek: r.day_of_week, startTime: r.start_time, endTime: r.end_time }));
+---
+
+<AppLayout title="Schedule — OpenSchedule">
+  <section style="padding: 2rem 1.5rem; max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <a href="/hosts/me" class="app-btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;">← Back</a>
+      <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">My Schedule</h1>
+    </div>
+
+    <div style="padding: 1.5rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
+      <p style="margin: 0 0 1rem; font-size: 0.9rem; color: var(--app-text-muted);">
+        Click a day to toggle it on or off. Type times like <code>9a</code>, <code>5p</code>, <code>09:00</code>, or <code>17:00</code>.
+      </p>
+      <ScheduleEditor initial={initial} client:load />
+    </div>
+  </section>
+</AppLayout>

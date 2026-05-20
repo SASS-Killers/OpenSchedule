@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { pgrst } from "@/lib/pgrst";
 
 interface EventType {
   id: string;
@@ -24,7 +25,7 @@ export function EventTypeManager() {
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
-    const res = await fetch("/api/admin/event-types");
+    const res = await pgrst("/event_types?order=duration");
     setTypes(await res.json());
   };
 
@@ -32,12 +33,36 @@ export function EventTypeManager() {
 
   const save = async () => {
     setSaving(true);
-    const body = editing ? { id: editing, ...form } : form;
-    await fetch("/api/admin/event-types", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    if (editing) {
+      // Update existing
+      await pgrst(`/event_types?id=eq.${editing}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: form.title,
+          slug: form.slug,
+          description: form.description || null,
+          duration: form.duration,
+          buffer_before: form.bufferBefore,
+          buffer_after: form.bufferAfter,
+          minimum_notice: form.minimumNotice,
+        }),
+      });
+    } else {
+      // Create new
+      await pgrst("/event_types", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          slug: form.slug,
+          description: form.description || null,
+          duration: form.duration,
+          buffer_before: form.bufferBefore,
+          buffer_after: form.bufferAfter,
+          minimum_notice: form.minimumNotice,
+          is_active: true,
+        }),
+      });
+    }
     setSaving(false);
     setShowForm(false);
     setEditing(null);
@@ -46,7 +71,7 @@ export function EventTypeManager() {
   };
 
   const remove = async (id: string) => {
-    await fetch(`/api/admin/event-types?id=${id}`, { method: "DELETE" });
+    await pgrst(`/event_types?id=eq.${id}`, { method: "DELETE" });
     load();
   };
 

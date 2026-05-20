@@ -1,0 +1,37 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { requireSession } from "@/lib/auth-guard";
+
+const session = await requireSession(Astro.request);
+if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
+---
+
+<AppLayout title="My Settings — OpenSchedule">
+  <section style="padding: 2rem 1.5rem; max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <div style="
+        width: 3rem; height: 3rem; border-radius: 999px;
+        background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
+        display: grid; place-items: center;
+        font-weight: 700; font-size: 1.1rem; color: #fff;
+      ">{session.name.charAt(0)}</div>
+      <div>
+        <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{session.name}</h1>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted);">
+          {session.email}
+        </p>
+      </div>
+    </div>
+
+    <div style="display: grid; gap: 0.75rem;">
+      <a href="/hosts/me/event-types" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+        <span style="font-weight: 600;">Event Types</span>
+        <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Meeting types you offer →</span>
+      </a>
+      <a href="/hosts/me/schedule" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+        <span style="font-weight: 600;">Schedule</span>
+        <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Your availability →</span>
+      </a>
+    </div>
+  </section>
+</AppLayout>
