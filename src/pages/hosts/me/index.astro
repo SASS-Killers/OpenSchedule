@@ -1,9 +1,14 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import { requireSession } from "@/lib/auth-guard";
+import { query } from "@/db/neon";
 
 const session = await requireSession(Astro.request);
 if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
+
+const [user] = await query`
+  SELECT slug FROM users WHERE id = ${session.userId} LIMIT 1
+` as any[];
 ---
 
 <AppLayout title="My Settings — OpenSchedule">
@@ -32,6 +37,12 @@ if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect
         <span style="font-weight: 600;">Schedule</span>
         <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Your availability →</span>
       </a>
+      {user && (
+        <a href={`/hosts/${user.slug}`} target="_blank" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+          <span style="font-weight: 600;">View Your Profile</span>
+          <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Open in new tab →</span>
+        </a>
+      )}
     </div>
   </section>
 </AppLayout>
