@@ -1,21 +1,18 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
-import { env } from "cloudflare:workers";
+import { query } from "@/db/neon";
 
-const db = env.DB as D1Database;
 const { slug } = Astro.params;
 
-const user = await db
-  .prepare("SELECT id, name, timezone FROM users WHERE slug = ? AND is_active = 1")
-  .bind(slug)
-  .first<any>();
+const [user] = await query`
+  SELECT id, name, timezone FROM users WHERE slug = ${slug} AND is_active = true LIMIT 1
+` as any[];
 
 if (!user) return Astro.redirect("/");
 
-const types = await db
-  .prepare("SELECT id, title, slug, description, duration FROM event_types WHERE user_id = ? AND is_active = 1 ORDER BY duration")
-  .bind(user.id)
-  .all();
+const types = await query`
+  SELECT id, title, slug, description, duration FROM event_types WHERE user_id = ${user.id} AND is_active = true ORDER BY duration
+` as any[];
 ---
 
 <AppLayout title={`Book with ${user.name} — OpenSchedule`}>
@@ -30,10 +27,10 @@ const types = await db
     <h1 style="margin: 0 0 2rem; font-size: 1.3rem; font-weight: 700;">Book with {user.name}</h1>
 
     <div style="display: grid; gap: 0.75rem; text-align: left;">
-      {(types.results as any[]).length === 0 && (
+      {types.length === 0 && (
         <p style="color: var(--app-text-muted); font-size: 0.9rem;">No event types available yet.</p>
       )}
-      {(types.results as any[]).map((t) => (
+      {types.map((t: any) => (
         <a
           href={`/${slug}/${t.slug}`}
           style={{

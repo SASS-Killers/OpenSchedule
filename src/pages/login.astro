@@ -68,7 +68,7 @@ emailForm.addEventListener("submit", async (e) => {
     stepEmail.style.display = "none";
     stepCode.style.display = "flex";
   } else {
-    stepError.textContent = "Email not recognized or rate limited.";
+    stepError.textContent = "Email not recognized. Make sure you are registered.";
     stepError.style.display = "block";
   }
 });
@@ -85,30 +85,21 @@ verifyForm.addEventListener("submit", async (e) => {
   });
   const data = await res.json();
 
-  if (data.token) {
-    // Store JWT in cookie and redirect
-    document.cookie = `session=${data.token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
-    window.location.href = "/hosts/me";
-  } else if (data.userId) {
-    // PostgREST returned user data — exchange it for a session JWT
-    const sessRes = await fetch("/api/auth/session", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        userId: data.userId,
-        email: data.email,
-        name: data.name,
-        role: data.role,
-      }),
-    });
-    const sess = await sessRes.json();
-    if (sess.token) {
-      document.cookie = `session=${sess.token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
-      window.location.href = "/hosts/me";
-    } else {
-      stepError.textContent = "Session creation failed";
-      stepError.style.display = "block";
+  if (data.userId) {
+    // PostgREST verified the code. Now redirect to session endpoint
+    // which sets the HttpOnly cookie server-side and redirects to /hosts/me.
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/api/auth/session";
+    for (const key of ["userId", "email", "name", "role"]) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = data[key] || "";
+      form.appendChild(input);
     }
+    document.body.appendChild(form);
+    form.submit();
   } else {
     stepError.textContent = data.error || "Verification failed";
     stepError.style.display = "block";

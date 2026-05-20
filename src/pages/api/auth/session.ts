@@ -11,7 +11,15 @@ export const POST: APIRoute = async ({ request }) => {
 
   const token = await signSession({ userId, email, name, role: role || "host" });
 
-  return new Response(JSON.stringify({ token }), {
-    headers: { "content-type": "application/json" },
+  // Set the cookie via Set-Cookie header (HttpOnly works server-side)
+  const isSecure = request.url.startsWith("https");
+  const cookie = `session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=604800${isSecure ? "; Secure" : ""}`;
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: "/hosts/me",
+      "set-cookie": cookie,
+    },
   });
 };
