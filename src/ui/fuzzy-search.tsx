@@ -29,8 +29,8 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Actual value to display — use prop if provided, otherwise internal state
-  const displayValue = onChange ? value : internalValue;
+  // Show internal state if set, otherwise prop value
+  const displayValue = internalValue || value;
 
   const filtered = useMemo(
     () => (query ? items.filter((i) => fuzzyMatch(query, i)) : []),
