@@ -2,6 +2,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import { requireSession } from "@/lib/auth-guard";
 import { query } from "@/db/neon";
+import { Avatar } from "@/components/Avatar";
 
 const session = await requireSession(Astro.request);
 if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
@@ -14,18 +15,7 @@ const [user] = await query`
 <AppLayout title="My Settings — OpenSchedule">
   <section style="padding: 2rem 1.5rem; max-width: 600px; margin: 0 auto;">
     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-      <div id="avatar-wrap" style="position: relative; width: 3.5rem; height: 3.5rem; flex-shrink: 0;">
-        <img id="avatar-img" src="/api/avatar?userId=${session.userId}" alt=""
-          style="width: 100%; height: 100%; border-radius: 999px; object-fit: cover; background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2)); display: none;"
-          onerror="this.style.display='none'; document.getElementById('avatar-fallback').style.display='grid';"
-        />
-        <div id="avatar-fallback" style="
-          width: 100%; height: 100%; border-radius: 999px;
-          background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
-          display: grid; place-items: center;
-          font-weight: 700; font-size: 1.2rem; color: #fff;
-        ">{session.name.charAt(0)}</div>
-      </div>
+      <Avatar userId={session.userId} name={session.name} client:load />
       <div>
         <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{session.name}</h1>
         <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted);">{session.email}</p>
@@ -61,8 +51,6 @@ const [user] = await query`
 
 <script>
 const input = document.getElementById("avatar-input")!;
-const img = document.getElementById("avatar-img") as HTMLImageElement;
-const fallback = document.getElementById("avatar-fallback")!;
 const status = document.getElementById("avatar-status")!;
 
 input.addEventListener("change", async () => {
@@ -97,10 +85,8 @@ input.addEventListener("change", async () => {
   });
 
   if (res.ok) {
-    // Force refresh the avatar image (cache bust)
-    img.src = `/api/avatar?userId=${img.src.match(/userId=([^&]+)/)?.[1] || ""}&t=${Date.now()}`;
-    img.style.display = "block";
-    fallback.style.display = "none";
+    // Trigger avatar component to reload
+    if ((window as any).__avatarReload) (window as any).__avatarReload();
     status.textContent = "Avatar updated.";
   } else {
     const err = await res.json();
