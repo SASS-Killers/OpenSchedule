@@ -1,6 +1,91 @@
-# Self-Hosting OpenSchedule — Free VPS Guide
+# Self-Hosting OpenSchedule
 
-OpenSchedule is designed to be self-hosted at **$0/month**. This guide covers deploying on free VPS providers so your data stays on your infrastructure.
+OpenSchedule runs at **$0/month** using Neon's free PostgreSQL tier deployed via Cloudflare Pages. No VPS required.
+
+---
+
+## Recommended: Deploy on Cloudflare Pages + Neon
+
+This is the primary deployment path — it's free, requires no server management, and auto-scales.
+
+### 1. Set Up Neon Database
+
+1. Go to [neon.tech](https://neon.tech) and create a free account
+2. Create a project → copy the **DATABASE_URL** connection string
+3. (Optional) Create a `dev` branch for testing: `npx neonctl branches create --name dev`
+
+### 2. Deploy to Cloudflare Pages
+
+```bash
+# Install Wrangler
+bun add -g wrangler
+
+# Set environment secrets
+wrangler pages secret put DATABASE_URL
+wrangler pages secret put JWT_SECRET
+
+# Deploy
+bun run build
+wrangler pages deploy dist/
+```
+
+### 3. Apply Schema
+
+```bash
+psql "$DATABASE_URL" -f src/db/schema.sql
+psql "$DATABASE_URL" -f src/db/rls.sql
+```
+
+### 4. Seed Admin
+
+```bash
+psql "$DATABASE_URL" -c "
+INSERT INTO users (id, email, name, slug, role, timezone, is_active, created_at)
+VALUES (gen_random_uuid()::TEXT, 'you@example.com', 'Your Name',
+        encode(gen_random_uuid()::bytea, 'hex'), 'admin', 'UTC', true,
+        extract(epoch from now())::INTEGER)
+ON CONFLICT (email) DO NOTHING;"
+```
+
+---
+
+## Alternative: Deploy on a VPS
+
+If you prefer running your own server, any $5-10/mo Linux VPS works.
+
+### Quick Deploy
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SASS-Killers/OpenSchedule/main/scripts/deploy.sh | bash
+```
+
+You'll be prompted for your Neon database URL, admin email, and domain.
+
+### Manual Setup
+
+```bash
+# Install deps
+apt update && apt install -y curl git nginx
+curl -fsSL https://bun.sh/install | bash
+
+# Install PostgREST
+curl -fsSL https://github.com/PostgREST/postgrest/releases/download/v14.11/postgrest-v14.11-linux-x64-static.tar.xz -o /tmp/pgrst.tar.xz
+tar -xf /tmp/pgrst.tar.xz -C /usr/local/bin/
+chmod +x /usr/local/bin/postgrest
+
+# Clone & build
+git clone https://github.com/SASS-Killers/OpenSchedule.git /opt/openschedule
+cd /opt/openschedule
+bun install
+cp .env.example .env
+# Edit .env with your DATABASE_URL
+psql "$DATABASE_URL" -f src/db/schema.sql
+psql "$DATABASE_URL" -f src/db/rls.sql
+bun run build
+
+# Run
+postgrest postgrest.conf &
+bun run dist/server/entry.mjs &
 
 ---
 

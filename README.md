@@ -64,15 +64,14 @@ bun run dev
 
 App runs at `http://127.0.0.1:6969`. PostgREST starts automatically on port 6970.
 
-### Deploy on a Free VPS
-
-One-command deploy on any Ubuntu/Debian VPS:
+### Deploy on Cloudflare Pages (Recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/SASS-Killers/OpenSchedule/main/scripts/deploy.sh | bash
+bun run build
+npx wrangler pages deploy dist/
 ```
 
-Works on free tiers from **Oracle Cloud**, **Google Cloud**, **AWS**, **Azure**, and **VPSWala** — see the [self-hosting guide](./prd/self-hosting.md) for details and step-by-step instructions.
+Set `DATABASE_URL` and `JWT_SECRET` as Cloudflare Pages secrets. See the [self-hosting guide](./prd/self-hosting.md) for full instructions.
 
 ### Create an Admin Account
 
