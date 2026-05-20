@@ -1,6 +1,5 @@
 ---
 import AppLayout from "@/layouts/app-layout.astro";
-import { Form } from "@/ui/form";
 ---
 
 <AppLayout title="Sign In — OpenSchedule">
@@ -8,78 +7,115 @@ import { Form } from "@/ui/form";
     <h1 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0;">Sign In</h1>
 
     <div id="step-email" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 320px;">
-      <Form
-        fields={[{ name: "email", label: "", type: "email", placeholder: "you@example.com", required: true }]}
-        submitLabel="Send Login Code"
-        client:load
-        onSubmit={async (values) => {
-          const res = await fetch("/api/auth/send-code", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: values.email }),
-          });
-          const data = await res.json();
-          if (data.ok) return { ok: true, data };
-          return { ok: false, error: "Email not recognized." };
-        }}
-        onSuccess={(data) => {
-          if (data.devCode) (document.getElementById("code-input") as HTMLInputElement).value = data.devCode;
-          document.getElementById("step-email")!.style.display = "none";
-          document.getElementById("step-code")!.style.display = "flex";
-          document.getElementById("code-input")!.focus();
-        }}
-      />
+      <form id="email-form">
+        <input type="email" id="email-input" placeholder="you@example.com" required
+          style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 0.95rem; outline: none; margin-bottom: 0.75rem;" />
+        <button type="submit" id="email-btn" class="app-btn app-btn-primary" style="justify-content: center; width: 100%;">Send Login Code</button>
+      </form>
     </div>
 
     <div id="step-code" style="display: none; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 320px;">
-      <p style="font-size: 0.9rem; color: var(--app-text-muted); margin: 0;">Check your email for the login code, then enter it below.</p>
-      <Form
-        fields={[{ name: "code", label: "", type: "text", placeholder: "000000", required: true }]}
-        submitLabel="Verify & Sign In"
-        client:load
-        onSubmit={async (values) => {
-          const email = (document.getElementById("step-email") as any)?.__email || "";
-          const res = await fetch("/pgrst/rpc/verify_code", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ p_email: email, p_code: values.code }),
-          });
-          const data = await res.json();
-          if (data.userId) return { ok: true, data };
-          return { ok: false, error: data.error || "Verification failed" };
-        }}
-        onSuccess={(data) => {
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = "/api/auth/session";
-          for (const key of ["userId", "email", "name", "role"]) {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = key;
-            input.value = data[key] || "";
-            form.appendChild(input);
-          }
-          document.body.appendChild(form);
-          form.submit();
-        }}
-      />
+      <p style="font-size: 0.9rem; color: var(--app-text-muted); margin: 0;">Check your email for the code, then enter it below.</p>
+      <form id="verify-form">
+        <input type="text" id="code-input" placeholder="000000" required maxlength="6" inputmode="numeric" pattern="[0-9]{6}"
+          style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 1.5rem; text-align: center; font-family: monospace; letter-spacing: 0.3em; outline: none; margin-bottom: 0.75rem;" />
+        <button type="submit" id="verify-btn" class="app-btn app-btn-primary" style="justify-content: center; width: 100%;">Verify & Sign In</button>
+      </form>
       <button id="back-btn" class="app-btn" style="justify-content: center; width: 100%;">Use a different email</button>
     </div>
+
+    <div id="step-error" style="display: none; color: #f87171; font-size: 0.9rem;"></div>
   </section>
 </AppLayout>
 
 <script>
-// Track email across the two forms
-const emailForm = document.querySelector("#step-email .app-btn-primary");
-if (emailForm) {
-  const emailInput = document.querySelector<HTMLInputElement>("#step-email input");
-  document.getElementById("step-email")!.addEventListener("submit", () => {
-    (document.getElementById("step-email") as any).__email = emailInput?.value || "";
-  });
+const emailForm = document.getElementById("email-form")!;
+const verifyForm = document.getElementById("verify-form")!;
+const stepEmail = document.getElementById("step-email")!;
+const stepCode = document.getElementById("step-code")!;
+const stepError = document.getElementById("step-error")!;
+const codeInput = document.getElementById("code-input") as HTMLInputElement;
+const emailInput = document.getElementById("email-input") as HTMLInputElement;
+const emailBtn = document.getElementById("email-btn") as HTMLButtonElement;
+const verifyBtn = document.getElementById("verify-btn") as HTMLButtonElement;
+const backBtn = document.getElementById("back-btn")!;
+
+let currentEmail = "";
+
+function setBusy(btn, busy) {
+  btn.disabled = busy;
+  btn.textContent = busy ? "Sending…" : btn.dataset.label;
 }
 
-document.getElementById("back-btn")!.addEventListener("click", () => {
-  document.getElementById("step-email")!.style.display = "flex";
-  document.getElementById("step-code")!.style.display = "none";
+emailForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  stepError.style.display = "none";
+  currentEmail = emailInput.value.trim();
+  if (!currentEmail) return;
+  setBusy(emailBtn, true);
+
+  try {
+    const res = await fetch("/api/auth/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: currentEmail }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      codeInput.value = "";
+      codeInput.focus();
+      stepEmail.style.display = "none";
+      stepCode.style.display = "flex";
+    } else {
+      stepError.textContent = "Email not recognized.";
+      stepError.style.display = "block";
+    }
+  } catch (err) {
+    stepError.textContent = "Network error. Check that services are running.";
+    stepError.style.display = "block";
+  }
+  setBusy(emailBtn, false);
+});
+
+verifyForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  stepError.style.display = "none";
+  const code = codeInput.value.trim();
+  if (!code) return;
+  setBusy(verifyBtn, true);
+
+  try {
+    const res = await fetch("/pgrst/rpc/verify_code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ p_email: currentEmail, p_code: code }),
+    });
+    const data = await res.json();
+    if (data.userId) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "/api/auth/session";
+      ["userId","email","name","role"].forEach(k => {
+        const i = document.createElement("input");
+        i.type = "hidden"; i.name = k; i.value = data[k] || "";
+        form.appendChild(i);
+      });
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      stepError.textContent = data.error || "Verification failed";
+      stepError.style.display = "block";
+    }
+  } catch {
+    stepError.textContent = "Network error";
+    stepError.style.display = "block";
+  }
+  setBusy(verifyBtn, false);
+});
+
+backBtn.addEventListener("click", () => {
+  stepEmail.style.display = "flex";
+  stepCode.style.display = "none";
+  stepError.style.display = "none";
 });
 </script>
