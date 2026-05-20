@@ -21,8 +21,16 @@ const types = await query`
       width: 4rem; height: 4rem; border-radius: 999px; margin: 0 auto 1rem;
       background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
       display: grid; place-items: center;
-      font-weight: 800; font-size: 1.5rem; color: #fff;
-    ">{user.name.charAt(0)}</div>
+      font-weight: 800; font-size: 1.5rem; color: #fff; overflow: hidden;
+    ">
+      <img src="/api/avatar?userId=${user.id}" alt=""
+        style="width: 100%; height: 100%; object-fit: cover; display: none;"
+        onerror="this.style.display='none'; this.parentElement!.querySelector('.avatar-fallback')!.style.display='grid';"
+      />
+      <div class="avatar-fallback" style="display: grid; place-items: center; width: 100%; height: 100%;">
+        ${user.name.charAt(0)}
+      </div>
+    </div>
 
     <h1 style="margin: 0 0 0.25rem; font-size: 1.3rem; font-weight: 700;">{user.name}</h1>
     <p style="margin: 0 0 2rem; color: var(--app-text-muted); font-size: 0.85rem;">
