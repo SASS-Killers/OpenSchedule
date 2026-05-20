@@ -1,6 +1,5 @@
 -- OpenSchedule Database Schema
--- Applied via: psql $DATABASE_URL -f src/db/schema.sql
--- Test via: Neon branching (instant schema + data copy)
+-- Applied via: bun run src/scripts/apply-schema.ts
 
 -- Users (Hosts & Admins)
 CREATE TABLE IF NOT EXISTS users (
@@ -21,6 +20,14 @@ CREATE TABLE IF NOT EXISTS verification_codes (
   code TEXT NOT NULL,
   attempts INTEGER NOT NULL DEFAULT 0,
   expires_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+-- Clients (auto-registered during booking)
+CREATE TABLE IF NOT EXISTS clients (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
   created_at INTEGER NOT NULL
 );
 
@@ -47,9 +54,26 @@ CREATE TABLE IF NOT EXISTS event_types (
   is_active BOOLEAN NOT NULL DEFAULT true
 );
 
+-- Bookings (reservations)
+CREATE TABLE IF NOT EXISTS bookings (
+  id TEXT PRIMARY KEY,
+  event_type_id TEXT NOT NULL REFERENCES event_types(id) ON DELETE RESTRICT,
+  client_id TEXT NOT NULL REFERENCES clients(id) ON DELETE RESTRICT,
+  start_time INTEGER NOT NULL,
+  end_time INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'confirmed' CHECK (status IN ('confirmed', 'cancelled')),
+  client_notes TEXT,
+  cancellation_token TEXT NOT NULL UNIQUE,
+  reminder_sent BOOLEAN NOT NULL DEFAULT false,
+  created_at INTEGER NOT NULL
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_slug ON users(slug);
 CREATE INDEX IF NOT EXISTS idx_schedules_user ON schedules(user_id);
 CREATE INDEX IF NOT EXISTS idx_event_types_user ON event_types(user_id);
 CREATE INDEX IF NOT EXISTS idx_verification_codes_email ON verification_codes(email);
+CREATE INDEX IF NOT EXISTS idx_bookings_event_time ON bookings(event_type_id, start_time);
+CREATE INDEX IF NOT EXISTS idx_bookings_cancel ON bookings(cancellation_token);
+CREATE INDEX IF NOT EXISTS idx_clients_email ON clients(email);
