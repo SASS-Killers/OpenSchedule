@@ -8,7 +8,7 @@
 
 No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
 
-[Get Started](https://github.com/augmentedmike/open-calendar#quick-start) · [Report a Bug](https://github.com/augmentedmike/open-calendar/issues) · [Contribute](https://github.com/augmentedmike/open-calendar/pulls)
+[Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
 
 ---
 
@@ -59,7 +59,7 @@ One database replaces Redis, Elasticsearch, RabbitMQ, and your entire custom API
 
 ```bash
 # Clone the repository
-git clone https://github.com/augmentedmike/open-calendar.git
+git clone https://github.com/SASS-Killers/OpenSchedule.git
 cd open-calendar
 
 # Install dependencies
@@ -127,7 +127,7 @@ MIT
 ---
 
 <p align="center">
-  <a href="https://github.com/augmentedmike/open-calendar">GitHub</a> ·
-  <a href="https://github.com/augmentedmike/open-calendar/issues">Issues</a> ·
-  <a href="https://github.com/augmentedmike/open-calendar/pulls">Pull Requests</a>
+  <a href="https://github.com/SASS-Killers/OpenSchedule">GitHub</a> ·
+  <a href="https://github.com/SASS-Killers/OpenSchedule/issues">Issues</a> ·
+  <a href="https://github.com/SASS-Killers/OpenSchedule/pulls">Pull Requests</a>
 </p>
