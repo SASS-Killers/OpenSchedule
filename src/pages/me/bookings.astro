@@ -1,0 +1,102 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { requireSession } from "@/lib/auth-guard";
+import { query } from "@/db/neon";
+
+const session = await requireSession(Astro.request);
+if (!session) return Astro.redirect("/login");
+
+const now = Math.floor(Date.now() / 1000);
+
+// Get bookings — for hosts/admin, show their event types' bookings
+let bookings: any[] = [];
+if (session.role === "admin" || session.role === "host") {
+  bookings = await query`
+    SELECT b.id, b.start_time, b.end_time, b.status, b.client_notes,
+           c.name AS client_name, c.email AS client_email,
+           e.title AS event_title, e.duration
+    FROM bookings b
+    JOIN clients c ON b.client_id = c.id
+    JOIN event_types e ON b.event_type_id = e.id
+    WHERE e.user_id = ${session.userId}
+      AND b.start_time > ${now - 86400}  /* include today's past bookings */
+      AND b.status = 'confirmed'
+    ORDER BY b.start_time ASC
+    LIMIT 50
+  ` as any[];
+}
+
+// Group by date
+const groups: Record<string, any[]> = {};
+for (const b of bookings) {
+  const d = new Date((b as any).start_time * 1000);
+  const key = d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  if (!groups[key]) groups[key] = [];
+  groups[key].push(b);
+}
+---
+
+<AppLayout title="My Bookings — OpenSchedule">
+  <section style="padding: 2rem 1.5rem; max-width: 640px; margin: 0 auto;">
+    <h1 style="margin: 0 0 1.5rem; font-size: 1.25rem; font-weight: 700;">My Bookings</h1>
+
+    {bookings.length === 0 && (
+      <div style="text-align: center; padding: 3rem 0; color: var(--app-text-muted); font-size: 0.9rem;">
+        No upcoming bookings.
+      </div>
+    )}
+
+    {Object.entries(groups).map(([date, slots]) => (
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.85rem; font-weight: 600; color: var(--app-text-muted); margin-bottom: 0.5rem;">
+          {date}
+        </div>
+        <div style="display: grid; gap: 0.5rem;">
+          {slots.map((b: any) => {
+            const start = new Date(b.start_time * 1000);
+            const end = new Date(b.end_time * 1000);
+            const time = start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+            const endTime = end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+            const isPast = b.end_time < Math.floor(Date.now() / 1000);
+            return (
+              <div style={{
+                display: "flex", gap: "0.75rem", alignItems: "flex-start",
+                padding: "0.85rem 1rem",
+                borderRadius: "0.7rem",
+                border: "1px solid var(--app-border)",
+                background: isPast ? "transparent" : "rgba(99,102,241,0.04)",
+                opacity: isPast ? 0.5 : 1,
+              }}>
+                <div style={{
+                  minWidth: "4rem", textAlign: "center", paddingTop: "0.15rem",
+                }}>
+                  <div style={{ fontSize: "0.92rem", fontWeight: 700, fontFamily: "monospace" }}>{time}</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--app-text-muted)" }}>{endTime}</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: "0.92rem" }}>{b.event_title}</div>
+                  <div style={{ fontSize: "0.82rem", color: "var(--app-text-muted)" }}>
+                    {b.client_name} &middot; {b.client_email}
+                  </div>
+                  {b.client_notes && (
+                    <div style={{ fontSize: "0.8rem", color: "var(--app-text-muted)", marginTop: "0.25rem", fontStyle: "italic" }}>
+                      "{b.client_notes}"
+                    </div>
+                  )}
+                </div>
+                <span style={{
+                  fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase",
+                  padding: "0.2rem 0.5rem", borderRadius: "999px",
+                  background: isPast ? "rgba(148,163,184,0.1)" : "rgba(52,211,153,0.15)",
+                  color: isPast ? "var(--app-text-muted)" : "#34d399",
+                }}>
+                  {isPast ? "Past" : "Upcoming"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    ))}
+  </section>
+</AppLayout>

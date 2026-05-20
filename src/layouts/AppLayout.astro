@@ -1,10 +1,17 @@
 ---
+import { verifySession } from "@/lib/auth";
+
 export interface Props {
   title: string;
   description?: string;
 }
 
 const { title, description } = Astro.props;
+
+// Read session from cookie
+const cookie = Astro.request.headers.get("cookie") || "";
+const match = cookie.match(/session=([^;]+)/);
+const session = match ? await verifySession(match[1]) : null;
 ---
 
 <!doctype html>
@@ -93,6 +100,19 @@ const { title, description } = Astro.props;
         gap: 0.75rem;
       }
 
+      .nav-link {
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--app-text-muted);
+        padding: 0.35rem 0.6rem;
+        border-radius: 0.4rem;
+        transition: color 0.2s, background 0.2s;
+      }
+      .nav-link:hover {
+        color: var(--app-text);
+        background: rgba(255,255,255,0.04);
+      }
+
       .app-page {
         min-height: calc(100vh - 74px);
       }
@@ -132,6 +152,21 @@ const { title, description } = Astro.props;
         </a>
         <div class="app-topbar-actions">
           <slot name="header-actions" />
+          {session && (
+            <>
+              {session.role === "admin" && (
+                <a href="/hosts/me" class="nav-link">Admin</a>
+              )}
+              {(session.role === "host" || session.role === "admin") && (
+                <a href="/me/bookings" class="nav-link">My Bookings</a>
+              )}
+              <form method="POST" action="/api/auth/logout" style="display:inline;">
+                <button type="submit" class="nav-link" style="border:none;background:none;cursor:pointer;">
+                  Log out →
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </header>
       <main class="app-page">
