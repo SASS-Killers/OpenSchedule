@@ -2,6 +2,90 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
-<AppLayout title="OpenSchedule">
-  <p style="color: var(--app-text-muted); padding: 2rem 1.5rem;">Home</p>
+<AppLayout title="OpenSchedule — Free, Self-Hosted Calendly Replacement">
+  <section style="padding: 5rem 1.5rem; max-width: 720px; margin: 0 auto; text-align: center;">
+    <div style="
+      width: 5rem; height: 5rem; border-radius: 999px; margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
+      display: grid; place-items: center;
+      font-weight: 800; font-size: 2rem; color: #fff;
+    ">OS</div>
+
+    <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 0.5rem; line-height: 1.1;">
+      OpenSchedule
+    </h1>
+    <p style="font-size: 1.15rem; color: var(--app-text-muted); max-width: 520px; margin: 0 auto 0.5rem; line-height: 1.7;">
+      A 100% free, self-hosted, multi-user scheduling platform that fully replaces Calendly.
+    </p>
+    <p style="font-size: 0.9rem; color: var(--app-text-muted); max-width: 480px; margin: 0 auto 2rem;">
+      No subscriptions. No data leaving your control. Just PostgreSQL and a few serverless functions.
+    </p>
+
+    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem;">
+      <a href="/login" class="app-btn app-btn-primary" style="padding: 0.85rem 2rem; font-weight: 600;">Get Started</a>
+      <a href="https://github.com/augmentedmike/open-calendar" target="_blank" class="app-btn" style="padding: 0.85rem 2rem; font-weight: 600;">
+        ★ GitHub
+      </a>
+    </div>
+
+    <div style="
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; text-align: left;
+      padding: 1.5rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);
+    ">
+      <div>
+        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem;">Free Forever</div>
+        <div style="font-size: 0.82rem; color: var(--app-text-muted);">No paid tiers, no hidden costs. Just your own PostgreSQL database.</div>
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem;">Self-Hosted</div>
+        <div style="font-size: 0.82rem; color: var(--app-text-muted);">Your data stays on your infrastructure. No third-party sharing.</div>
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem;">Multi-User</div>
+        <div style="font-size: 0.82rem; color: var(--app-text-muted);">Admin provisions hosts. Clients book meetings. All in one system.</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 3rem 1.5rem; max-width: 720px; margin: 0 auto;">
+    <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0 0 1rem;">How It Works</h2>
+    <div style="display: grid; gap: 0.75rem;">
+      <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border-radius: 0.7rem; border: 1px solid var(--app-border);">
+        <div style="width: 2rem; height: 2rem; border-radius: 999px; background: rgba(99,102,241,0.15); display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; color: var(--app-primary); flex-shrink: 0;">1</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.92rem;">Set Your Availability</div>
+          <div style="font-size: 0.82rem; color: var(--app-text-muted);">Configure weekly hours and date-specific exceptions. Google Calendar not required.</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border-radius: 0.7rem; border: 1px solid var(--app-border);">
+        <div style="width: 2rem; height: 2rem; border-radius: 999px; background: rgba(99,102,241,0.15); display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; color: var(--app-primary); flex-shrink: 0;">2</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.92rem;">Share Your Link</div>
+          <div style="font-size: 0.82rem; color: var(--app-text-muted);">Clients visit your unique booking URL and pick a time that works for them.</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border-radius: 0.7rem; border: 1px solid var(--app-border);">
+        <div style="width: 2rem; height: 2rem; border-radius: 999px; background: rgba(99,102,241,0.15); display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; color: var(--app-primary); flex-shrink: 0;">3</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.92rem;">Get Booked</div>
+          <div style="font-size: 0.82rem; color: var(--app-text-muted);">Bookings appear on your dashboard. No double-booking. No spam.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 3rem 1.5rem 5rem; max-width: 720px; margin: 0 auto; text-align: center;">
+    <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0 0 1rem;">Built With</h2>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; font-size: 0.85rem; color: var(--app-text-muted);">
+      <span style="padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--app-border);">Neon PostgreSQL</span>
+      <span style="padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--app-border);">PostgREST</span>
+      <span style="padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--app-border);">Astro</span>
+      <span style="padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--app-border);">Cloudflare Pages</span>
+      <span style="padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--app-border);">React</span>
+      <span style="padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--app-border);">Brevo</span>
+    </div>
+    <p style="margin-top: 2rem; font-size: 0.85rem; color: var(--app-text-muted);">
+      Open source on <a href="https://github.com/augmentedmike/open-calendar" target="_blank" style="color: var(--app-primary);">GitHub</a>. Contributions welcome.
+    </p>
+  </section>
 </AppLayout>
