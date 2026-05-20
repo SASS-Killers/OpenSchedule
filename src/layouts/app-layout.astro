@@ -199,7 +199,6 @@ const session = match ? await verifySession(match[1]) : null;
         </a>
         <div class="app-topbar-actions">
           <slot name="header-actions" />
-          {!session && <a href="/login" class="nav-link" style="display:inline-flex;align-items:center;gap:0.3rem;">Log in →</a>}
           <button class="hamburger" id="hamburger-btn" aria-label="Menu">☰</button>
           <div class="nav-drawer" id="nav-drawer">
             {!session && <a href="/login" class="nav-link">Log in →</a>}
