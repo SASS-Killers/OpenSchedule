@@ -12,12 +12,12 @@ function getTimezones(): string[] {
 }
 
 export function TimezonePicker({ value, onChange }: { value: string; onChange?: (tz: string) => void }) {
+  const [selected, setSelected] = useState(value); // use state not ref so FuzzySearch re-renders
   const initRef = useRef(false);
-  const selectedRef = useRef(value);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setReady(true); // trigger re-render on client with real timezones
+    setReady(true);
   }, []);
 
   // On mount: detect browser timezone and auto-save if stored is a generic default
@@ -26,8 +26,8 @@ export function TimezonePicker({ value, onChange }: { value: string; onChange?: 
     initRef.current = true;
     const browser = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const defaults = ["UTC", "America/New_York", "America/Los_Angeles", "America/Chicago", "Europe/London"];
-    if (browser && browser !== selectedRef.current && defaults.includes(selectedRef.current)) {
-      selectedRef.current = browser;
+    if (browser && browser !== selected && defaults.includes(selected)) {
+      setSelected(browser);
       if (onChange) onChange(browser);
       else fetch("/api/host/timezone", {
         method: "POST",
@@ -38,7 +38,7 @@ export function TimezonePicker({ value, onChange }: { value: string; onChange?: 
   }, []);
 
   const handleChange = (tz: string) => {
-    selectedRef.current = tz;
+    setSelected(tz);
     if (onChange) onChange(tz);
     else fetch("/api/host/timezone", {
       method: "POST",
@@ -52,7 +52,7 @@ export function TimezonePicker({ value, onChange }: { value: string; onChange?: 
   return (
     <FuzzySearch
       items={tzs}
-      value={selectedRef.current}
+      value={selected}
       onChange={handleChange}
       placeholder="Search timezone…"
       groupBy={(tz) => tz.split("/").slice(0, -1).join(" / ") || "Other"}
