@@ -167,7 +167,10 @@ export function TimezonePicker({
                 return (
                   <div
                     key={tz}
-                    onClick={() => select(tz)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      select(tz);
+                    }}
                     onMouseEnter={() => setHighlightIdx(globalIdx)}
                     style={{
                       padding: "0.4rem 0.6rem",
