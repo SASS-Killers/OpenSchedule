@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 
-// All IANA timezones (guard against SSR where Intl may not be available)
-let ALL_TZS: string[] = [];
-try {
-  ALL_TZS = (typeof Intl !== "undefined" && Intl.supportedValuesOf
-    ? Intl.supportedValuesOf("timeZone")
-    : []
-  ).filter((tz) => !tz.includes("/Etc/") && !tz.startsWith("System/"));
-} catch (e) {
-  // SSR fallback — empty array, component won't render until client hydrates
+// Lazy init to avoid SSR crashes
+let ALL_TZS: string[] | null = null;
+function getTimezones(): string[] {
+  if (ALL_TZS) return ALL_TZS;
+  try {
+    ALL_TZS = (Intl as any).supportedValuesOf?.("timeZone")
+      ?.filter((tz: string) => !tz.includes("/Etc/") && !tz.startsWith("System/")) ?? [];
+  } catch { ALL_TZS = []; }
+  return ALL_TZS;
 }
 
 // Simple fuzzy match — checks if all chars in query appear in order in the target
@@ -29,10 +29,8 @@ function groupTz(tz: string): string {
 
 export function TimezonePicker({
   value,
-  onChange,
 }: {
   value: string;
-  onChange: (tz: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -46,19 +44,26 @@ export function TimezonePicker({
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
+    getTimezones(); // ensure timezone list is loaded
     const browser = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const defaults = ["UTC", "America/New_York", "America/Los_Angeles", "America/Chicago", "Europe/London"];
     if (browser && browser !== selected && defaults.includes(selected)) {
       setSelected(browser);
-      onChange(browser);
+      // Auto-save detected browser timezone
+      fetch("/api/host/timezone", {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body: `timezone=${encodeURIComponent(browser)}`,
+      });
     }
   }, []);
 
   const displayName = (tz: string) => tz.replace(/_/g, " ");
 
   // Filter timezones by fuzzy match
+  const tzs = getTimezones();
   const filtered = query
-    ? ALL_TZS.filter((tz) => fuzzyMatch(query, tz))
+    ? tzs.filter((tz) => fuzzyMatch(query, tz))
     : [];
 
   const select = (tz: string) => {
