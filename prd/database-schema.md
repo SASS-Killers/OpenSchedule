@@ -23,14 +23,17 @@ To ensure high data integrity, ease of queries, and protection against anomalies
 
 ### Table: `users` (Hosts & Admins)
 Represents the system users: the Admin and all provisioned Hosts.
+
+Each user is assigned a **cryptographic UUID slug** at creation time (e.g., `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`). This slug is used in public booking URLs (`/{slug}`) to avoid collisions from similar names and prevent host enumeration via predictable URLs.
+
 ```typescript
 {
   id: "TEXT" (Primary Key - UUID),
   email: "TEXT" (Unique, Not Null),
   name: "TEXT" (Not Null),
+  slug: "TEXT" (Unique, Not Null - UUID hex string, e.g., "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"),
   role: "TEXT" (Not Null - 'admin' | 'host'),
   timezone: "TEXT" (Not Null - e.g., 'America/New_York'),
-  avatar_url: "TEXT",
   is_active: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 1),
   created_at: "INTEGER" (Not Null, Unix Timestamp)
 }
@@ -218,10 +221,11 @@ To prevent corrupted records or invalid schema states:
 ## 4. Indices & Optimizations
 
 To ensure dynamic slot computation stays under **100ms** at the Edge:
-1. **User Index**: Index `users.email` for authentication check speeds.
-2. **Booking Search Index**: Index `bookings(event_type_id, start_time)` to quickly query busy intervals on specific dates.
-3. **Date Overrides Index**: Index `date_overrides(user_id, start_date, end_date, exception_type)` for efficient lookup of all active exceptions covering a date range. This composite index avoids table scans when computing per-day slot availability.
-4. **Recurring Exceptions Index**: Index `recurring_exceptions(user_id, day_of_week, is_active)` to find all recurring blocks active on a given day of the week.
-5. **Client Search Index**: Index `clients.email` to speed up auto-registration operations.
-6. **Sent Emails Log Index**: Index `sent_emails_log(sent_at)` for real-time telemetry lookups.
-7. **Booking Cancellation Index**: Index `bookings.cancellation_token` to make client cancellation lookups instantaneous.
+1. **User Email Index**: Index `users.email` for authentication check speeds.
+2. **User Slug Index**: Index `users.slug` for public booking page URL lookups. UUID-based slugs ensure O(1) lookups without host enumeration risk.
+3. **Booking Search Index**: Index `bookings(event_type_id, start_time)` to quickly query busy intervals on specific dates.
+4. **Date Overrides Index**: Index `date_overrides(user_id, start_date, end_date, exception_type)` for efficient lookup of all active exceptions covering a date range. This composite index avoids table scans when computing per-day slot availability.
+5. **Recurring Exceptions Index**: Index `recurring_exceptions(user_id, day_of_week, is_active)` to find all recurring blocks active on a given day of the week.
+6. **Client Search Index**: Index `clients.email` to speed up auto-registration operations.
+7. **Sent Emails Log Index**: Index `sent_emails_log(sent_at)` for real-time telemetry lookups.
+8. **Booking Cancellation Index**: Index `bookings.cancellation_token` to make client cancellation lookups instantaneous.

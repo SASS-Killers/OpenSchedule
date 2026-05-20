@@ -4,12 +4,12 @@ import { env } from "cloudflare:workers";
 export const GET: APIRoute = async () => {
   const db = env.DB as D1Database;
 
-  // Create tables
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
       name TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
       role TEXT NOT NULL DEFAULT 'host',
       timezone TEXT NOT NULL DEFAULT 'UTC',
       is_active INTEGER NOT NULL DEFAULT 1,
@@ -32,6 +32,19 @@ export const GET: APIRoute = async () => {
       start_time TEXT NOT NULL,
       end_time TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS event_types (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      description TEXT,
+      duration INTEGER NOT NULL,
+      buffer_before INTEGER NOT NULL DEFAULT 0,
+      buffer_after INTEGER NOT NULL DEFAULT 0,
+      minimum_notice INTEGER NOT NULL DEFAULT 4,
+      is_active INTEGER NOT NULL DEFAULT 1
+    );
   `);
 
   // Seed admin if not exists
@@ -41,14 +54,16 @@ export const GET: APIRoute = async () => {
     .first();
 
   if (!existing) {
+    const userId = crypto.randomUUID();
     await db
       .prepare(
-        "INSERT INTO users (id, email, name, role, timezone, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO users (id, email, name, slug, role, timezone, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
       .bind(
-        crypto.randomUUID(),
+        userId,
         "augmentedmike@gmail.com",
         "Michael ONeal",
+        crypto.randomUUID().replace(/-/g, ""),
         "admin",
         "America/New_York",
         1,

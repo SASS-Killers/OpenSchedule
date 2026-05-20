@@ -1,0 +1,48 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { env } from "cloudflare:workers";
+
+const db = env.DB as D1Database;
+const { slug, eventSlug } = Astro.params;
+
+const user = await db
+  .prepare("SELECT id, name, timezone FROM users WHERE slug = ? AND is_active = 1")
+  .bind(slug)
+  .first<any>();
+
+if (!user) return Astro.redirect("/");
+
+const eventType = await db
+  .prepare("SELECT id, title, description, duration FROM event_types WHERE user_id = ? AND slug = ? AND is_active = 1")
+  .bind(user.id, eventSlug)
+  .first<any>();
+
+if (!eventType) return Astro.redirect(`/${slug}`);
+---
+
+<AppLayout title={`${eventType.title} — ${user.name}`}>
+  <section style="padding: 3rem 1.5rem; max-width: 480px; margin: 0 auto;">
+    <a href={`/${slug}`} class="app-btn" style="display: inline-flex; padding: 0.4rem 0.85rem; font-size: 0.82rem; margin-bottom: 1.5rem;">
+      ← Back
+    </a>
+
+    <h1 style="margin: 0 0 0.25rem; font-size: 1.3rem; font-weight: 700;">{eventType.title}</h1>
+    {eventType.description && (
+      <p style="margin: 0 0 1.5rem; color: var(--app-text-muted); font-size: 0.9rem;">{eventType.description}</p>
+    )}
+
+    <div style="
+      padding: 1.5rem; border-radius: 0.85rem;
+      border: 1px solid var(--app-border);
+      background: rgba(255,255,255,0.02);
+      text-align: center;
+    ">
+      <p style="margin: 0 0 1rem; color: var(--app-text-muted); font-size: 0.9rem;">
+        Select a date and time for this {eventType.duration}-minute session.
+      </p>
+      <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted);">
+        (Schedule component coming next)
+      </p>
+    </div>
+  </section>
+</AppLayout>
