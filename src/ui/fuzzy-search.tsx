@@ -14,14 +14,14 @@ function fuzzyMatch(query: string, target: string): boolean {
 interface Props {
   items: string[];
   value: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   placeholder?: string;
   /** If provided, groups items by this prefix (e.g., "America/New_York" -> "America") */
   groupBy?: (item: string) => string;
   displayName?: (item: string) => string;
 }
 
-export function FuzzySearch({ items, value, onChange, placeholder = "Search…", groupBy, displayName }: Props) {
+export function FuzzySearch({ items, value = "", onChange, placeholder = "Search…", groupBy, displayName }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(0);
@@ -45,7 +45,7 @@ export function FuzzySearch({ items, value, onChange, placeholder = "Search…",
   }, [filtered, groupBy]);
 
   const select = (item: string) => {
-    onChange(item);
+    if (onChange) onChange(item);
     setOpen(false);
     setQuery("");
   };

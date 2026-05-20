@@ -24,7 +24,7 @@ const session = match ? await verifySession(match[1]) : null;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <style>
+    <style is:global>
       @font-face {
         font-family: 'Montserrat';
         font-style: normal;
@@ -32,8 +32,6 @@ const session = match ? await verifySession(match[1]) : null;
         font-display: swap;
         src: url('/fonts/Montserrat.woff2') format('woff2');
       }
-    </style>
-    <style is:global>
       :root {
         color-scheme: dark;
         --app-bg: #060b16;
