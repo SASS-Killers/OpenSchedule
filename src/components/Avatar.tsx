@@ -10,7 +10,7 @@ export function Avatar({ userId, name, size = "3.5rem" }: { userId: string; name
   };
 
   // Expose reload globally so the upload handler can trigger it
-  (window as any).__avatarReload = reload;
+  if (typeof window !== "undefined") (window as any).__avatarReload = reload;
 
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
