@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
   const token = await signSession({ userId, email, name, role: role || "host" });
 
   const isSecure = request.url.startsWith("https");
-  const cookie = `session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=604800${isSecure ? "; Secure" : ""}`;
+  const cookie = `session=${token}; SameSite=Lax; Path=/; Max-Age=604800${isSecure ? "; Secure" : ""}`;
 
   return new Response(null, {
     status: 302,
