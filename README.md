@@ -1,5 +1,9 @@
 # OpenSchedule
 
+<p align="center">
+  <img src="public/images/sass-killers.png" alt="SASS Killers Logo" width="200" />
+</p>
+
 **A 100% free, self-hosted, multi-user scheduling platform — a complete Calendly replacement.**
 
 No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
