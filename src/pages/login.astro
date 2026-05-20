@@ -34,7 +34,7 @@ import AppLayout from "@/layouts/app-layout.astro";
 </AppLayout>
 
 <script>
-const PGRST = "/pgrst";
+const PGRST_VERIFY = "/pgrst/rpc/verify_code";
 
 const emailForm = document.getElementById("email-form")!;
 const verifyForm = document.getElementById("verify-form")!;
@@ -53,10 +53,10 @@ emailForm.addEventListener("submit", async (e) => {
   stepError.style.display = "none";
   currentEmail = emailInput.value;
 
-  const res = await fetch(`${PGRST}/rpc/send_code`, {
+  const res = await fetch("/api/auth/send-code", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ p_email: currentEmail }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `email=${encodeURIComponent(currentEmail)}`,
   });
   const data = await res.json();
 

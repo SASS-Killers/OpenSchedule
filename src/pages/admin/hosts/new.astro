@@ -58,13 +58,12 @@ document.getElementById("add-host-form")!.addEventListener("submit", async (e) =
   if (!m) { window.location.href = "/login"; return; }
   const jwt = m[1];
 
-  const res = await fetch("/pgrst/users", {
+  const res = await fetch("/api/admin/create-host", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${jwt}`,
     },
-    body: JSON.stringify({ name, email, timezone, role: "host", is_active: true }),
+    body: JSON.stringify({ name, email, timezone: selectedTimezone }),
   });
 
   if (res.ok || res.status === 201) {
