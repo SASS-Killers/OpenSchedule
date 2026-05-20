@@ -1,7 +1,7 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import { requireSession } from "@/lib/auth-guard";
-import { EventTypeManager } from "@/components/EventTypeManager";
+import { EventTypeManager } from "@/host-dashboard/event-type-manager";
 
 const session = await requireSession(Astro.request);
 if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");

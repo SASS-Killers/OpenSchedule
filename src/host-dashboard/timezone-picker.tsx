@@ -1,10 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 
-// All IANA timezones (from Intl API, filtered to remove legacy/aliases)
-const ALL_TZS = (typeof Intl !== "undefined" && Intl.supportedValuesOf
-  ? Intl.supportedValuesOf("timeZone")
-  : [] as string[]
-).filter((tz) => !tz.includes("/Etc/") && !tz.startsWith("System/"));
+// All IANA timezones (guard against SSR where Intl may not be available)
+let ALL_TZS: string[] = [];
+try {
+  ALL_TZS = (typeof Intl !== "undefined" && Intl.supportedValuesOf
+    ? Intl.supportedValuesOf("timeZone")
+    : []
+  ).filter((tz) => !tz.includes("/Etc/") && !tz.startsWith("System/"));
+} catch (e) {
+  // SSR fallback — empty array, component won't render until client hydrates
+}
 
 // Simple fuzzy match — checks if all chars in query appear in order in the target
 function fuzzyMatch(query: string, target: string): boolean {
@@ -58,9 +63,14 @@ export function TimezonePicker({
 
   const select = (tz: string) => {
     setSelected(tz);
-    onChange(tz);
     setOpen(false);
     setQuery("");
+    // Auto-save to server
+    fetch("/api/host/timezone", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: `timezone=${encodeURIComponent(tz)}`,
+    });
   };
 
   // Keyboard navigation

@@ -2,8 +2,8 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import { requireSession } from "@/lib/auth-guard";
 import { query } from "@/db/neon";
-import { Avatar } from "@/components/Avatar";
-import { TimezonePicker } from "@/components/TimezonePicker";
+import { Avatar } from "@/host-dashboard/avatar";
+import { TimezonePicker } from "@/host-dashboard/timezone-picker";
 
 const session = await requireSession(Astro.request);
 if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");

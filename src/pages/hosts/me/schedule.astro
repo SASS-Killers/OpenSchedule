@@ -2,7 +2,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import { requireSession } from "@/lib/auth-guard";
 import { query } from "@/db/neon";
-import { ScheduleEditor } from "@/components/ScheduleEditor";
+import { ScheduleEditor } from "@/host-dashboard/schedule-editor";
 
 const session = await requireSession(Astro.request);
 if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
