@@ -5,66 +5,75 @@ import { sendEmail, cancellationEmail } from "@/lib/email";
 
 const { token } = Astro.params;
 
-if (!token) return Astro.redirect("/");
+let page: "invalid" | "already-cancelled" | "success" = "invalid";
+let booking: any = {};
+let startStr = "";
 
-// Find the booking
-const [booking] = await query`
-  SELECT b.id, b.start_time, b.end_time, b.status, b.event_type_id, b.client_id,
-         e.title AS event_title, u.name AS host_name, u.email AS host_email,
-         c.name AS client_name, c.email AS client_email
-  FROM bookings b
-  JOIN event_types e ON b.event_type_id = e.id
-  JOIN users u ON e.user_id = u.id
-  JOIN clients c ON b.client_id = c.id
-  WHERE b.cancellation_token = ${token}
-  LIMIT 1
-` as any[];
+if (!token) {
+  // stays invalid
+} else {
+  const [found] = await query`
+    SELECT b.id, b.start_time, b.end_time, b.status, b.event_type_id, b.client_id,
+           e.title AS event_title, u.name AS host_name, u.email AS host_email,
+           c.name AS client_name, c.email AS client_email
+    FROM bookings b
+    JOIN event_types e ON b.event_type_id = e.id
+    JOIN users u ON e.user_id = u.id
+    JOIN clients c ON b.client_id = c.id
+    WHERE b.cancellation_token = ${token}
+    LIMIT 1
+  ` as any[];
 
-if (!booking) {
-  return <AppLayout title="Invalid Link — OpenSchedule">
-    <section style="padding: 4rem 1.5rem; max-width: 480px; margin: 0 auto; text-align: center;">
-      <h1 style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem;">Invalid Cancellation Link</h1>
-      <p style="color:var(--app-text-muted);">This link doesn't match any booking. It may have been already cancelled or the link is incorrect.</p>
-    </section>
-  </AppLayout>;
+  if (!found) {
+    page = "invalid";
+  } else if (found.status === "cancelled") {
+    page = "already-cancelled";
+    booking = found;
+  } else {
+    page = "success";
+    booking = found;
+    startStr = new Date(booking.start_time * 1000).toLocaleString("en-US", {
+      weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+    });
+
+    // Cancel in DB
+    await query`UPDATE bookings SET status = 'cancelled' WHERE id = ${booking.id}`;
+
+    // Send emails
+    const cancelForClient = cancellationEmail({ name: booking.client_name, eventTitle: booking.event_title, startTime: startStr });
+    await sendEmail({ to: booking.client_email, ...cancelForClient });
+    const cancelForHost = cancellationEmail({ name: booking.host_name, eventTitle: booking.event_title, startTime: startStr });
+    await sendEmail({ to: booking.host_email, ...cancelForHost });
+  }
 }
-
-// If already cancelled, show that
-if (booking.status === "cancelled") {
-  return <AppLayout title="Already Cancelled — OpenSchedule">
-    <section style="padding: 4rem 1.5rem; max-width: 480px; margin: 0 auto; text-align: center;">
-      <h1 style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem;">Already Cancelled</h1>
-      <p style="color:var(--app-text-muted);">This booking has already been cancelled.</p>
-    </section>
-  </AppLayout>;
-}
-
-// Cancel the booking
-await query`UPDATE bookings SET status = 'cancelled' WHERE id = ${booking.id}`;
-
-// Send cancellation emails
-const startStr = new Date(booking.start_time * 1000).toLocaleString("en-US", {
-  weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-});
-const cancelForClient = cancellationEmail({ name: booking.client_name, eventTitle: booking.event_title, startTime: startStr });
-await sendEmail({ to: booking.client_email, ...cancelForClient });
-
-const cancelForHost = cancellationEmail({ name: booking.host_name, eventTitle: booking.event_title, startTime: startStr });
-await sendEmail({ to: booking.host_email, ...cancelForHost });
 ---
 
 <AppLayout title="Booking Cancelled — OpenSchedule">
   <section style="padding: 4rem 1.5rem; max-width: 480px; margin: 0 auto; text-align: center;">
-    <div style="font-size:2rem;margin-bottom:1rem;">✅</div>
-    <h1 style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem;">Booking Cancelled</h1>
-    <p style="font-size:0.95rem;color:var(--app-text-muted);margin:0 0 0.25rem;">
-      {booking.event_title} with {booking.host_name}
-    </p>
-    <p style="font-size:0.85rem;color:var(--app-text-muted);margin:0;">
-      {startStr}
-    </p>
-    <p style="font-size:0.85rem;color:var(--app-text-muted);margin-top:1.5rem;">
-      Both parties have been notified via email.
-    </p>
+
+    {page === "invalid" && (
+      <>
+        <h1 style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem;">Invalid Cancellation Link</h1>
+        <p style="color:var(--app-text-muted);">This link doesn't match any booking. It may have been already cancelled or the link is incorrect.</p>
+      </>
+    )}
+
+    {page === "already-cancelled" && (
+      <>
+        <h1 style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem;">Already Cancelled</h1>
+        <p style="color:var(--app-text-muted);">This booking has already been cancelled.</p>
+      </>
+    )}
+
+    {page === "success" && (
+      <>
+        <div style="font-size:2rem;margin-bottom:1rem;">✅</div>
+        <h1 style="font-size:1.25rem;font-weight:700;margin:0 0 0.5rem;">Booking Cancelled</h1>
+        <p style="font-size:0.95rem;color:var(--app-text-muted);margin:0 0 0.25rem;">{booking.event_title} with {booking.host_name}</p>
+        <p style="font-size:0.85rem;color:var(--app-text-muted);margin:0;">{startStr}</p>
+        <p style="font-size:0.85rem;color:var(--app-text-muted);margin-top:1.5rem;">Both parties have been notified via email.</p>
+      </>
+    )}
+
   </section>
 </AppLayout>
