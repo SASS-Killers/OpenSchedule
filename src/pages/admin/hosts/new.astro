@@ -1,6 +1,7 @@
 ---
-import AppLayout from "@/layouts/AppLayout.astro";
+import AppLayout from "@/layouts/app-layout.astro";
 import { requireSession } from "@/lib/auth-guard";
+import { TimezonePicker } from "@/host-dashboard/timezone-picker";
 
 const session = await requireSession(Astro.request);
 if (!session || session.role !== "admin") return Astro.redirect("/login");
@@ -22,32 +23,19 @@ if (!session || session.role !== "admin") return Astro.redirect("/login");
       <form id="add-host-form" style="display: grid; gap: 0.75rem;">
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Name</label>
-          <input type="text" name="name" id="field-name" required
+          <input type="text" id="field-name" required
             style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;" />
         </div>
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Email</label>
-          <input type="email" name="email" id="field-email" required
+          <input type="email" id="field-email" required
             style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;" />
         </div>
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Timezone</label>
-          <select name="timezone" id="field-tz"
-            style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;">
-            <option value="America/New_York">America/New_York</option>
-            <option value="America/Chicago">America/Chicago</option>
-            <option value="America/Denver">America/Denver</option>
-            <option value="America/Los_Angeles">America/Los_Angeles</option>
-            <option value="America/Mexico_City">America/Mexico_City</option>
-            <option value="Europe/London">Europe/London</option>
-            <option value="Europe/Paris">Europe/Paris</option>
-            <option value="Europe/Berlin">Europe/Berlin</option>
-            <option value="Asia/Tokyo">Asia/Tokyo</option>
-            <option value="Asia/Shanghai">Asia/Shanghai</option>
-            <option value="Pacific/Auckland">Pacific/Auckland</option>
-            <option value="Australia/Sydney">Australia/Sydney</option>
-            <option value="UTC">UTC</option>
-          </select>
+          <TimezonePicker value="America/New_York" client:load
+            onChange={(tz) => { (window as any).__hostTz = tz; }}
+          />
         </div>
         <div id="form-error" style="color:#f87171;font-size:0.85rem;display:none;"></div>
         <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; margin-top: 0.5rem;">Create Host</button>
@@ -64,9 +52,8 @@ document.getElementById("add-host-form")!.addEventListener("submit", async (e) =
 
   const name = (document.getElementById("field-name") as HTMLInputElement).value;
   const email = (document.getElementById("field-email") as HTMLInputElement).value;
-  const timezone = (document.getElementById("field-tz") as HTMLSelectElement).value;
+  const timezone = (window as any).__hostTz || "America/New_York";
 
-  // Get JWT from cookie
   const m = document.cookie.match(/session=([^;]+)/);
   if (!m) { window.location.href = "/login"; return; }
   const jwt = m[1];

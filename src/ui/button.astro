@@ -1,0 +1,25 @@
+---
+export interface Props {
+  href?: string;
+  variant?: "primary" | "secondary";
+  type?: "button" | "submit" | "reset";
+  target?: string;
+  style?: string;
+}
+
+const { href, variant = "secondary", type, target, style } = Astro.props;
+const cls = variant === "primary" ? "app-btn app-btn-primary" : "app-btn";
+const tag = href ? "a" : "button";
+---
+
+{
+  tag === "a" ? (
+    <a href={href} class={cls} target={target} style={style}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type || "button"} class={cls} style={style}>
+      <slot />
+    </button>
+  )
+}

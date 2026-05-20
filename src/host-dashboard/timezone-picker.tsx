@@ -29,8 +29,10 @@ function groupTz(tz: string): string {
 
 export function TimezonePicker({
   value,
+  onChange,
 }: {
   value: string;
+  onChange?: (tz: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -70,12 +72,16 @@ export function TimezonePicker({
     setSelected(tz);
     setOpen(false);
     setQuery("");
-    // Auto-save to server
-    fetch("/api/host/timezone", {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: `timezone=${encodeURIComponent(tz)}`,
-    });
+    if (onChange) {
+      onChange(tz);
+    } else {
+      // Auto-save to server
+      fetch("/api/host/timezone", {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body: `timezone=${encodeURIComponent(tz)}`,
+      });
+    }
   };
 
   // Keyboard navigation
