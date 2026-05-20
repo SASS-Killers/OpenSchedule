@@ -175,6 +175,11 @@ const session = match ? await verifySession(match[1]) : null;
         color: #fff;
         cursor: pointer;
       }
+      .app-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
 
       .app-btn-primary {
         background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
