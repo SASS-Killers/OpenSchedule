@@ -201,7 +201,7 @@ const session = match ? await verifySession(match[1]) : null;
           <slot name="header-actions" />
           <button class="hamburger" id="hamburger-btn" aria-label="Menu">☰</button>
           <div class="nav-drawer" id="nav-drawer">
-            {!session && <a href="/login" class="nav-link">Log in →</a>}
+            {!session && !Astro.url.pathname.startsWith("/login") && <a href="/login" class="nav-link">Log in →</a>}
             {session && (
               <>
                 {session.role === "admin" && (

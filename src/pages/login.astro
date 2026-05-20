@@ -4,10 +4,6 @@ import AppLayout from "@/layouts/app-layout.astro";
 
 <AppLayout title="Sign In — OpenSchedule">
   <section style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6rem 1.5rem; gap: 1.5rem;">
-    <div style="background: rgba(255, 200, 0, 0.1); border: 1px solid rgba(255, 200, 0, 0.3); border-radius: 0.85rem; padding: 0.75rem 1.25rem; font-size: 0.85rem; color: #fbbf24; max-width: 400px;">
-      ⚡ Dev mode — codes shown on screen. No email sent.
-    </div>
-
     <h1 style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.03em; margin: 0;">Sign In</h1>
 
     <div id="step-email" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 320px;">
@@ -19,8 +15,7 @@ import AppLayout from "@/layouts/app-layout.astro";
     </div>
 
     <div id="step-code" style="display: none; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 320px;">
-      <div id="code-display" style="font-size: 2rem; font-weight: 800; letter-spacing: 0.3em; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 0.85rem; padding: 1rem; color: #a5b4fc; font-family: monospace;">------</div>
-      <p style="font-size: 0.85rem; color: var(--app-text-muted); margin: 0;">Enter the code above to sign in</p>
+      <p style="font-size: 0.9rem; color: var(--app-text-muted); margin: 0;">Check your email for the login code, then enter it below.</p>
       <form id="verify-form">
         <input type="text" id="code-input" placeholder="000000" required maxlength="6" inputmode="numeric" pattern="[0-9]{6}"
           style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.03); color: #fff; font-size: 1.5rem; text-align: center; font-family: monospace; letter-spacing: 0.3em; outline: none; margin-bottom: 0.75rem;" />
