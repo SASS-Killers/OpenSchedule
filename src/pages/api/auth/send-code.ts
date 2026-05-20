@@ -2,8 +2,16 @@ import type { APIRoute } from "astro";
 import { sendEmail, otpEmail } from "@/lib/email";
 
 export const POST: APIRoute = async ({ request }) => {
-  const form = await request.formData();
-  const email = form.get("email") as string;
+  // Accept both form-encoded and JSON
+  let email: string;
+  const ct = request.headers.get("content-type") || "";
+  if (ct.includes("application/json")) {
+    const body = await request.json();
+    email = body.email;
+  } else {
+    const form = await request.formData();
+    email = form.get("email") as string;
+  }
 
   if (!email) {
     return new Response(JSON.stringify({ error: "Email required" }), { status: 400 });
