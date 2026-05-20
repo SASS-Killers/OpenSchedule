@@ -1,0 +1,33 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+---
+
+<AppLayout title="OpenSchedule — Free Self-Hosted Scheduling">
+  <section style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 1.5rem;
+    gap: 1.5rem;
+  ">
+    <h1 style="
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 0;
+    ">OpenSchedule</h1>
+    <p style="
+      font-size: 1.1rem;
+      color: var(--app-text-muted);
+      max-width: 480px;
+      line-height: 1.7;
+      margin: 0;
+    ">A free, self-hosted, multi-user scheduling platform designed to fully replace Calendly.</p>
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+      <a href="/login" class="app-btn app-btn-primary">Sign In</a>
+      <a href="/book" class="app-btn">Book a Meeting</a>
+    </div>
+  </section>
+</AppLayout>

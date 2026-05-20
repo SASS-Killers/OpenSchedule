@@ -1,0 +1,142 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {description && <meta name="description" content={description} />}
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style is:global>
+      :root {
+        color-scheme: dark;
+        --app-bg: #060b16;
+        --app-panel: rgba(15, 23, 42, 0.88);
+        --app-panel-soft: rgba(15, 23, 42, 0.68);
+        --app-border: rgba(148, 163, 184, 0.16);
+        --app-text: #f8fafc;
+        --app-text-muted: #94a3b8;
+        --app-primary: #6366f1;
+        --app-primary-2: #8b5cf6;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+
+      body {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 28%),
+          radial-gradient(circle at top right, rgba(34, 211, 238, 0.14), transparent 24%),
+          linear-gradient(180deg, #030712 0%, var(--app-bg) 100%);
+        color: var(--app-text);
+      }
+
+      a { color: inherit; text-decoration: none; }
+      button, input, textarea, select { font: inherit; }
+
+      .app-shell { min-height: 100vh; }
+
+      .app-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--app-border);
+        background: rgba(3, 7, 18, 0.82);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .app-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+      }
+
+      .app-brand-mark {
+        display: grid;
+        place-items: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .app-brand-copy { min-width: 0; }
+      .app-brand-title {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .app-topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .app-page {
+        min-height: calc(100vh - 74px);
+      }
+
+      .app-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+        padding: 0.7rem 1rem;
+        border-radius: 0.85rem;
+        border: 1px solid var(--app-border);
+        background: rgba(255, 255, 255, 0.03);
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .app-btn-primary {
+        background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
+        border-color: transparent;
+      }
+
+      @media (max-width: 720px) {
+        .app-topbar { padding: 0.9rem 1rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-topbar">
+        <a class="app-brand" href="/">
+          <div class="app-brand-mark">OC</div>
+          <div class="app-brand-copy">
+            <div class="app-brand-title">OpenSchedule</div>
+          </div>
+        </a>
+        <div class="app-topbar-actions">
+          <slot name="header-actions" />
+        </div>
+      </header>
+      <main class="app-page">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

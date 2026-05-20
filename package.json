@@ -1,0 +1,21 @@
+{
+  "name": "open-calendar",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.5.2",
+    "@astrojs/react": "^5.0.5",
+    "astro": "^6.3.5",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "wrangler": "^4.93.0"
+  }
+}
