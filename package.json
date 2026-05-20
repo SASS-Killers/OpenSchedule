@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
+    "dev": "lsof -ti:6969 | xargs kill -9 2>/dev/null; lsof -ti:6970 | xargs kill -9 2>/dev/null; postgrest postgrest.conf & sleep 2; astro dev --host 127.0.0.1 --port 6969",
     "build": "astro build",
     "preview": "astro preview"
   },

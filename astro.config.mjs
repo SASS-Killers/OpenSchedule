@@ -17,5 +17,15 @@ export default defineConfig({
         "@": "/src",
       },
     },
+    server: {
+      proxy: {
+        // Proxy PostgREST calls so the browser talks to the same origin (no CORS)
+        "/pgrst": {
+          target: "http://localhost:6970",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/pgrst/, ""),
+        },
+      },
+    },
   },
 });

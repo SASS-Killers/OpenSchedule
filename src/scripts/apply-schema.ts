@@ -57,6 +57,6 @@ const [me] = await sql`SELECT email, slug, role FROM users WHERE email = 'augmen
 if (me) {
   const u = me as any;
   console.log(`\n  Admin: ${u.email} (${u.role})`);
-  console.log(`  Booking URL: http://localhost:4321/${u.slug}`);
+  console.log(`  Booking URL: http://localhost:6969/${u.slug}`);
 }
 console.log(`\n${ok} succeeded, ${fail} failed`);

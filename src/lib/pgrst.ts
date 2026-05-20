@@ -1,6 +1,8 @@
-// PostgREST base URL for client-side calls
-// In dev: localhost:3001. In prod: proxied through the main domain or subdomain.
-export const PGRST = import.meta.env.PROD ? "/api" : "http://localhost:3001";
+// PostgREST base URL — proxied through the Astro dev server at /pgrst
+// so the browser never hits a different origin (no CORS issues).
+// In dev, Astro proxies /pgrst/* -> PostgREST on port 6970.
+// In prod, Cloudflare Pages proxies /pgrst/* -> PostgREST on the server.
+export const PGRST = "/pgrst";
 
 // Get the session JWT from cookie
 export function getToken(): string {
