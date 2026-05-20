@@ -49,37 +49,30 @@ One database replaces Redis, Elasticsearch, RabbitMQ, and your entire custom API
 
 ## Quick Start
 
-### Prerequisites
-
-- [Bun](https://bun.sh) runtime
-- A [Neon](https://neon.tech) PostgreSQL database (free tier)
-- [PostgREST](https://postgrest.org) installed locally (`brew install postgrest`)
-
-### Setup
+### Local Dev
 
 ```bash
-# Clone the repository
 git clone https://github.com/SASS-Killers/OpenSchedule.git
 cd open-calendar
-
-# Install dependencies
 bun install
-
-# Copy and configure environment
 cp .env.example .env
 # Edit .env with your Neon database connection string
-
-# Apply the database schema
 psql $DATABASE_URL -f src/db/schema.sql
-
-# Apply RLS policies and auth functions
 psql $DATABASE_URL -f src/db/rls.sql
-
-# Start the development server
 bun run dev
 ```
 
-The app runs at `http://127.0.0.1:6969`. PostgREST starts automatically on port 6970.
+App runs at `http://127.0.0.1:6969`. PostgREST starts automatically on port 6970.
+
+### Deploy on a Free VPS
+
+One-command deploy on any Ubuntu/Debian VPS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SASS-Killers/OpenSchedule/main/scripts/deploy.sh | bash
+```
+
+Works on free tiers from **Oracle Cloud**, **Google Cloud**, **AWS**, **Azure**, and **VPSWala** — see the [self-hosting guide](./prd/self-hosting.md) for details and step-by-step instructions.
 
 ### Create an Admin Account
 
