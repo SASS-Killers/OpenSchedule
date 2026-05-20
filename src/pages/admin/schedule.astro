@@ -1,0 +1,58 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { requireSession } from "@/lib/auth-guard";
+
+const session = await requireSession(Astro.request);
+if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
+---
+
+<AppLayout title="Schedule — OpenSchedule">
+  <section style="padding: 2rem 1.5rem; max-width: 720px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <a href="/admin" class="app-btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;">← Back</a>
+      <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Availability Schedule</h1>
+    </div>
+
+    <div style="
+      display: grid; gap: 0.75rem;
+      padding: 2rem; border-radius: 0.85rem;
+      border: 1px solid var(--app-border);
+      background: rgba(255,255,255,0.02);
+    ">
+      <p style="margin: 0; font-size: 0.9rem; color: var(--app-text-muted);">
+        Set your default weekly hours and date-specific exceptions.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Mon</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px solid var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">9a – 5p</div>
+        </div>
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Tue</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px solid var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">9a – 5p</div>
+        </div>
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Wed</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px solid var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">9a – 5p</div>
+        </div>
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Thu</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px solid var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">9a – 5p</div>
+        </div>
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Fri</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px solid var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">9a – 5p</div>
+        </div>
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Sat</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px dashed var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">—</div>
+        </div>
+        <div style="display: grid; gap: 0.35rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--app-text-muted); text-align: center;">Sun</span>
+          <div style="padding: 1rem 0.5rem; border-radius: 0.5rem; border: 1px dashed var(--app-border); text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--app-text-muted);">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</AppLayout>

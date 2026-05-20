@@ -83,7 +83,7 @@ import AppLayout from "@/layouts/AppLayout.astro";
     const data = await res.json();
 
     if (data.devCode) {
-      codeDisplay.textContent = data.devCode.split("").join(" ");
+      codeDisplay.textContent = data.devCode;
       verifyEmail.value = email;
       codeInput.value = "";
       stepEmail.style.display = "none";

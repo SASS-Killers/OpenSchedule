@@ -1,14 +1,9 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
-import { verifySession } from "@/lib/auth";
+import { requireSession } from "@/lib/auth-guard";
 
-const cookie = Astro.request.headers.get("cookie") || "";
-const match = cookie.match(/session=([^;]+)/);
-const session = match ? await verifySession(match[1]) : null;
-
-if (!session) {
-  return Astro.redirect("/login");
-}
+const session = await requireSession(Astro.request);
+if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
 ---
 
 <AppLayout title="Admin — OpenSchedule">
@@ -29,18 +24,18 @@ if (!session) {
     </div>
 
     <div style="display: grid; gap: 1rem;">
-      <div class="app-btn" style="justify-content: flex-start; padding: 1rem;">
-        <span style="font-weight: 600;">Hosts</span>
+      <a href="/admin/hosts" class="app-btn" style="
+        justify-content: flex-start; padding: 1rem; text-decoration: none;
+      ">
+        <span style="font-weight: 600;">Team</span>
         <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Manage team members →</span>
-      </div>
-      <div class="app-btn" style="justify-content: flex-start; padding: 1rem;">
+      </a>
+      <a href="/admin/schedule" class="app-btn" style="
+        justify-content: flex-start; padding: 1rem; text-decoration: none;
+      ">
         <span style="font-weight: 600;">Schedule</span>
         <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Set availability →</span>
-      </div>
-      <div class="app-btn" style="justify-content: flex-start; padding: 1rem;">
-        <span style="font-weight: 600;">Email Quota</span>
-        <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">300 / 300 today →</span>
-      </div>
+      </a>
     </div>
   </section>
 </AppLayout>
