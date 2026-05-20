@@ -204,7 +204,7 @@ const session = match ? await verifySession(match[1]) : null;
             {session && (
               <>
                 {session.role === "admin" && (
-                  <a href="/hosts/me" class="nav-link">Admin</a>
+                  <a href="/admin" class="nav-link">Admin</a>
                 )}
                 {(session.role === "host" || session.role === "admin") && (
                   <a href="/hosts/me" class="nav-link">My Profile</a>
