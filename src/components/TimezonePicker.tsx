@@ -32,18 +32,32 @@ export function TimezonePicker({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [highlightIdx, setHighlightIdx] = useState(0);
+  const [selected, setSelected] = useState(value); // actual selected value for display
+  const initRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // On mount: detect browser timezone and override if stored value looks like a default
+  useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+    const browser = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const defaults = ["UTC", "America/New_York", "America/Los_Angeles", "America/Chicago", "Europe/London"];
+    if (browser && browser !== selected && defaults.includes(selected)) {
+      setSelected(browser);
+      onChange(browser);
+    }
+  }, []);
+
+  const displayName = (tz: string) => tz.replace(/_/g, " ");
 
   // Filter timezones by fuzzy match
   const filtered = query
     ? ALL_TZS.filter((tz) => fuzzyMatch(query, tz))
     : [];
 
-  // Display name: strip region prefix for common areas, show full for others
-  const displayName = (tz: string) => tz.replace(/_/g, " ");
-
   const select = (tz: string) => {
+    setSelected(tz);
     onChange(tz);
     setOpen(false);
     setQuery("");
@@ -104,7 +118,7 @@ export function TimezonePicker({
         ref={inputRef}
         type="text"
         placeholder="Search timezone…"
-        value={open ? query : displayName(value)}
+        value={open ? query : displayName(selected)}
         onFocus={() => {
           setOpen(true);
           setQuery("");
