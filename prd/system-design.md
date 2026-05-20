@@ -49,11 +49,10 @@ Before estimating traffic, we must establish what our **free-tier limits actuall
 | Resource | Free Limit | Max Sustained (for our architecture) | Headroom vs 25-Host Need |
 | :--- | :--- | :--- | :--- |
 | Brevo transactional emails | **300/day** | ~25 Hosts / 125 bookings | **1× — defines scale** |
-| Cloudflare D1 reads | 5,000,000/day | ~250× our need (20K/day) | **250×** |
-| Cloudflare D1 writes | 100,000/day | ~833× our need (120/day) | **833×** |
-| Pages Functions | 100,000/day | ~31× our need (3,200/day) | **31×** |
+| Neon PostgreSQL storage | 500 MB | ~94 MB over 3 years | **5×** |
+| Cloudflare Pages Functions | 100,000/day | ~10,000/day | **10×** |
 
-> **Email is the bottleneck that defines our scale.** D1 and compute have 31× to 833× headroom. No external APIs required — everything runs off D1.
+> **Email is the bottleneck that defines our scale.** Neon and Pages have 5× to 10× headroom. No external APIs required — everything runs off PostgreSQL.
 
 > **Email is the bottleneck that defines our scale.** Brevo's 300/day cap is 3× better than Resend's 100/day, but it's still the tightest constraint. All other resources have 31× to 10,000× headroom.
 
@@ -139,44 +138,48 @@ graph TB
 
     subgraph Cloudflare["Cloudflare Edge Network"]
         CDN["CDN<br/>(Static Assets: CSS/JS/Images)"]
-        SSR["Astro SSR + Pages Functions<br/>(Edge Rendering + API Layer)"]
+        SSR["Astro SSR<br/>(Booking page shell, login page)"]
         CDN --> SSR
     end
 
-    subgraph Services["Services"]
-        D1[("Cloudflare D1<br/>(SQLite Primary DB)")]
-        Brevo["Brevo API<br/>(Transactional Email)"]
+    subgraph API["Auto-Generated API"]
+        PGRST["PostgREST<br/>(REST API from DB schema)"]
+    end
+
+    subgraph Data["Data Layer"]
+        PG[("Neon PostgreSQL<br/>+ RLS Policies")]
         Cron["Workers Cron Trigger<br/>(Daily Reminders @ 08:00 UTC)"]
     end
 
     Browser -- "HTTPS" --> CDN
-    SSR -- "SQL Queries" --> D1
-    SSR -- "REST API" --> Brevo
-    Cron -- "Secure Internal Call" --> SSR
+    Browser -- "Authorization: Bearer JWT" --> PGRST
+    PGRST -- "SQL" --> PG
+    SSR -- "data via PostgREST" --> PGRST
+    Cron -- "SQL" --> PG
 ```
 
-### Component Roles
+> **Legend**: All data access goes through PostgREST. The frontend never connects to PostgreSQL directly. Authentication is handled by JWT → RLS policies.
 
 | Component | Role | Why This Choice |
 | :--- | :--- | :--- |
-| **Cloudflare Pages** | SSR + Static hosting | Free tier (100K req/day), 330 global PoPs, sub-ms cold starts |
-| **Astro** | Web framework | Islands architecture = near-zero JS on public pages, only hydrate the date picker |
-| **D1 (SQLite)** | Primary database | Native edge integration = < 10ms query latency from Workers. Free 5M reads/day |
-| **Drizzle ORM** | Type-safe SQL access | Zero runtime overhead. Compiles to raw SQL. No edge compatibility issues |
-| **Brevo** | Transactional email | REST API (simple), **300 emails/day free** (vs Resend's 100), 9,000/month, SMTP fallback available |
-| **Workers Cron** | Scheduled tasks | Free (up to 3 triggers), runs the daily reminder worker |
+| **Cloudflare Pages** | SSR for public pages | Free tier (100K req/day), 330 global PoPs, sub-ms cold starts |
+| **Astro** | Web framework | Islands architecture = near-zero JS on public booking pages |
+| **Neon (PostgreSQL)** | Single data platform | **Cannibalizes the entire middleware stack**: JSONB for NoSQL, `pg_trgm` + `tsvector` for search, `pgvector` for AI embeddings, `SELECT ... FOR UPDATE SKIP LOCKED` for job queues, materialized views for dashboards, PostGIS for spatial data, BRIN indexes for time-series. Everything in one ACID-compliant database. |
+| **PostgREST** | Auto-generated REST API | Reads the PostgreSQL schema and exposes every table as a REST endpoint. RLS policies replace middleware auth. Zero hand-written API routes. |
+| **Brevo** | Transactional email | 300 emails/day free, REST API, works from Cloudflare Workers |
+| **Workers Cron** | Scheduled tasks | Free (up to 3 triggers), runs daily reminder worker |
 
 ### Key Design Decisions & Trade-offs
 
 | Decision | Option A (Chosen) | Option B (Rejected) | Rationale |
 | :--- | :--- | :--- | :--- |
-| **Database** | D1 (SQLite) | PostgreSQL (Neon) | D1 has zero latency to Workers. Neon requires HTTP pooler. At our scale, D1's single-writer model is sufficient. |
+| **Database** | Neon (PostgreSQL) | SQLite / D1 / separate services | PostgreSQL extensions cannibalize the entire stack: JSONB → NoSQL, `pg_trgm` → search, `pgvector` → AI, `SKIP LOCKED` → queues, materialized views → analytics. One database to rule them all. |
+| **API Layer** | PostgREST (auto-generated) | Hand-written Astro endpoints | PostgREST reads the DB schema and exposes every table as a REST endpoint automatically. Adding a table = adding an endpoint. RLS policies replace middleware auth. |
+| **ORM** | None | Drizzle / Prisma | PostgREST eliminates the need for an ORM. The database schema IS the API contract. Raw SQL for migrations via Neon branching. |
 | **Framework** | Astro SSR | SPA (React-only) | Astro public pages ship ~5 KB JS vs 200+ KB for SPA. Critical for sub-1s mobile loads. |
-| **Auth** | OTP + JWT cookies | OAuth/SAML | Self-hosted means no IdP dependency. OTP via email is simplest for non-technical users. |
-| **ORM** | Drizzle | Prisma | Drizzle compiles to raw SQL with no runtime — critical for edge Workers. Prisma has a heavier runtime. |
-| **Email** | Brevo transactional via REST API | SMTP relay | SMTP requires port 25 (blocked by Cloudflare). Brevo's REST API is a single HTTP POST. 3× free capacity vs Resend (300/day vs 100/day). |
-| **Cache** | In-memory (Worker) + D1 reads | Redis / Upstash | At our QPS (peak 5/s), Worker memory cache is sufficient. Redis adds cost and complexity. |
-| **Real-time slot sync** | Client-side polling (15s interval) | WebSockets + Durable Objects | Polling hits D1 every 15s per viewer (~1.5 reads/min). WebSockets need DO infra, connection management, and reconnection logic. For < 10 concurrent viewers, polling is simpler and free-tier friendly. The race check at booking time provides final consistency regardless of sync method. |
+| **Auth** | OTP + JWT + RLS | OAuth/SAML | Self-hosted means no IdP dependency. JWT passed to PostgREST — RLS enforces row-level access in-database. |
+| **Email** | Brevo via REST API | SMTP relay | SMTP requires port 25 (blocked by Cloudflare). Brevo is a single HTTP POST. 300/day free. |
+| **Cache** | None needed at this scale | Redis / Upstash | At < 1 QPS and ~30ms Postgres queries, caching adds complexity with zero perceptible benefit. |
 
 ---
 

@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { env } from "cloudflare:workers";
+import { query } from "@/db/neon";
 import { verifySession } from "@/lib/auth";
 
 async function getUser(request: Request) {
@@ -15,13 +15,11 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(null, { status: 401 });
   }
 
-  const db = env.DB as D1Database;
-  const rows = await db
-    .prepare("SELECT id, day_of_week, start_time, end_time FROM schedules WHERE user_id = ? ORDER BY day_of_week")
-    .bind(session.userId)
-    .all();
+  const rows = await query`
+    SELECT id, day_of_week, start_time, end_time FROM schedules WHERE user_id = ${session.userId} ORDER BY day_of_week
+  `;
 
-  return new Response(JSON.stringify(rows.results), {
+  return new Response(JSON.stringify(rows), {
     headers: { "content-type": "application/json" },
   });
 };
@@ -32,18 +30,16 @@ export const PUT: APIRoute = async ({ request }) => {
     return new Response(null, { status: 401 });
   }
 
-  const db = env.DB as D1Database;
   const body = await request.json();
   const entries = body as { dayOfWeek: number; startTime: string; endTime: string }[];
 
-  // Replace all schedules for this user in a transaction-like sequence
-  await db.prepare("DELETE FROM schedules WHERE user_id = ?").bind(session.userId).run();
+  await query`DELETE FROM schedules WHERE user_id = ${session.userId}`;
 
   for (const entry of entries) {
-    await db
-      .prepare("INSERT INTO schedules (id, user_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?)")
-      .bind(crypto.randomUUID(), session.userId, entry.dayOfWeek, entry.startTime, entry.endTime)
-      .run();
+    await query`
+      INSERT INTO schedules (id, user_id, day_of_week, start_time, end_time)
+      VALUES (${crypto.randomUUID()}, ${session.userId}, ${entry.dayOfWeek}, ${entry.startTime}, ${entry.endTime})
+    `;
   }
 
   return new Response(JSON.stringify({ ok: true }), {

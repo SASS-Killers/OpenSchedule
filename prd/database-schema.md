@@ -1,21 +1,18 @@
-# PRD Section 5: Database Schema Design (SQLite / D1)
+# PRD Section 5: Database Schema Design (PostgreSQL)
 
-OpenSchedule uses **Cloudflare D1**, which runs on a serverless SQLite engine. The schema utilizes SQLite-compliant data types (`TEXT` for strings/UUIDs/dates, `INTEGER` for timestamps/booleans, and `REAL` for floating points). 
+OpenSchedule uses **Neon (serverless PostgreSQL)** as its single database. The schema is managed as a **raw SQL file** (`src/db/schema.sql`) applied via `psql` or Neon's branching workflow. No ORM.
 
-To ensure high data integrity, ease of queries, and protection against anomalies, the database schema is strictly designed to satisfy **Third Normal Form (3NF)**.
+PostgreSQL types used: `TEXT` for strings/UUIDs, `INTEGER` for Unix timestamps/numbers, `BOOLEAN` for flags, with `CHECK` constraints for enum validation.
 
 ---
 
-## 1. Normalization Strategy & Relational Integrity
+## 1. Schema Management (No ORM)
 
-* **First Normal Form (1NF)**: Every table has a primary key (`id` as a UUID TEXT), all attributes contain atomic values, and there are no repeating groups or comma-separated lists (e.g., split shifts or multi-value entries are normalized into individual rows).
-* **Second Normal Form (2NF)**: Meets 1NF, and all non-key columns depend entirely on the primary key. Since all tables use a single-column primary key (`id`), there are zero partial key dependencies.
-* **Third Normal Form (3NF)**: Meets 2NF, and no non-key column is transitively dependent on the primary key. For example:
-  * The `bookings` table does *not* contain Host (`users`) details or Client details directly. It references `event_type_id` and `client_id` via foreign keys.
-  * Host details are traversed dynamically via `bookings` -> `event_types` -> `users`.
-  * Client details are traversed via `bookings` -> `clients`.
-  * This eliminates data redundancy and prevents update anomalies.
-* **Referential Integrity (Foreign Keys)**: All relationships explicitly configure `ON DELETE CASCADE` or `ON DELETE RESTRICT` actions to ensure orphan records are never left in the D1 database.
+* **No Drizzle / Prisma / any ORM**: PostgREST reads the schema directly and auto-generates the REST API. An ORM would be a redundant abstraction layer.
+* **Raw SQL migrations**: The entire schema lives in `src/db/schema.sql`. Changes are applied via `psql $DATABASE_URL -f src/db/migrations/001_add_column.sql`.
+* **Neon branching**: Before applying a migration to production, create an instant Neon branch, run the migration, verify PostgREST generates the correct endpoints, then merge.
+* **Referential Integrity**: Foreign keys with `ON DELETE CASCADE` ensure orphan records are never left in the database.
+* **Row-Level Security (RLS)**: Tables that contain user-specific data will have RLS policies that reference `request.jwt.claims.user_id` (set by PostgREST from the JWT token). This moves authorization into the database layer — no application code needed.
 
 ---
 
@@ -26,91 +23,74 @@ Represents the system users: the Admin and all provisioned Hosts.
 
 Each user is assigned a **cryptographic UUID slug** at creation time (e.g., `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`). This slug is used in public booking URLs (`/{slug}`) to avoid collisions from similar names and prevent host enumeration via predictable URLs.
 
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  email: "TEXT" (Unique, Not Null),
-  name: "TEXT" (Not Null),
-  slug: "TEXT" (Unique, Not Null - UUID hex string, e.g., "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"),
-  role: "TEXT" (Not Null - 'admin' | 'host'),
-  timezone: "TEXT" (Not Null - e.g., 'America/New_York'),
-  is_active: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 1),
-  created_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  role TEXT NOT NULL DEFAULT 'host' CHECK (role IN ('admin', 'host')),
+  timezone TEXT NOT NULL DEFAULT 'UTC',
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at INTEGER NOT NULL
+);
 ```
 
 ### Table: `clients`
 Represents client accounts auto-provisioned during booking.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  email: "TEXT" (Unique, Not Null),
-  name: "TEXT" (Not Null),
-  created_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE clients (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
 ```
 
 ### Table: `verification_codes` (OTP Verification)
 One-time codes generated for passwordless logins. Wiped immediately on verification.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  email: "TEXT" (Not Null),
-  code: "TEXT" (Not Null - 6-digit string),
-  attempts: "INTEGER" (Not Null, Default: 0),
-  expires_at: "INTEGER" (Not Null, Unix Timestamp),
-  created_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE verification_codes (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  code TEXT NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  expires_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+);
 ```
 
 ### Table: `schedules` (Default Weekly Hours)
-Defines default weekly availability blocks for Hosts. Multiple shifts per day are supported as separate rows (e.g. a morning shift and an afternoon shift for the same day), satisfying 1NF.
+Defines default weekly availability blocks for Hosts. Multiple shifts per day are supported as separate rows (e.g. a morning shift and an afternoon shift for the same day).
 * **FK Rule**: `ON DELETE CASCADE` ensures deleting a Host purges their schedules.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  user_id: "TEXT" (Not Null, Foreign Key -> users.id, ON DELETE CASCADE),
-  day_of_week: "INTEGER" (Not Null, 0 to 6, 0 = Sunday),
-  start_time: "TEXT" (Not Null - 24hr format "HH:MM", e.g., "09:00"),
-  end_time: "TEXT" (Not Null - 24hr format "HH:MM", e.g., "17:00")
-}
+```sql
+CREATE TABLE schedules (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL
+);
 ```
 
 ### Table: `date_overrides` (Availability Exceptions)
 Defines dates where default weekly schedules are overridden (e.g. holidays, vacations, dentist appointments, or custom working hours). Supports three exception types via the `exception_type` column.
-
-* **Multi-day ranges**: The `start_date` / `end_date` pair supports single-day and multi-day exceptions (e.g., a two-week vacation) in one row, avoiding 14 individual records.
-* **Partial-day blocks**: `exception_type = 'window_block'` punches a hole in the Host's normal schedule without replacing it (e.g., "dentist 2–3pm, available rest of day").
-* **Custom hours**: `exception_type = 'custom_hours'` replaces the default schedule entirely for that date range (e.g., "working from home 10am–4pm").
-* **Full-day blocks**: `exception_type = 'full_day_block'` removes all availability for the entire date range. `start_time` and `end_time` must be null.
-* **Conflict detection**: Creating an exception that overlaps existing confirmed bookings triggers a conflict warning to the Host.
 * **FK Rule**: `ON DELETE CASCADE` ensures deleting a Host purges their overrides.
 
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  user_id: "TEXT" (Not Null, Foreign Key -> users.id, ON DELETE CASCADE),
-  
-  // Date range (single day: start_date == end_date)
-  start_date: "TEXT" (Not Null, ISO string format "YYYY-MM-DD"),
-  end_date: "TEXT" (Not Null, ISO string format "YYYY-MM-DD"),
-  
-  // Exception type determines semantics of start_time/end_time
-  exception_type: "TEXT" (Not Null, 'full_day_block' | 'custom_hours' | 'window_block'),
-  
-  // Time window: required for custom_hours and window_block, must be null for full_day_block
-  start_time: "TEXT" (Allows Null - "HH:MM" 24hr format),
-  end_time: "TEXT" (Allows Null - "HH:MM" 24hr format),
-  
-  // Human-readable label for Host dashboard calendar display
-  title: "TEXT" (Allows Null - e.g., "Italy vacation", "Dentist appointment"),
-  
-  // Soft-delete / toggle support
-  is_active: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 1),
-  
-  created_at: "INTEGER" (Not Null, Unix Timestamp),
-  updated_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE date_overrides (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  exception_type TEXT NOT NULL CHECK (exception_type IN ('full_day_block', 'custom_hours', 'window_block')),
+  start_time TEXT,
+  end_time TEXT,
+  title TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
 ```
 
 **Valid semantic combinations:**
@@ -125,85 +105,72 @@ Defines dates where default weekly schedules are overridden (e.g. holidays, vaca
 | `custom_hours` | 2026-07-01 | 2026-09-01 | `08:00` | `16:00` | Summer hours Jul–Sep |
 
 ### Table: `recurring_exceptions` (Repeating Availability Blocks)
-Defines exceptions that repeat on a weekly schedule (e.g., "every Tuesday 10–11am team standup"). Unlike `date_overrides`, these do not require a specific date — they apply to all matching days of the week within optional date bounds.
-
-* **Priority**: Recurring exceptions have lower priority than date-specific overrides. If a `date_overrides` entry exists for a given date, the recurring exception does not apply to that date.
-* **Window block**: `exception_type = 'window_block'` punches a recurring hole in the Host's schedule (e.g., recurring weekly meeting).
-* **Custom hours**: `exception_type = 'custom_hours'` replaces the normal schedule on matching days (e.g., "summer hours Monday–Thursday").
-* **Date bounds**: `effective_start` / `effective_end` allow temporary recurring exceptions (e.g., "every Tuesday in June"). Null = active indefinitely until explicitly deleted or deactivated.
+Defines exceptions that repeat on a weekly schedule (e.g., "every Tuesday 10–11am team standup").
 * **FK Rule**: `ON DELETE CASCADE` ensures deleting a Host purges their recurring exceptions.
 
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  user_id: "TEXT" (Not Null, Foreign Key -> users.id, ON DELETE CASCADE),
-  
-  // Weekly pattern
-  day_of_week: "INTEGER" (Not Null, 0 to 6, 0 = Sunday),
-  
-  // Type and time window
-  exception_type: "TEXT" (Not Null, 'window_block' | 'custom_hours'),
-  start_time: "TEXT" (Not Null - "HH:MM" 24hr format),
-  end_time: "TEXT" (Not Null - "HH:MM" 24hr format),
-  
-  // Optional date bounds (null = active indefinitely)
-  effective_start: "TEXT" (Allows Null - "YYYY-MM-DD"),
-  effective_end: "TEXT" (Allows Null - "YYYY-MM-DD"),
-  
-  // Display & management
-  title: "TEXT" (Allows Null - e.g., "Weekly team standup"),
-  is_active: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 1),
-  created_at: "INTEGER" (Not Null, Unix Timestamp),
-  updated_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE recurring_exceptions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+  exception_type TEXT NOT NULL CHECK (exception_type IN ('window_block', 'custom_hours')),
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL,
+  effective_start TEXT,
+  effective_end TEXT,
+  title TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
 ```
 
 ### Table: `event_types` (Meeting Configurations)
 Defined meeting formats hosted by a specific Host.
 * **FK Rule**: `ON DELETE CASCADE` ensures deleting a Host purges their event types.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  user_id: "TEXT" (Not Null, Foreign Key -> users.id, ON DELETE CASCADE),
-  title: "TEXT" (Not Null),
-  slug: "TEXT" (Not Null), // Unique combination (user_id, slug) is enforced
-  description: "TEXT",
-  duration: "INTEGER" (Not Null, duration in minutes),
-  buffer_before: "INTEGER" (Not Null, minutes, Default: 0),
-  buffer_after: "INTEGER" (Not Null, minutes, Default: 0),
-  minimum_notice: "INTEGER" (Not Null, hours notice required, Default: 4),
-  is_active: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 1)
-}
+```sql
+CREATE TABLE event_types (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  duration INTEGER NOT NULL,
+  buffer_before INTEGER NOT NULL DEFAULT 0,
+  buffer_after INTEGER NOT NULL DEFAULT 0,
+  minimum_notice INTEGER NOT NULL DEFAULT 4,
+  is_active BOOLEAN NOT NULL DEFAULT true
+);
 ```
 
 ### Table: `bookings` (Reservations)
 Individual scheduled appointments reserved by Clients.
 * **FK Rules**:
   * `ON DELETE RESTRICT` on `event_type_id` and `client_id` prevents deleting an active meeting configuration or client record if booking histories are attached.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  event_type_id: "TEXT" (Not Null, Foreign Key -> event_types.id, ON DELETE RESTRICT),
-  client_id: "TEXT" (Not Null, Foreign Key -> clients.id, ON DELETE RESTRICT),
-  start_time: "INTEGER" (Not Null, UTC Unix Timestamp),
-  end_time: "INTEGER" (Not Null, UTC Unix Timestamp),
-  status: "TEXT" (Not Null - 'confirmed' | 'cancelled', Default: 'confirmed'),
-  client_notes: "TEXT",
-  cancellation_token: "TEXT" (Not Null, Unique - cryptographically secure UUID),
-  reminder_sent: "INTEGER" (Not Null, Boolean: 0 | 1, Default: 0),
-  created_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE bookings (
+  id TEXT PRIMARY KEY,
+  event_type_id TEXT NOT NULL REFERENCES event_types(id) ON DELETE RESTRICT,
+  client_id TEXT NOT NULL REFERENCES clients(id) ON DELETE RESTRICT,
+  start_time INTEGER NOT NULL,
+  end_time INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'confirmed' CHECK (status IN ('confirmed', 'cancelled')),
+  client_notes TEXT,
+  cancellation_token TEXT NOT NULL UNIQUE,
+  reminder_sent BOOLEAN NOT NULL DEFAULT false,
+  created_at INTEGER NOT NULL
+);
 ```
 
 ### Table: `sent_emails_log` (Local Email Telemetry)
 Tracks transactional and batch email dispatch for local telemetry, quota checking, and Admin dashboard rendering. Fully decoupled log with zero relational ties to prevent database locking during telemetry queries.
-```typescript
-{
-  id: "TEXT" (Primary Key - UUID),
-  email_type: "TEXT" (Not Null - 'otp' | 'confirmation' | 'reminder' | 'cancellation'),
-  recipient: "TEXT" (Not Null),
-  sent_at: "INTEGER" (Not Null, Unix Timestamp)
-}
+```sql
+CREATE TABLE sent_emails_log (
+  id TEXT PRIMARY KEY,
+  email_type TEXT NOT NULL CHECK (email_type IN ('otp', 'confirmation', 'reminder', 'cancellation')),
+  recipient TEXT NOT NULL,
+  sent_at INTEGER NOT NULL
+);
 ```
 
 ---
@@ -218,14 +185,31 @@ To prevent corrupted records or invalid schema states:
 
 ---
 
-## 4. Indices & Optimizations
+## 4. Row-Level Security (RLS)
 
-To ensure dynamic slot computation stays under **100ms** at the Edge:
-1. **User Email Index**: Index `users.email` for authentication check speeds.
-2. **User Slug Index**: Index `users.slug` for public booking page URL lookups. UUID-based slugs ensure O(1) lookups without host enumeration risk.
+PostgREST sends the JWT claims to PostgreSQL as `request.jwt.claims`. RLS policies use these to enforce access:
+
+```sql
+-- Hosts can only see their own schedules
+ALTER TABLE schedules ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_schedules ON schedules
+  USING (user_id = current_setting('request.jwt.claims.user_id')::TEXT);
+
+-- Admins can see everything
+CREATE POLICY admin_all ON schedules
+  USING (current_setting('request.jwt.claims.role')::TEXT = 'admin');
+```
+
+---
+
+## 5. Indices & Optimizations
+
+To ensure dynamic slot computation stays under **100ms**:
+1. **User Email Index**: Index `users(email)` for authentication check speeds.
+2. **User Slug Index**: Index `users(slug)` for public booking page URL lookups. UUID-based slugs ensure O(1) lookups without host enumeration risk.
 3. **Booking Search Index**: Index `bookings(event_type_id, start_time)` to quickly query busy intervals on specific dates.
-4. **Date Overrides Index**: Index `date_overrides(user_id, start_date, end_date, exception_type)` for efficient lookup of all active exceptions covering a date range. This composite index avoids table scans when computing per-day slot availability.
+4. **Date Overrides Index**: Index `date_overrides(user_id, start_date, end_date, exception_type)` for efficient lookup of all active exceptions covering a date range.
 5. **Recurring Exceptions Index**: Index `recurring_exceptions(user_id, day_of_week, is_active)` to find all recurring blocks active on a given day of the week.
-6. **Client Search Index**: Index `clients.email` to speed up auto-registration operations.
+6. **Client Search Index**: Index `clients(email)` to speed up auto-registration operations.
 7. **Sent Emails Log Index**: Index `sent_emails_log(sent_at)` for real-time telemetry lookups.
-8. **Booking Cancellation Index**: Index `bookings.cancellation_token` to make client cancellation lookups instantaneous.
+8. **Booking Cancellation Index**: Index `bookings(cancellation_token)` to make client cancellation lookups instantaneous.

@@ -1,9 +1,8 @@
 import type { APIRoute } from "astro";
-import { env } from "cloudflare:workers";
+import { query } from "@/db/neon";
 import { signSession } from "@/lib/auth";
 
 export const POST: APIRoute = async ({ request }) => {
-  const db = env.DB as D1Database;
   const form = await request.formData();
   const email = form.get("email") as string;
   const code = form.get("code") as string;
@@ -14,45 +13,37 @@ export const POST: APIRoute = async ({ request }) => {
 
   const now = Math.floor(Date.now() / 1000);
 
-  // Find valid code
-  const record = await db
-    .prepare(
-      "SELECT * FROM verification_codes WHERE email = ? AND code = ? AND expires_at > ?"
-    )
-    .bind(email, code, now)
-    .first<any>();
+  const [record] = await query`
+    SELECT * FROM verification_codes WHERE email = ${email} AND code = ${code} AND expires_at > ${now} LIMIT 1
+  `;
 
   if (!record) {
     return new Response(JSON.stringify({ error: "Invalid or expired code" }), { status: 401 });
   }
 
-  if (record.attempts >= 5) {
-    await db.prepare("DELETE FROM verification_codes WHERE id = ?").bind(record.id).run();
+  if ((record as any).attempts >= 5) {
+    await query`DELETE FROM verification_codes WHERE id = ${(record as any).id}`;
     return new Response(JSON.stringify({ error: "Too many attempts" }), { status: 429 });
   }
 
-  // Get user
-  const user = await db
-    .prepare("SELECT * FROM users WHERE email = ? AND is_active = 1")
-    .bind(email)
-    .first<any>();
+  const [user] = await query`
+    SELECT * FROM users WHERE email = ${email} AND is_active = true LIMIT 1
+  `;
 
   if (!user) {
     return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
   }
 
-  // Delete the code
-  await db.prepare("DELETE FROM verification_codes WHERE id = ?").bind(record.id).run();
+  await query`DELETE FROM verification_codes WHERE id = ${(record as any).id}`;
 
-  // Sign session JWT
+  const u = user as any;
   const token = await signSession({
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
+    userId: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
   });
 
-  // Set cookie and redirect
   return new Response(null, {
     status: 302,
     headers: {
