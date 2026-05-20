@@ -12,7 +12,7 @@ export interface SessionPayload {
 const getSecret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? "dev-secret-do-not-use-in-prod-change-me");
 
 export async function signSession(payload: SessionPayload): Promise<string> {
-  return new SignJWT({ ...payload, userrole: payload.role })
+  return new SignJWT({ userId: payload.userId, email: payload.email, name: payload.name, userrole: payload.role })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
@@ -27,7 +27,7 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
       userId: p.userId || p.userid || "",
       email: p.email || "",
       name: p.name || "",
-      role: p.role || p.userrole || "host",
+      role: p.userrole || "host",
     };
   } catch {
     return null;
