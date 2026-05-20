@@ -69,12 +69,7 @@ input.addEventListener("change", async () => {
   const file = input.files?.[0];
   if (!file) return;
 
-  if (file.size > 512 * 1024) {
-    status.textContent = "Image too large. Max 512KB.";
-    return;
-  }
-
-  status.textContent = "Uploading...";
+  status.textContent = "Processing...";
 
   // Resize to 200x200 on the client
   const canvas = document.createElement("canvas");
