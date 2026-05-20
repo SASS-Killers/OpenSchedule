@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Race condition check
   const [conflict] = await query`
-    SELECT id FROM bookings b
+    SELECT b.id FROM bookings b
     JOIN event_types e ON b.event_type_id = e.id
     WHERE e.user_id = ${evt.user_id} AND b.status = 'confirmed'
     AND b.start_time < ${slotEnd} AND b.end_time > ${slotStart}
