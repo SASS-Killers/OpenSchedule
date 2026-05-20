@@ -28,6 +28,7 @@
 | NFR3 | **Consistency** — No double-bookings allowed (strong consistency on writes) | Exactly-once |
 | NFR4 | **Availability** — Booking page must be available even if email service is down | Degrade gracefully |
 | NFR5 | **Durability** — All booking data persisted; no data loss on crash | ACID writes |
+| NFR6 | **Responsive** — Desktop is wide (side-by-side columns), mobile is tall (stacked single column) | CSS grid with `grid-template-columns: 1fr 1fr` → `1fr` at < 768px |
 
 ### Out of Scope
 

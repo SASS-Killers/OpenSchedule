@@ -138,6 +138,7 @@ const session = match ? await verifySession(match[1]) : null;
 
       @media (max-width: 720px) {
         .app-topbar { padding: 0.9rem 1rem; }
+        .profile-grid { grid-template-columns: 1fr !important; }
       }
     </style>
   </head>
@@ -158,7 +159,7 @@ const session = match ? await verifySession(match[1]) : null;
                 <a href="/hosts/me" class="nav-link">Admin</a>
               )}
               {(session.role === "host" || session.role === "admin") && (
-                <a href="/me/bookings" class="nav-link">My Bookings</a>
+                <a href="/hosts/me" class="nav-link">My Profile</a>
               )}
               <form method="POST" action="/api/auth/logout" style="display:inline;">
                 <button type="submit" class="nav-link" style="border:none;background:none;cursor:pointer;">

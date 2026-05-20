@@ -90,6 +90,9 @@ Click any non-functional constraint to inspect the corresponding engineering str
   * *Constraint*: Prevent workspace code rot, casing inconsistencies, and generic "junk drawers" that complicate asset tracking.
   * *Engineering Solution*: Strictly enforce kebab-case (lowercase, hyphen-separated) naming across all files and folders. Banish generic directories like `/components`, `/utils`, or `/helpers`. Organise codebase into highly cohesive, feature-driven folders (e.g., `/installer-wizard`, `/host-dashboard`, `/shared-ui`).
   * *Deep Link*: **[Directory & Modular Architecture Standards](./coding-standards.md)**
+* **[NFR-9] Responsive Layout**:
+  * *Constraint*: Desktop is wide (side-by-side columns), mobile is tall (stacked single column).
+  * *Engineering Solution*: CSS Grid with `grid-template-columns: 1fr 1fr` on wide screens, collapsing to `1fr` at ≤ 768px. No horizontal scroll, no fixed widths.
 
 ---
 
