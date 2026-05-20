@@ -19,20 +19,20 @@ if (!session || session.role !== "admin") return Astro.redirect("/login");
     <section style="padding: 1.5rem; max-width: 480px;">
       <a href="/admin" class="app-btn" style="padding: 0.35rem 0.75rem; min-height: 0; font-size: 0.82rem; display: inline-flex; margin-bottom: 1.5rem;">← Back</a>
       <h1 style="margin: 0 0 1.5rem; font-size: 1.25rem; font-weight: 700;">Add Host</h1>
-      <form method="POST" action="/api/admin/hosts" style="display: grid; gap: 0.75rem;">
+      <form id="add-host-form" style="display: grid; gap: 0.75rem;">
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Name</label>
-          <input type="text" name="name" required
+          <input type="text" name="name" id="field-name" required
             style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;" />
         </div>
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Email</label>
-          <input type="email" name="email" required
+          <input type="email" name="email" id="field-email" required
             style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;" />
         </div>
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Timezone</label>
-          <select name="timezone"
+          <select name="timezone" id="field-tz"
             style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;">
             <option value="America/New_York">America/New_York</option>
             <option value="America/Chicago">America/Chicago</option>
@@ -49,8 +49,43 @@ if (!session || session.role !== "admin") return Astro.redirect("/login");
             <option value="UTC">UTC</option>
           </select>
         </div>
+        <div id="form-error" style="color:#f87171;font-size:0.85rem;display:none;"></div>
         <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; margin-top: 0.5rem;">Create Host</button>
       </form>
     </section>
   </div>
 </AppLayout>
+
+<script>
+document.getElementById("add-host-form")!.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById("form-error")!;
+  errEl.style.display = "none";
+
+  const name = (document.getElementById("field-name") as HTMLInputElement).value;
+  const email = (document.getElementById("field-email") as HTMLInputElement).value;
+  const timezone = (document.getElementById("field-tz") as HTMLSelectElement).value;
+
+  // Get JWT from cookie
+  const m = document.cookie.match(/session=([^;]+)/);
+  if (!m) { window.location.href = "/login"; return; }
+  const jwt = m[1];
+
+  const res = await fetch("/pgrst/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${jwt}`,
+    },
+    body: JSON.stringify({ name, email, timezone, role: "host", is_active: true }),
+  });
+
+  if (res.ok || res.status === 201) {
+    window.location.href = "/admin";
+  } else {
+    const data = await res.json();
+    errEl.textContent = data.message || "Failed to create host.";
+    errEl.style.display = "block";
+  }
+});
+</script>
