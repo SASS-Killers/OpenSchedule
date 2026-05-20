@@ -25,8 +25,12 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(0);
+  const [internalValue, setInternalValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // Actual value to display — use prop if provided, otherwise internal state
+  const displayValue = onChange ? value : internalValue;
 
   const filtered = useMemo(
     () => (query ? items.filter((i) => fuzzyMatch(query, i)) : []),
@@ -45,6 +49,7 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
   }, [filtered, groupBy]);
 
   const select = (item: string) => {
+    setInternalValue(item);
     if (onChange) onChange(item);
     setOpen(false);
     setQuery("");
@@ -73,7 +78,7 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
         ref={inputRef}
         type="text"
         placeholder={placeholder}
-        value={open ? query : fmt(value)}
+        value={open ? query : fmt(displayValue)}
         onFocus={() => { setOpen(true); setQuery(""); }}
         onChange={(e) => { setQuery(e.target.value); setHighlightIdx(0); if (!open) setOpen(true); }}
         onKeyDown={onKeyDown}

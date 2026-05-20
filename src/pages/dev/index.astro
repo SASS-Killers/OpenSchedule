@@ -1,0 +1,191 @@
+---
+import AppLayout from "@/layouts/app-layout.astro";
+import { TimezonePicker } from "@/host-dashboard/timezone-picker";
+import { FuzzySearch } from "@/ui/fuzzy-search";
+import { Avatar } from "@/host-dashboard/avatar";
+
+const isDev = import.meta.env.DEV;
+if (!isDev) return Astro.redirect("/");
+---
+
+<AppLayout title="Dev UI — OpenSchedule">
+  <div style="display:grid;grid-template-columns:200px 1fr;max-width:1100px;margin:0 auto;padding:2rem 1.5rem;gap:2rem;">
+    <!-- Sidebar nav -->
+    <div style="position:sticky;top:6rem;align-self:start;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+        <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.45rem;border-radius:0.25rem;background:rgba(255,200,0,0.15);color:#fbbf24;">DEV</span>
+      </div>
+      {["buttons","inputs","cards","badges","typography","dropdown","fuzzy-search","timezone-picker","avatar","form","schedule-editor","event-types","booking-widget"].map(s => (
+        <a href={"#"+s} style="display:block;padding:0.3rem 0.65rem;border-radius:0.4rem;font-size:0.82rem;color:var(--app-text-muted);text-decoration:none;">{s.replace(/-/g," ")}</a>
+      ))}
+    </div>
+
+    <!-- Content -->
+    <div>
+      <!-- Buttons -->
+      <section id="buttons" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Buttons</h2>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+          <button class="app-btn">Secondary</button>
+          <button class="app-btn app-btn-primary">Primary</button>
+          <button class="app-btn app-btn-outline">Outline</button>
+          <button class="app-btn" disabled>Disabled</button>
+          <button class="app-btn app-btn-primary" disabled>Disabled Primary</button>
+          <a href="#" class="app-btn">Link</a>
+          <a href="#" class="app-btn app-btn-primary">Primary Link</a>
+        </div>
+      </section>
+
+      <!-- Inputs -->
+      <section id="inputs" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Inputs</h2>
+        <div style="display:grid;gap:0.75rem;max-width:320px;">
+          <div style="display:grid;gap:0.3rem;">
+            <label style="font-size:0.82rem;color:var(--app-text-muted);">Text</label>
+            <input type="text" placeholder="Placeholder" style="width:100%;padding:0.55rem 0.75rem;border-radius:0.7rem;border:1px solid var(--app-border);background:rgba(0,0,0,0.2);color:#fff;font-size:0.88rem;outline:none;" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards -->
+      <section id="cards" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Cards</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div style="padding:1.5rem;border-radius:0.85rem;border:1px solid var(--app-border);background:rgba(255,255,255,0.02);"><h3 style="margin:0;font-size:0.95rem;font-weight:700;">Default</h3></div>
+          <div style="padding:1.5rem;border-radius:0.85rem;border:1px dashed var(--app-border);"><h3 style="margin:0;font-size:0.95rem;font-weight:700;">Dashed</h3></div>
+          <div style="padding:1.5rem;border-radius:0.85rem;border:1px solid var(--app-border);background:rgba(99,102,241,0.04);"><h3 style="margin:0;font-size:0.95rem;font-weight:700;">Tinted</h3></div>
+          <div style="padding:1rem;border-radius:0.7rem;border:1px solid var(--app-border);"><h3 style="margin:0;font-size:0.9rem;font-weight:600;">Compact</h3></div>
+        </div>
+      </section>
+
+      <!-- Badges -->
+      <section id="badges" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Badges</h2>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <span style="padding:0.25rem 0.6rem;border-radius:999px;border:1px solid var(--app-border);font-size:0.78rem;color:var(--app-text-muted);">Default</span>
+          <span style="padding:0.25rem 0.6rem;border-radius:999px;background:rgba(99,102,241,0.12);font-size:0.78rem;color:var(--app-primary);">Primary</span>
+          <span style="padding:0.25rem 0.6rem;border-radius:999px;background:rgba(52,211,153,0.12);font-size:0.78rem;color:#34d399;">Success</span>
+          <span style="padding:0.25rem 0.6rem;border-radius:999px;background:rgba(248,113,113,0.12);font-size:0.78rem;color:#f87171;">Error</span>
+          <span style="padding:0.25rem 0.6rem;border-radius:999px;background:rgba(251,191,36,0.12);font-size:0.78rem;color:#fbbf24;">Warning</span>
+        </div>
+      </section>
+
+      <!-- Typography -->
+      <section id="typography" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Typography (Montserrat)</h2>
+        <div style="display:grid;gap:0.4rem;">
+          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;">Heading 1</div>
+          <div style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">Heading 2</div>
+          <div style="font-size:1.25rem;font-weight:700;">Heading 3</div>
+          <div style="font-size:0.95rem;color:var(--app-text-muted);">Body text at 0.95rem.</div>
+          <div style="font-size:0.82rem;color:var(--app-text-muted);">Small text at 0.82rem.</div>
+        </div>
+      </section>
+
+      <!-- Dropdown -->
+      <section id="dropdown" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Dropdown</h2>
+        <div style="max-width:320px;">
+          <div style="padding:0.6rem 0.85rem;border-radius:0.7rem;border:1px solid var(--app-border);display:flex;justify-content:space-between;cursor:pointer;">
+            <span>Click me</span>
+            <span style="font-size:0.7rem;">▼</span>
+          </div>
+          <p style="font-size:0.82rem;color:var(--app-text-muted);margin-top:0.4rem;">
+            Reusable via <code>ui/dropdown.tsx</code> — wraps trigger + content, outside-click close.
+          </p>
+        </div>
+      </section>
+
+      <!-- Fuzzy Search -->
+      <section id="fuzzy-search" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Fuzzy Search</h2>
+        <div style="max-width:320px;">
+          <FuzzySearch
+            items={["Apple","Apricot","Avocado","Banana","Cherry","Date","Elderberry","Fig","Grape","Kiwi","Lemon","Mango","Orange","Papaya","Peach","Pear","Pineapple","Plum","Raspberry","Strawberry","Watermelon"]}
+            placeholder="Search fruit…"
+            client:load
+          />
+          <p style="font-size:0.82rem;color:var(--app-text-muted);margin-top:0.4rem;">
+            <code>ui/fuzzy-search.tsx</code> — built on <code>Dropdown</code>. Fuzzy matches, keyboard nav, grouped results.
+          </p>
+        </div>
+      </section>
+
+      <!-- Timezone Picker -->
+      <section id="timezone-picker" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Timezone Picker</h2>
+        <div style="max-width:320px;">
+          <TimezonePicker value="America/New_York" client:load />
+          <p style="font-size:0.82rem;color:var(--app-text-muted);margin-top:0.4rem;">
+            <code>host-dashboard/timezone-picker.tsx</code> — wraps <code>FuzzySearch</code> with all IANA timezones. Auto-detects browser timezone.
+          </p>
+        </div>
+      </section>
+
+      <!-- Avatar -->
+      <section id="avatar" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Avatar</h2>
+        <div style="display:flex;gap:1rem;align-items:center;">
+          <Avatar userId="ddeec28c-e2a5-444b-ba8f-53153605c874" name="Michael ONeal" client:load />
+          <Avatar userId="nonexistent" name="No Avatar" client:load />
+          <div style="width:3.5rem;height:3.5rem;border-radius:999px;background:linear-gradient(135deg,var(--app-primary),var(--app-primary-2));display:grid;place-items:center;font-weight:700;font-size:1.2rem;color:#fff;">JS</div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);margin-top:0.4rem;">
+          <code>host-dashboard/avatar.tsx</code> — shows uploaded avatar or letter fallback. Auto-reloads on upload.
+        </p>
+      </section>
+
+      <!-- Form -->
+      <section id="form" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Form Component</h2>
+        <div style="max-width:320px;padding:1.5rem;border-radius:0.85rem;border:1px solid var(--app-border);background:rgba(255,255,255,0.02);display:grid;gap:0.75rem;">
+          <h3 style="margin:0;font-size:1rem;font-weight:700;">Example</h3>
+          <div style="display:grid;gap:0.3rem;">
+            <label style="font-size:0.82rem;color:var(--app-text-muted);">Name</label>
+            <input type="text" style="width:100%;padding:0.55rem 0.75rem;border-radius:0.7rem;border:1px solid var(--app-border);background:rgba(0,0,0,0.2);color:#fff;font-size:0.88rem;outline:none;" />
+          </div>
+          <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+            <button class="app-btn" style="padding:0.5rem 1rem;min-height:0;font-size:0.85rem;">Cancel</button>
+            <button class="app-btn app-btn-primary" style="padding:0.5rem 1rem;min-height:0;font-size:0.85rem;">Save</button>
+          </div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);margin-top:0.4rem;">
+          <code>ui/form.tsx</code> — reusable form with field labels, busy states, error display, Enter-to-submit.
+        </p>
+      </section>
+
+      <!-- Schedule Editor (reference) -->
+      <section id="schedule-editor" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Schedule Editor</h2>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);">
+          <code>host-dashboard/schedule-editor.tsx</code> — weekly availability grid with day toggle, time inputs, and save-to-API.
+        </p>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);">
+          Used at <a href="/hosts/me/schedule" style="color:var(--app-primary);">/hosts/me/schedule</a>
+        </p>
+      </section>
+
+      <!-- Event Type Manager (reference) -->
+      <section id="event-types" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Event Type Manager</h2>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);">
+          <code>host-dashboard/event-type-manager.tsx</code> — CRUD for meeting types via PostgREST.
+        </p>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);">
+          Used at <a href="/hosts/me/event-types" style="color:var(--app-primary);">/hosts/me/event-types</a>
+        </p>
+      </section>
+
+      <!-- Booking Widget (reference) -->
+      <section id="booking-widget" style="margin-bottom:2.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;margin:0 0 0.75rem;">Booking Widget</h2>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);">
+          <code>booking-widget/booking-widget.tsx</code> — full booking flow: calendar picker, slot selection, form, confirmation.
+        </p>
+        <p style="font-size:0.82rem;color:var(--app-text-muted);">
+          Used at <code>/{'{slug}'}/{'{eventSlug}'}</code>
+        </p>
+      </section>
+    </div>
+  </div>
+</AppLayout>
