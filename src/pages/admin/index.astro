@@ -46,12 +46,12 @@ const hosts = await query`
             }}>{u.name.charAt(0)}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 600, fontSize: "0.88rem" }}>{u.name}</div>
-              <div style={{ fontSize: "0.78rem", color: var("--app-text-muted") }}>
+               <div style={{ fontSize: "0.78rem", color: "var(--app-text-muted)" }}>
                 {u.email} · {u.role}
               </div>
             </div>
             <div style={{ fontSize: "0.78rem", color: "var(--app-text-muted)" }}>
-              {u.slug?.slice(0, 8)}…
+              {u.slug ? u.slug.slice(0, 8) : ""}…
             </div>
             <span style={{
               fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase",
