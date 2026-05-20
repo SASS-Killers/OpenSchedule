@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "lsof -ti:6969 | xargs kill -9 2>/dev/null; lsof -ti:6970 | xargs kill -9 2>/dev/null; docker start mailpit 2>/dev/null || docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit 2>/dev/null || brew services start mailpit 2>/dev/null || echo 'ℹ Mailpit not running'; export $(grep -v '^#' .env | xargs) && envsubst < postgrest.conf > /tmp/pgrst.conf && nohup postgrest /tmp/pgrst.conf > /tmp/postgrest.log 2>&1 & sleep 2; astro dev --host 127.0.0.1 --port 6969",
+    "dev": "lsof -ti:6970 | xargs kill -9 2>/dev/null; docker start mailpit 2>/dev/null || docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit 2>/dev/null || echo 'ℹ Mailpit not running'; export $(grep -v '^#' .env | xargs) && envsubst < postgrest.conf > /tmp/pgrst.conf; nohup postgrest /tmp/pgrst.conf > /tmp/postgrest.log 2>&1 & disown; sleep 2; astro dev --host 127.0.0.1 --port 6969",
     "build": "astro build",
     "preview": "astro preview"
   },
