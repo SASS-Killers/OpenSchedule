@@ -71,7 +71,7 @@ bun run build
 npx wrangler pages deploy dist/
 ```
 
-Set `DATABASE_URL` and `JWT_SECRET` as Cloudflare Pages secrets. See the [self-hosting guide](./prd/self-hosting.md) for full instructions.
+Set `DATABASE_URL` and `JWT_SECRET` as Cloudflare Pages secrets. See the [self-hosting guide](./docs/prd/self-hosting.md) for full instructions.
 
 ### Create an Admin Account
 
@@ -81,7 +81,8 @@ After setup, hit `/api/setup` to create the initial admin account. Then navigate
 
 ```
 open-calendar/
-├── prd/                 # Product requirements documentation
+├── docs/                 # Developer documentation & PRD
+│   └── prd/              # Product requirements
 ├── src/
 │   ├── components/      # React components (islands)
 │   ├── db/              # Schema, migrations, Neon client
