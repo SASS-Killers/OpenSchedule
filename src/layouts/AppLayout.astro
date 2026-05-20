@@ -139,6 +139,7 @@ const session = match ? await verifySession(match[1]) : null;
       @media (max-width: 720px) {
         .app-topbar { padding: 0.9rem 1rem; }
         .profile-grid { grid-template-columns: 1fr !important; }
+        .profile-grid > * { order: 0 !important; }
       }
     </style>
   </head>

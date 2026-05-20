@@ -41,44 +41,8 @@ for (const b of bookings) {
   <section style="padding: 2rem 1.5rem; max-width: 960px; margin: 0 auto;">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;"
       class="profile-grid">
-      <!-- Left: Profile & Settings -->
-      <div>
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-          <Avatar userId={session.userId} name={session.name} client:load />
-          <div>
-            <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{session.name}</h1>
-            <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted);">{session.email}</p>
-          </div>
-        </div>
-
-        <div style="display: grid; gap: 0.75rem; margin-bottom: 1.5rem;">
-          <label class="app-btn" style="justify-content: center; cursor: pointer;">
-            Upload Avatar
-            <input type="file" id="avatar-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display: none;" />
-          </label>
-          <div id="avatar-status" style="font-size: 0.82rem; color: var(--app-text-muted); text-align: center;"></div>
-        </div>
-
-        <div style="display: grid; gap: 0.75rem;">
-          <a href="/hosts/me/event-types" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
-            <span style="font-weight: 600;">Event Types</span>
-            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Meeting types you offer →</span>
-          </a>
-          <a href="/hosts/me/schedule" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
-            <span style="font-weight: 600;">Schedule</span>
-            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Your availability →</span>
-          </a>
-          {user && (
-            <a href={`/hosts/${user.slug}`} target="_blank" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
-              <span style="font-weight: 600;">View Your Profile</span>
-              <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Open in new tab →</span>
-            </a>
-          )}
-        </div>
-      </div>
-
-      <!-- Right: Bookings Agenda -->
-      <div>
+      <!-- Right column first in source order: Bookings (shows first on mobile) -->
+      <div style="order: 0;">
         <h2 style="margin: 0 0 1rem; font-size: 1.1rem; font-weight: 700;">Upcoming Bookings</h2>
 
         {bookings.length === 0 && (
@@ -137,6 +101,42 @@ for (const b of bookings) {
             </div>
           </div>
         ))}
+      </div>
+
+      <!-- Left column second in source: Profile & Settings (shows second on mobile) -->
+      <div style="order: 1;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+          <Avatar userId={session.userId} name={session.name} client:load />
+          <div>
+            <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{session.name}</h1>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted);">{session.email}</p>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <label class="app-btn" style="justify-content: center; cursor: pointer;">
+            Upload Avatar
+            <input type="file" id="avatar-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display: none;" />
+          </label>
+          <div id="avatar-status" style="font-size: 0.82rem; color: var(--app-text-muted); text-align: center;"></div>
+        </div>
+
+        <div style="display: grid; gap: 0.75rem;">
+          <a href="/hosts/me/event-types" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+            <span style="font-weight: 600;">Event Types</span>
+            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Meeting types you offer →</span>
+          </a>
+          <a href="/hosts/me/schedule" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+            <span style="font-weight: 600;">Schedule</span>
+            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Your availability →</span>
+          </a>
+          {user && (
+            <a href={`/hosts/${user.slug}`} target="_blank" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+              <span style="font-weight: 600;">View Your Profile</span>
+              <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Open in new tab →</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
 </AppLayout>
