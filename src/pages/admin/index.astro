@@ -1,0 +1,46 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import { verifySession } from "@/lib/auth";
+
+const cookie = Astro.request.headers.get("cookie") || "";
+const match = cookie.match(/session=([^;]+)/);
+const session = match ? await verifySession(match[1]) : null;
+
+if (!session) {
+  return Astro.redirect("/login");
+}
+---
+
+<AppLayout title="Admin — OpenSchedule">
+  <section style="padding: 2rem 1.5rem; max-width: 720px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <div style="
+        width: 3rem; height: 3rem; border-radius: 999px;
+        background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
+        display: grid; place-items: center;
+        font-weight: 700; font-size: 1.1rem; color: #fff;
+      ">{session.name.charAt(0)}</div>
+      <div>
+        <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{session.name}</h1>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted);">
+          {session.role === "admin" ? "Administrator" : "Host"} &middot; {session.email}
+        </p>
+      </div>
+    </div>
+
+    <div style="display: grid; gap: 1rem;">
+      <div class="app-btn" style="justify-content: flex-start; padding: 1rem;">
+        <span style="font-weight: 600;">Hosts</span>
+        <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Manage team members →</span>
+      </div>
+      <div class="app-btn" style="justify-content: flex-start; padding: 1rem;">
+        <span style="font-weight: 600;">Schedule</span>
+        <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Set availability →</span>
+      </div>
+      <div class="app-btn" style="justify-content: flex-start; padding: 1rem;">
+        <span style="font-weight: 600;">Email Quota</span>
+        <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">300 / 300 today →</span>
+      </div>
+    </div>
+  </section>
+</AppLayout>
