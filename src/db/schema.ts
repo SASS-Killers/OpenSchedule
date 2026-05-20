@@ -18,3 +18,11 @@ export const verificationCodes = sqliteTable("verification_codes", {
   expiresAt: integer("expires_at").notNull(),
   createdAt: integer("created_at").notNull(),
 });
+
+export const schedules = sqliteTable("schedules", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  dayOfWeek: integer("day_of_week").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+});
