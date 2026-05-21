@@ -1721,11 +1721,10 @@ function HostingStackScene({ frame }: { frame: number }) {
         <div
           style={{ fontSize: 15, fontWeight: 600, color: FG, marginBottom: 4 }}
         >
-          Scales to ~25 Hosts / 125 bookings/day
+          Scales to ~25 Hosts / 125 bookings/day — $0/month
         </div>
         <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>
-          Email is the bottleneck (300/day). Database and compute have 5×
-          headroom.
+          No per-seat licenses. No surprise bills. No SaaS treadmill.
           <br />
           Grow beyond? Upgrade Brevo to Starter ($25/mo) — 20K emails/month.
         </div>
@@ -1782,12 +1781,22 @@ function FeaturesScene({ frame }: { frame: number }) {
           fontSize: 32,
           fontWeight: 700,
           color: FG,
-          margin: "0 0 24px",
+          margin: "0 0 8px",
           opacity: fadeIn(frame, 0),
         }}
       >
         OpenSchedule
       </h2>
+      <p
+        style={{
+          fontSize: 18,
+          color: MUTED,
+          margin: "0 0 24px",
+          opacity: fadeIn(frame, 4),
+        }}
+      >
+        Ditch the SaaS treadmill. Own your scheduling.
+      </p>
       <div
         style={{
           display: "grid",
@@ -1880,7 +1889,7 @@ function OutroScene({ frame }: { frame: number }) {
           opacity: fadeIn(frame, 18),
         }}
       >
-        A free, self-hosted Calendly replacement
+        Ditch the SaaS treadmill. Own your scheduling.
       </p>
       <div
         style={{

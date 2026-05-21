@@ -10,8 +10,9 @@
 | Time | Script |
 |------|--------|
 | 0.5s | **(pause — let music breathe)** |
-| 1.5s | OpenSchedule lets anyone book time with you — no account needed. |
-| 4.5s | Just pick a date, choose a slot, and you're done. |
+| 1.5s | Stop paying subscription fees every month to have simple scheduling. |
+| 3.5s | Ditch the SaaS treadmill. |
+| 5.0s | OpenSchedule lets anyone book time with you — no account needed. Just pick a date, choose a slot, and you're done. |
 
 **On screen**: Calendar grid → clicking a date → time slots appearing → one highlighted as "Selected"
 
