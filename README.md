@@ -4,7 +4,7 @@ Stop paying monthly for simple scheduling. OpenSchedule is a 100% free, self-hos
 
 No subscriptions. No per-seat licenses. No surprise bills. Just you and your data.
 
-[Watch the demo](#) · [Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
+[Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
 
 <p align="center">
   <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
