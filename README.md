@@ -6,13 +6,11 @@ No subscriptions. No per-seat licenses. No surprise bills. Just you and your dat
 
 [Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
 
-<p align="center">
-  <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
-    <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Click to watch the OpenSchedule demo video" width="700" style="border-radius: 12px; max-width: 100%;" />
-  </a>
-  <br/>
-  <sub><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">▶ Play demo (3.2 MB)</a></sub>
-</p>
+
+
+https://github.com/user-attachments/assets/7cd623ff-f042-41c2-96f6-e12db0cf8097
+
+
 
 <p align="center">
   <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-outro.png" alt="" width="45%" style="border-radius: 8px;" />
