@@ -21,6 +21,53 @@ const RED = "#f87171";
 const YELLOW = "#fbbf24";
 const FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 
+// ── Cinematic Noise Overlay ────────────────────────────────────────────
+const NOISE_DOTS = 400;
+function NoiseOverlay() {
+  const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+  const dots: React.ReactNode[] = [];
+  const spacing = Math.sqrt((width * height) / NOISE_DOTS);
+
+  for (let i = 0; i < NOISE_DOTS; i++) {
+    const px = ((i * 37 + 13) % Math.ceil(width / spacing)) * spacing;
+    const py = Math.floor((i * spacing) / width) * spacing;
+    const dx = noise3D("x", i, 0, frame * 0.02) * 3;
+    const dy = noise3D("y", i, 0, frame * 0.02) * 3;
+    const opacity = interpolate(
+      noise3D("o", i, 0, frame * 0.03),
+      [-1, 1],
+      [0, 0.035],
+    );
+    if (opacity > 0.01) {
+      dots.push(
+        <circle
+          key={i}
+          cx={px + dx}
+          cy={py + dy}
+          r={0.6}
+          fill="#fff"
+          opacity={opacity}
+        />,
+      );
+    }
+  }
+  return (
+    <svg
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 9999,
+      }}
+    >
+      {dots}
+    </svg>
+  );
+}
+
 // ── Scene durations
 const S5 = 5 * FPS; // 5 seconds
 const S4 = 4 * FPS; // 4 seconds

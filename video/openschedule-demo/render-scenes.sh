@@ -4,7 +4,8 @@
 # Output: out/scene-01.mp4 ... out/scene-12.mp4
 
 set -e
-cd "$(dirname "$0")/openschedule-demo"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 mkdir -p out
 
 # Scene frame ranges (from OpenScheduleDemo.tsx scene offsets)
