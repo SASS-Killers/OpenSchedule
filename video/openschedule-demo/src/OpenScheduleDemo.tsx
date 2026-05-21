@@ -6,7 +6,9 @@ import {
   AbsoluteFill,
   spring,
   Easing,
+  staticFile,
 } from "remotion";
+import { Audio } from "@remotion/media";
 
 // ── Constants ──────────────────────────────────────────────────────────
 const FPS = 30;
@@ -19,6 +21,48 @@ const GREEN = "#34d399";
 const RED = "#f87171";
 const YELLOW = "#fbbf24";
 const FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+
+// ── Voiceover Configuration ────────────────────────────────────────────
+// Edit these [startFrame, endFrame] pairs after recording your voiceover.
+// Music ducks to VOICEVOL during these segments, with a 6-frame fade ramp.
+const VOICEVOL = 0.15; // background music volume during voiceover (0–1)
+const MUSICVOL = 1.0; // background music volume between voiceover
+const FADE_FRAMES = 6; // smooth ramp duration for ducking
+
+// Scene names + their frame ranges (matching the composition below)
+const SCENES = [
+  { name: "Booking Widget", start: 0, end: 150 },
+  { name: "Booking Confirmation", start: 150, end: 270 },
+  { name: "Login", start: 270, end: 390 },
+  { name: "Host Dashboard", start: 390, end: 540 },
+  { name: "Schedule Editor", start: 540, end: 660 },
+  { name: "Exceptions", start: 660, end: 780 },
+  { name: "Event Types", start: 780, end: 900 },
+  { name: "Admin Dashboard", start: 900, end: 1050 },
+  { name: "Easy Install App", start: 1050, end: 1200 },
+  { name: "Free Hosting Stack", start: 1200, end: 1320 },
+  { name: "Features Grid", start: 1320, end: 1410 },
+  { name: "Outro", start: 1410, end: 1500 },
+];
+
+// ── Ducking helper ─────────────────────────────────────────────────────
+// Fill in the [startFrame, endFrame] pairs that overlap your voiceover.
+// Music volume smoothly ramps down/up over FADE_FRAMES around each edge.
+const VOICEOVER_SEGMENTS: [number, number][] = [
+  // Example — replace with your actual timings after recording:
+  // [30,  120],   // Intro narration
+  // [170, 250],   // Booking widget explanation
+  // [290, 370],   // Login flow
+  // [410, 520],   // Host dashboard
+  // [560, 640],   // Schedule editor
+  // [680, 760],   // Exceptions
+  // [800, 880],   // Event types
+  // [920, 1030],  // Admin dashboard
+  // [1070, 1180], // Install app
+  // [1220, 1300], // Hosting stack
+  // [1340, 1390], // Features
+  // [1430, 1480], // Outro
+];
 
 // Scene durations
 const S5 = 5 * FPS; // 5 seconds
@@ -1960,6 +2004,32 @@ export const OpenScheduleDemo: React.FC = () => {
       <Sequence from={s[11]} durationInFrames={S3}>
         <OutroScene frame={frame - s[11]} />
       </Sequence>
+
+      {/* ── Background music with voiceover ducking ── */}
+      <Audio
+        src={staticFile("bg-music.mp3")}
+        volume={(f) => {
+          const absFrame = f; // Audio starts at frame 0 (no Sequence wrapper)
+          let vol = MUSICVOL;
+
+          for (const [vs, ve] of VOICEOVER_SEGMENTS) {
+            const duckStart = vs - FADE_FRAMES;
+            const duckEnd = ve + FADE_FRAMES;
+
+            if (absFrame >= duckStart && absFrame <= duckEnd) {
+              // Smooth ramp: interpolate between MUSICVOL and VOICEVOL
+              vol = interpolate(
+                absFrame,
+                [duckStart, vs, ve, duckEnd],
+                [MUSICVOL, VOICEVOL, VOICEVOL, MUSICVOL],
+                { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+              );
+              break;
+            }
+          }
+          return vol;
+        }}
+      />
     </AbsoluteFill>
   );
 };
