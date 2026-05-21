@@ -27,10 +27,6 @@ No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL
 ### 🆓 Free Forever
 No paid tiers, no hidden costs. Runs entirely on free-tier Neon (PostgreSQL), Cloudflare Pages, and Brevo.
 
-<p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-hosting.png" alt="Free hosting stack" width="80%" style="border-radius: 8px;" />
-</p>
-
 ### 🔐 Self-Hosted & Passwordless Auth
 Your data on your infrastructure. No third-party scheduling services processing your clients' information. Secure OTP codes via email — no passwords to manage or leak.
 
@@ -48,19 +44,15 @@ Admin provisions hosts. Hosts configure their availability. Clients book meeting
 ### 📅 Smart Scheduling & Double-Booking Protection
 Configurable weekly hours, date-specific overrides, buffer times, and minimum notice. Real-time conflict detection — no external calendar API required.
 
-<p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-exceptions.png" alt="Availability exceptions management" width="80%" style="border-radius: 8px;" />
-</p>
+### 👤 Client Auto-Registration & Notifications
+Clients register automatically on first booking. Confirmation emails with .ics calendar files, cancellation links, and daily reminders — all via Brevo's free tier.
 
 ### 🛠️ Admin Console & Email Telemetry
-Provision host accounts, monitor email usage, and manage your deployment from a single dashboard.
+Provision host accounts, monitor email usage against Brevo's 300/day quota, and manage your deployment from a single dashboard.
 
 <p align="center">
   <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Admin dashboard with email telemetry" width="80%" style="border-radius: 8px;" />
 </p>
-
-### 👤 Client Auto-Registration
-Clients are registered automatically on first booking. No signup forms, no friction.
 
 ### 📱 Responsive
 Desktop and mobile friendly.
