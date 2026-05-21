@@ -13,3 +13,4 @@ next/
 .DS_Store
 Thumbs.db
 coverage/
+video/
