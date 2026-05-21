@@ -99,7 +99,7 @@ export function ScheduleEditor({ initial }: { initial: DaySlot[] }) {
     if (!isValid) return;
     setSaving(true);
     const entries = Object.values(slots).filter((s) => s);
-    await fetch("/api/admin/schedule", {
+    await fetch("/api/host/schedule", {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(entries),
