@@ -2,6 +2,7 @@
 import AppLayout from "@/layouts/app-layout.astro";
 import { requireSession } from "@/lib/auth-guard";
 import { query } from "@/db/neon";
+import { EmailTelemetry } from "@/admin/email-telemetry";
 
 const session = await requireSession(Astro.request);
 if (!session || session.role !== "admin") return Astro.redirect("/login");
@@ -20,6 +21,9 @@ const hosts = await query`
       </div>
       <div style="padding: 0.5rem 1rem; margin: 0.25rem 0.5rem; border-radius: 0.5rem; color: var(--app-text-muted); font-size: 0.88rem; cursor: default;">
         Settings
+      </div>
+      <div style="padding: 0.5rem 1rem; margin: 0.25rem 0.5rem; border-radius: 0.5rem; color: var(--app-text-muted); font-size: 0.88rem; cursor: default;">
+        <EmailTelemetry client:load />
       </div>
     </div>
 

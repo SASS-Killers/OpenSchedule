@@ -1,15 +1,42 @@
 const isDev = process.env.NODE_ENV !== "production";
 
+let logEmail: ((type: string, recipient: string) => Promise<void>) | null = null;
+
+// Lazy-import the db query to avoid SSR issues in browser bundles
+async function getLogEmail() {
+  if (logEmail) return logEmail;
+  try {
+    const { query } = await import("@/db/neon");
+    logEmail = async (type: string, recipient: string) => {
+      try {
+        const id = crypto.randomUUID();
+        const now = Math.floor(Date.now() / 1000);
+        await query`
+          INSERT INTO sent_emails_log (id, email_type, recipient, sent_at)
+          VALUES (${id}, ${type}, ${recipient}, ${now})
+        `;
+      } catch {
+        // Silent — telemetry logging should never break email delivery
+      }
+    };
+  } catch {
+    logEmail = async () => {};
+  }
+  return logEmail;
+}
+
 export async function sendEmail({
   to,
   subject,
   text,
   html,
+  emailType = "confirmation",
 }: {
   to: string;
   subject: string;
   text: string;
   html?: string;
+  emailType?: string;
 }) {
   if (isDev) {
     // Mailpit REST API — catches emails in local browser UI
@@ -43,6 +70,10 @@ export async function sendEmail({
       }),
     });
   }
+
+  // Log to telemetry (fire-and-forget)
+  const logger = await getLogEmail();
+  logger(emailType, to);
 }
 
 // ── Templates ──────────────────────────────────────────────
@@ -60,17 +91,18 @@ export function otpEmail(code: string) {
 }
 
 export function bookingConfirmationClientEmail({
-  clientName, hostName, eventTitle, startTime, endTime, cancellationUrl,
+  clientName, hostName, eventTitle, startTime, endTime, cancellationUrl, icsUrl,
 }: {
-  clientName: string; hostName: string; eventTitle: string; startTime: string; endTime: string; cancellationUrl: string;
+  clientName: string; hostName: string; eventTitle: string; startTime: string; endTime: string; cancellationUrl: string; icsUrl?: string;
 }) {
   return {
     subject: `Confirmed: ${eventTitle} with ${hostName}`,
-    text: `Hi ${clientName},\n\nYour ${eventTitle} with ${hostName} is confirmed for ${startTime} – ${endTime}.\n\nCancel: ${cancellationUrl}`,
+    text: `Hi ${clientName},\n\nYour ${eventTitle} with ${hostName} is confirmed for ${startTime} – ${endTime}.\n\nCancel: ${cancellationUrl}\n\nAdd to calendar: ${icsUrl || "Download .ics from your booking page"}`,
     html: `<div style="font-family:sans-serif;padding:2rem;max-width:480px;margin:0 auto;">
       <h2>Booking Confirmed</h2>
       <p><strong>${eventTitle}</strong> with ${hostName}</p>
       <p>${startTime} – ${endTime}</p>
+      ${icsUrl ? `<p style="margin:1rem 0;"><a href="${icsUrl}" style="display:inline-block;padding:0.5rem 1rem;background:#6366f1;color:#fff;border-radius:0.45rem;text-decoration:none;font-size:0.85rem;">Add to Calendar (.ics)</a></p>` : ""}
       <hr style="border:none;border-top:1px solid #eee;margin:1.5rem 0;"/>
       <p style="color:#666;">Need to cancel? <a href="${cancellationUrl}">Click here</a></p>
     </div>`,

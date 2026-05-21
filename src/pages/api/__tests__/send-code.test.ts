@@ -1,7 +1,12 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest";
 
-vi.mock("@/db/neon", () => ({ query: vi.fn(), raw: vi.fn() }));
+vi.mock("@/db/neon", () => {
+  const mockQuery = vi.fn();
+  // Return empty results by default (tagged template returns array)
+  mockQuery.mockReturnValue(Promise.resolve([]));
+  return { query: mockQuery, raw: vi.fn() };
+});
 
 import { POST as sendCode } from "@/pages/api/auth/send-code";
 

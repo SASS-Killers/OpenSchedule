@@ -41,9 +41,9 @@ if (!token) {
 
     // Send emails
     const cancelForClient = cancellationEmail({ name: booking.client_name, eventTitle: booking.event_title, startTime: startStr });
-    await sendEmail({ to: booking.client_email, ...cancelForClient });
+    await sendEmail({ to: booking.client_email, emailType: "cancellation", ...cancelForClient });
     const cancelForHost = cancellationEmail({ name: booking.host_name, eventTitle: booking.event_title, startTime: startStr });
-    await sendEmail({ to: booking.host_email, ...cancelForHost });
+    await sendEmail({ to: booking.host_email, emailType: "cancellation", ...cancelForHost });
   }
 }
 ---

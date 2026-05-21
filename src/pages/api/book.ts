@@ -69,6 +69,7 @@ export const POST: APIRoute = async ({ request }) => {
   const endStr = fmtDate(slotEnd);
 
   // Send confirmation to client
+  const icsUrl = `${origin}/api/bookings/${bookingId}/download-ics`;
   const clientEmailData = bookingConfirmationClientEmail({
     clientName,
     hostName: evt.host_name,
@@ -76,8 +77,9 @@ export const POST: APIRoute = async ({ request }) => {
     startTime: startStr,
     endTime: endStr,
     cancellationUrl: `${origin}/cancel/${cancelToken}`,
+    icsUrl,
   });
-  await sendEmail({ to: clientEmail, ...clientEmailData });
+  await sendEmail({ to: clientEmail, emailType: "confirmation", ...clientEmailData });
 
   // Send notification to host
   const hostEmailData = bookingNotificationHostEmail({
@@ -88,7 +90,7 @@ export const POST: APIRoute = async ({ request }) => {
     startTime: startStr,
     endTime: endStr,
   });
-  await sendEmail({ to: evt.host_email, ...hostEmailData });
+  await sendEmail({ to: evt.host_email, emailType: "confirmation", ...hostEmailData });
 
   return new Response(JSON.stringify({
     ok: true,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 function formatDate(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -59,8 +59,17 @@ export function BookingWidget({ hostId, eventTypeId }: Props) {
     setLoading(false);
   }, [hostId, eventTypeId]);
 
+  // Background polling every 15s to refresh slots while date is selected
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => {
-    if (selectedDate) fetchSlots(selectedDate);
+    if (selectedDate) {
+      // Initial fetch + poll
+      fetchSlots(selectedDate);
+      pollRef.current = setInterval(() => fetchSlots(selectedDate), 15000);
+    }
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, [selectedDate, fetchSlots]);
 
   const book = async () => {

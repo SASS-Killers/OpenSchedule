@@ -68,6 +68,45 @@ CREATE TABLE IF NOT EXISTS bookings (
   created_at INTEGER NOT NULL
 );
 
+-- Date-specific availability overrides (vacations, custom hours, window blocks)
+CREATE TABLE IF NOT EXISTS date_overrides (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  exception_type TEXT NOT NULL CHECK (exception_type IN ('full_day_block', 'custom_hours', 'window_block')),
+  start_time TEXT,
+  end_time TEXT,
+  title TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- Recurring availability exceptions (weekly patterns)
+CREATE TABLE IF NOT EXISTS recurring_exceptions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+  exception_type TEXT NOT NULL CHECK (exception_type IN ('window_block', 'custom_hours')),
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL,
+  effective_start TEXT,
+  effective_end TEXT,
+  title TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- Email telemetry log
+CREATE TABLE IF NOT EXISTS sent_emails_log (
+  id TEXT PRIMARY KEY,
+  email_type TEXT NOT NULL CHECK (email_type IN ('otp', 'confirmation', 'reminder', 'cancellation')),
+  recipient TEXT NOT NULL,
+  sent_at INTEGER NOT NULL
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_slug ON users(slug);
@@ -77,3 +116,6 @@ CREATE INDEX IF NOT EXISTS idx_verification_codes_email ON verification_codes(em
 CREATE INDEX IF NOT EXISTS idx_bookings_event_time ON bookings(event_type_id, start_time);
 CREATE INDEX IF NOT EXISTS idx_bookings_cancel ON bookings(cancellation_token);
 CREATE INDEX IF NOT EXISTS idx_clients_email ON clients(email);
+CREATE INDEX IF NOT EXISTS idx_date_overrides_lookup ON date_overrides(user_id, start_date, end_date, exception_type);
+CREATE INDEX IF NOT EXISTS idx_recurring_exceptions_lookup ON recurring_exceptions(user_id, day_of_week, is_active);
+CREATE INDEX IF NOT EXISTS idx_sent_emails_log_sent ON sent_emails_log(sent_at);

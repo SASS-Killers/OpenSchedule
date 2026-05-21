@@ -44,14 +44,81 @@ export const GET: APIRoute = async ({ url }) => {
   const jsDay = new Date(date + "T12:00:00Z").getDay();
   const dbDay = jsDay === 0 ? 6 : jsDay - 1;
 
-  const blocks = await query`
+  // ── PHASE 1: Gather availability signals ──
+
+  // Date-specific overrides
+  const overrides = await query`
+    SELECT exception_type, start_time, end_time FROM date_overrides
+    WHERE user_id = ${hostId} AND is_active = true
+    AND start_date <= ${date} AND end_date >= ${date}
+  ` as any[];
+
+  // Full-day block check
+  const fullDayBlock = overrides.find((o: any) => o.exception_type === "full_day_block");
+  if (fullDayBlock) return new Response(JSON.stringify({ slots: [], date }));
+
+  // Recurring exceptions for this day of week
+  const recurring = await query`
+    SELECT exception_type, start_time, end_time FROM recurring_exceptions
+    WHERE user_id = ${hostId} AND day_of_week = ${dbDay} AND is_active = true
+    AND (effective_start IS NULL OR effective_start <= ${date})
+    AND (effective_end IS NULL OR effective_end >= ${date})
+  ` as any[];
+
+  // Default schedule
+  const defaultBlocks = await query`
     SELECT start_time, end_time FROM schedules
     WHERE user_id = ${hostId} AND day_of_week = ${dbDay}
     ORDER BY start_time
   ` as any[];
 
+  // ── PHASE 2: Build base available blocks ──
+  let blocks: { start_time: string; end_time: string }[] = [];
+
+  // Custom hours override
+  const customOverride = overrides.find((o: any) => o.exception_type === "custom_hours");
+  if (customOverride) {
+    blocks.push({ start_time: customOverride.start_time, end_time: customOverride.end_time });
+  } else {
+    // Start from default schedule
+    blocks = defaultBlocks.map((b: any) => ({ start_time: b.start_time, end_time: b.end_time }));
+    // Apply recurring custom_hours
+    const recurringCustom = recurring.filter((r: any) => r.exception_type === "custom_hours");
+    for (const rc of recurringCustom) {
+      if (!blocks.some(b => b.start_time === rc.start_time && b.end_time === rc.end_time)) {
+        blocks.push({ start_time: rc.start_time, end_time: rc.end_time });
+      }
+    }
+  }
+
   if (blocks.length === 0) return new Response(JSON.stringify({ slots: [], date }));
 
+  // ── PHASE 3: Carve out window blocks ──
+  const windowBlocks = [
+    ...overrides.filter((o: any) => o.exception_type === "window_block"),
+    ...recurring.filter((r: any) => r.exception_type === "window_block"),
+  ];
+
+  for (const wb of windowBlocks) {
+    const newBlocks: typeof blocks = [];
+    for (const block of blocks) {
+      if (block.start_time >= wb.end_time || block.end_time <= wb.start_time) {
+        // No overlap
+        newBlocks.push(block);
+      } else {
+        // Overlap — split
+        if (block.start_time < wb.start_time) {
+          newBlocks.push({ start_time: block.start_time, end_time: wb.start_time });
+        }
+        if (block.end_time > wb.end_time) {
+          newBlocks.push({ start_time: wb.end_time, end_time: block.end_time });
+        }
+      }
+    }
+    blocks = newBlocks;
+  }
+
+  // ── PHASE 4: Booked slots ──
   const booked = await query`
     SELECT b.start_time, b.end_time FROM bookings b
     JOIN event_types e ON b.event_type_id = e.id
@@ -62,6 +129,7 @@ export const GET: APIRoute = async ({ url }) => {
   const durationSec = evt.duration * 60;
   const candidates: number[] = [];
 
+  // ── PHASE 5: Slice blocks into candidate intervals and filter ──
   for (const block of blocks) {
     const [bh, bm] = block.start_time.split(":").map(Number);
     const [eh, em] = block.end_time.split(":").map(Number);

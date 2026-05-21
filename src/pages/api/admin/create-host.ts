@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Send welcome email
   const { subject, text, html } = welcomeHostEmail({ name, email });
-  await sendEmail({ to: email, subject, text, html });
+  await sendEmail({ to: email, emailType: "confirmation", subject, text, html });
 
   return new Response(null, {
     status: 302,
