@@ -1,157 +1,92 @@
 # OpenSchedule
 
-**A 100% free, self-hosted, multi-user scheduling platform — a complete Calendly replacement.**
+Stop paying monthly for simple scheduling. OpenSchedule is a 100% free, self-hosted replacement for Calendly that you actually own.
 
-No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
+No subscriptions. No per-seat licenses. No surprise bills. Just you and your data.
 
-[Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
+[Watch the demo](#) · [Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
 
 <p align="center">
   <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
     <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Click to watch the OpenSchedule demo video" width="700" style="border-radius: 12px; max-width: 100%;" />
   </a>
   <br/>
-  <sub><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">▶ Play demo video (3.2 MB MP4)</a></sub>
+  <sub><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">▶ Play demo (3.2 MB)</a></sub>
 </p>
 
 <p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-outro.png" alt="OpenSchedule logo and tech stack" width="45%" style="border-radius: 8px;" />
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="Public booking calendar" width="45%" style="border-radius: 8px;" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-outro.png" alt="" width="45%" style="border-radius: 8px;" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="" width="45%" style="border-radius: 8px;" />
 </p>
 
 <p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Admin dashboard with email telemetry" width="70%" style="border-radius: 8px;" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="" width="70%" style="border-radius: 8px;" />
 </p>
 
 ---
 
-## Features
+## What is OpenSchedule?
 
-### 🆓 Free Forever
-No paid tiers, no hidden costs. Runs entirely on free-tier Neon (PostgreSQL), Cloudflare Pages, and Brevo.
+It's a booking platform for your business or team. Clients pick a time from your calendar, book instantly, and get a confirmation email with a calendar file attached. You get notified. Everyone shows up on time.
 
-### 🔐 Self-Hosted & Passwordless Auth
-Your data on your infrastructure. No third-party scheduling services processing your clients' information. Secure OTP codes via email — no passwords to manage or leak.
+**The difference?** It runs on free cloud services. No monthly fees. No contracts. If you can click "deploy" on a website, you can run OpenSchedule.
 
-<p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="Public booking calendar" width="80%" style="border-radius: 8px;" />
-</p>
+## Who is this for?
 
-### 👥 Multi-User & Role-Based Access
-Admin provisions hosts. Hosts configure their availability. Clients book meetings. All in one system with Admin and Host roles.
+- **Freelancers & consultants** — Stop paying $15/mo for Calendly
+- **Small businesses** — Offer online booking without adding another subscription
+- **Teams** — Multiple staff, each with their own availability and meeting types
+- **Anyone tired of SaaS bills** — Own your scheduling infrastructure
 
-<p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-dashboard.png" alt="Host dashboard with settings and bookings" width="80%" style="border-radius: 8px;" />
-</p>
+## What you get
 
-### 📅 Smart Scheduling & Double-Booking Protection
-Configurable weekly hours, date-specific overrides, buffer times, and minimum notice. Real-time conflict detection — no external calendar API required.
+- **Public booking page** — Clients pick a date and time, no account needed
+- **Multiple meeting types** — 30 min calls, consultations, strategy sessions — customize each one
+- **Weekly schedule** — Set your hours, toggle days on/off
+- **Exceptions** — Block out vacations, dentist appointments, or set custom hours for a day
+- **Automatic conflict prevention** — No double-bookings. Buffer times between meetings. Minimum notice periods.
+- **Email notifications** — Booking confirmations, cancellation links, daily reminders. 300 emails/day free.
+- **Admin controls** — Add/remove hosts, see email usage at a glance
+- **Team ready** — Admin creates host accounts. Hosts manage their own calendars. Clients book.
+- **Login with email** — No passwords. A code arrives in your inbox.
 
-### 👤 Client Auto-Registration & Notifications
-Clients register automatically on first booking. Confirmation emails with .ics calendar files, cancellation links, and daily reminders — all via Brevo's free tier.
+## Quick start
 
-### 🛠️ Admin Console & Email Telemetry
-Provision host accounts, monitor email usage against Brevo's 300/day quota, and manage your deployment from a single dashboard.
+The easiest way is the one-click installer:
 
-<p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Admin dashboard with email telemetry" width="80%" style="border-radius: 8px;" />
-</p>
-
-### 📱 Responsive
-Desktop and mobile friendly.
-
-## Tech Stack
-
-| Component | Technology |
-| :--- | :--- |
-| **Database** | [Neon](https://neon.tech) (Serverless PostgreSQL) |
-| **API Layer** | [PostgREST](https://postgrest.org) (Auto-generated REST API) |
-| **Framework** | [Astro](https://astro.build) + [React](https://react.dev) |
-| **Hosting** | [Cloudflare Pages](https://pages.cloudflare.com) |
-| **Email** | [Brevo](https://brevo.com) (Transactional) |
-| **Auth** | OTP + JWT + PostgreSQL Row-Level Security |
-
-## Architecture
-
-```
-Browser → Cloudflare Pages (SSR) → PostgREST → Neon PostgreSQL
-                                        ↓
-                                   RLS Policies
-                                        ↓
-                                   JWT Auth
+```bash
+npm run install-wizard
 ```
 
-One database replaces Redis, Elasticsearch, RabbitMQ, and your entire custom API layer. PostgreSQL extensions handle JSONB (NoSQL), `pg_trgm` (fuzzy search), `pgvector` (embeddings), and `SELECT ... FOR UPDATE SKIP LOCKED` (job queues).
+It walks you through setting up a free Cloudflare account, connects Brevo for email, and deploys the whole thing. Takes about 10 minutes.
 
-## Quick Start
-
-### Local Dev
+### Manual setup
 
 ```bash
 git clone https://github.com/SASS-Killers/OpenSchedule.git
 cd open-calendar
 bun install
-cp .env.example .env
-# Edit .env with your Neon database connection string
-psql $DATABASE_URL -f src/db/schema.sql
-psql $DATABASE_URL -f src/db/rls.sql
+# Set up a free Neon database and Brevo account
 bun run dev
 ```
 
-App runs at `http://127.0.0.1:6969`. PostgREST starts automatically on port 6970.
+Full instructions in the [self-hosting guide](./docs/prd/self-hosting.md).
 
-### Deploy on Cloudflare Pages (Recommended)
+## How it's built
 
-```bash
-bun run build
-npx wrangler pages deploy dist/
-```
+It runs on free tiers of:
 
-Set `DATABASE_URL` and `JWT_SECRET` as Cloudflare Pages secrets. See the [self-hosting guide](./docs/prd/self-hosting.md) for full instructions.
+| Service | What it does | Free limit |
+|---------|-------------|------------|
+| **Neon** | Database (PostgreSQL) | 500 MB |
+| **Cloudflare Pages** | Hosting + edge compute | 100K req/day |
+| **Brevo** | Transactional emails | 300/day |
 
-### Create an Admin Account
+That's about **25 team members and 125 bookings per day** — completely free. If you grow beyond that, Brevo's paid plan is $25/month for 20K emails.
 
-After setup, hit `/api/setup` to create the initial admin account. Then navigate to `/login` and enter the admin email to receive a one-time code.
+## Project status
 
-## Project Structure
-
-```
-open-calendar/
-├── docs/                 # Developer documentation & PRD
-│   └── prd/              # Product requirements
-├── src/
-│   ├── components/      # React components (islands)
-│   ├── db/              # Schema, migrations, Neon client
-│   ├── layouts/         # Astro layouts
-│   ├── lib/             # Auth, PostgREST client helpers
-│   ├── pages/           # Routes and API endpoints
-│   │   ├── [slug]/      # Public booking pages
-│   │   ├── api/         # Thin API layer (session only)
-│   │   ├── hosts/       # Host settings and public profiles
-│   │   └── login.astro  # Passwordless login
-│   └── scripts/         # Schema application script
-├── postgrest.conf       # PostgREST configuration
-└── astro.config.mjs     # Astro configuration
-```
-
-## Why PostgreSQL?
-
-> *"One battle-tested tool can cannibalize your entire architecture."*
-
-PostgreSQL with its extension ecosystem eliminates the need for:
-- **MongoDB** → `JSONB` + GIN indexes
-- **Redis/RabbitMQ** → `SELECT ... FOR UPDATE SKIP LOCKED`
-- **Elasticsearch** → `tsvector` + `pg_trgm`
-- **Pinecone** → `pgvector` + HNSW indexes
-- **Snowflake** → Materialized views
-- **TimescaleDB** → BRIN indexes + partitioning
-- **PostGIS** → GiST indexes
-
-One database. One source of truth. Zero sync problems.
-
-## License
-
-MIT
+185+ tests · 81% code coverage · MIT license
 
 ---
 
