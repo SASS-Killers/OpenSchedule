@@ -1,14 +1,10 @@
 # OpenSchedule
 
-<p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="OpenSchedule" width="600" style="border-radius: 12px;" />
-</p>
-
-# OpenSchedule
-
 **A 100% free, self-hosted, multi-user scheduling platform — a complete Calendly replacement.**
 
 No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
+
+[Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
 
 <p align="center">
   <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
@@ -18,7 +14,14 @@ No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL
   <sub><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">▶ Play demo video (3.2 MB MP4)</a></sub>
 </p>
 
-[Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-outro.png" alt="OpenSchedule logo and tech stack" width="45%" style="border-radius: 8px;" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="Public booking calendar" width="45%" style="border-radius: 8px;" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Admin dashboard with email telemetry" width="70%" style="border-radius: 8px;" />
+</p>
 
 ---
 
