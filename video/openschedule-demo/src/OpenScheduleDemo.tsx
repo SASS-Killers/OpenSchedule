@@ -9,7 +9,6 @@ import {
   staticFile,
 } from "remotion";
 import { Audio } from "@remotion/media";
-import { CameraMotionBlur } from "@remotion/motion-blur";
 import { noise3D } from "@remotion/noise";
 
 // ── Constants ──────────────────────────────────────────────────────────
@@ -89,33 +88,35 @@ const SCENES = [
 ];
 
 // ── Cinematic Noise Overlay ────────────────────────────────────────────
+// Subtle grain effect — lightweight SVG dots that drift slowly
+const NOISE_DOTS = 400; // Keep this low for performance
 function NoiseOverlay() {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
   const dots: React.ReactNode[] = [];
+  const spacing = Math.sqrt((width * height) / NOISE_DOTS);
 
-  // Subtle 3% opacity dot grid that drifts slowly
-  for (let x = 0; x < width; x += 6) {
-    for (let y = 0; y < height; y += 6) {
-      const dx = noise3D("x", x / 200, y / 200, frame * 0.02) * 2;
-      const dy = noise3D("y", x / 200, y / 200, frame * 0.02) * 2;
-      const opacity = interpolate(
-        noise3D("opacity", x, y, frame * 0.03),
-        [-1, 1],
-        [0, 0.04],
+  for (let i = 0; i < NOISE_DOTS; i++) {
+    const x = ((i * 37 + 13) % Math.ceil(width / spacing)) * spacing;
+    const y = Math.floor((i * spacing) / width) * spacing;
+    const dx = noise3D("x", i, 0, frame * 0.02) * 3;
+    const dy = noise3D("y", i, 0, frame * 0.02) * 3;
+    const opacity = interpolate(
+      noise3D("o", i, 0, frame * 0.03),
+      [-1, 1],
+      [0, 0.035],
+    );
+    if (opacity > 0.01) {
+      dots.push(
+        <circle
+          key={i}
+          cx={x + dx}
+          cy={y + dy}
+          r={0.6}
+          fill="#fff"
+          opacity={opacity}
+        />,
       );
-      if (opacity > 0.01) {
-        dots.push(
-          <circle
-            key={`${x}-${y}`}
-            cx={x + dx}
-            cy={y + dy}
-            r={0.5}
-            fill="#fff"
-            opacity={opacity}
-          />,
-        );
-      }
     }
   }
 
@@ -134,6 +135,7 @@ function NoiseOverlay() {
     </svg>
   );
 }
+
 // Fill in the [startFrame, endFrame] pairs that overlap your voiceover.
 // Music volume smoothly ramps down/up over FADE_FRAMES around each edge.
 const VOICEOVER_SEGMENTS: [number, number][] = [
@@ -2088,46 +2090,42 @@ export const OpenScheduleDemo: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: BG }}>
-      <CameraMotionBlur shutterAngle={60} samples={6}>
-        <AbsoluteFill style={{ background: BG }}>
-          <Sequence durationInFrames={S5}>
-            <BookingWidgetScene frame={frame} />
-          </Sequence>
-          <Sequence from={s[1]} durationInFrames={S4}>
-            <ConfirmationScene frame={frame - s[1]} />
-          </Sequence>
-          <Sequence from={s[2]} durationInFrames={S4}>
-            <LoginScene frame={frame - s[2]} />
-          </Sequence>
-          <Sequence from={s[3]} durationInFrames={S5}>
-            <HostDashboardScene frame={frame - s[3]} />
-          </Sequence>
-          <Sequence from={s[4]} durationInFrames={S4}>
-            <ScheduleScene frame={frame - s[4]} />
-          </Sequence>
-          <Sequence from={s[5]} durationInFrames={S4}>
-            <ExceptionsScene frame={frame - s[5]} />
-          </Sequence>
-          <Sequence from={s[6]} durationInFrames={S4}>
-            <EventTypesScene frame={frame - s[6]} />
-          </Sequence>
-          <Sequence from={s[7]} durationInFrames={S5}>
-            <AdminDashboardScene frame={frame - s[7]} />
-          </Sequence>
-          <Sequence from={s[8]} durationInFrames={S5}>
-            <InstallScene frame={frame - s[8]} />
-          </Sequence>
-          <Sequence from={s[9]} durationInFrames={S4}>
-            <HostingStackScene frame={frame - s[9]} />
-          </Sequence>
-          <Sequence from={s[10]} durationInFrames={S3}>
-            <FeaturesScene frame={frame - s[10]} />
-          </Sequence>
-          <Sequence from={s[11]} durationInFrames={S3}>
-            <OutroScene frame={frame - s[11]} />
-          </Sequence>
-        </AbsoluteFill>
-      </CameraMotionBlur>
+      <Sequence durationInFrames={S5}>
+        <BookingWidgetScene frame={frame} />
+      </Sequence>
+      <Sequence from={s[1]} durationInFrames={S4}>
+        <ConfirmationScene frame={frame - s[1]} />
+      </Sequence>
+      <Sequence from={s[2]} durationInFrames={S4}>
+        <LoginScene frame={frame - s[2]} />
+      </Sequence>
+      <Sequence from={s[3]} durationInFrames={S5}>
+        <HostDashboardScene frame={frame - s[3]} />
+      </Sequence>
+      <Sequence from={s[4]} durationInFrames={S4}>
+        <ScheduleScene frame={frame - s[4]} />
+      </Sequence>
+      <Sequence from={s[5]} durationInFrames={S4}>
+        <ExceptionsScene frame={frame - s[5]} />
+      </Sequence>
+      <Sequence from={s[6]} durationInFrames={S4}>
+        <EventTypesScene frame={frame - s[6]} />
+      </Sequence>
+      <Sequence from={s[7]} durationInFrames={S5}>
+        <AdminDashboardScene frame={frame - s[7]} />
+      </Sequence>
+      <Sequence from={s[8]} durationInFrames={S5}>
+        <InstallScene frame={frame - s[8]} />
+      </Sequence>
+      <Sequence from={s[9]} durationInFrames={S4}>
+        <HostingStackScene frame={frame - s[9]} />
+      </Sequence>
+      <Sequence from={s[10]} durationInFrames={S3}>
+        <FeaturesScene frame={frame - s[10]} />
+      </Sequence>
+      <Sequence from={s[11]} durationInFrames={S3}>
+        <OutroScene frame={frame - s[11]} />
+      </Sequence>
 
       {/* Cinematic noise overlay */}
       <NoiseOverlay />
