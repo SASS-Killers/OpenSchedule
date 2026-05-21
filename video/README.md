@@ -21,21 +21,23 @@ npx remotion render OpenScheduleDemo out/openschedule-demo.mp4
 
 ## Structure
 
-- `src/Root.tsx` — Defines the composition (1080×720, 30fps, 30s duration)
-- `src/OpenScheduleDemo.tsx` — All 10 scenes with animations
+- `src/Root.tsx` — Defines the composition (1280×720, 30fps, 50s duration)
+- `src/OpenScheduleDemo.tsx` — All 12 scenes with fade/slide/scale animations
 - `src/index.css` — Base styles
 
-## Scenes
+## Scene Order (App-first)
 
-| # | Scene | Duration | Description |
-|---|-------|----------|-------------|
-| 1 | Intro | 5s | Logo + title + tech stack tags |
-| 2 | Features | 5s | 8 feature cards with icons |
-| 3 | Login | 5s | Email OTP flow mockup |
-| 4 | Host Dashboard | 5s | Two-column settings + bookings |
-| 5 | Schedule Editor | 5s | Weekly availability grid |
-| 6 | Exceptions | 5s | Date-specific + recurring exceptions |
-| 7 | Booking Widget | 5s | Calendar picker + time slots |
-| 8 | Admin Dashboard | 5s | Hosts list + email telemetry widget |
-| 9 | Confirmation | 5s | Booking confirmed + .ics download |
-| 10 | Outro | 5s | Stack tags + GitHub link |
+| # | Scene | Duration | What It Shows |
+|---|-------|----------|---------------|
+| 1 | **Booking Widget** | 5s | Public calendar picker + time slots + 15s polling |
+| 2 | **Booking Confirmation** | 4s | Confirmed state + .ics download + emails sent |
+| 3 | **Login** | 4s | Email OTP flow with security features |
+| 4 | **Host Dashboard** | 5s | Avatar, links, upcoming bookings agenda |
+| 5 | **Schedule Editor** | 4s | Weekly availability grid with toggle |
+| 6 | **Exceptions** | 4s | Date-specific + recurring override management |
+| 7 | **Event Types** | 4s | Meeting configurations with buffers/notice |
+| 8 | **Admin Dashboard** | 5s | Host list + email telemetry widget |
+| 9 | **Easy Install App** | 5s | 5-step local setup wizard for Cloudflare + Brevo |
+| 10 | **Free Hosting Stack** | 4s | Neon + Cloudflare + Brevo — all free tiers |
+| 11 | **Features Grid** | 3s | 8 feature cards |
+| 12 | **Outro** | 3s | Logo, stack tags, GitHub link |
