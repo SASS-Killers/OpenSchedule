@@ -6,6 +6,9 @@ export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
   const { eventTypeId, startTime, clientName, clientEmail, notes } = body;
 
+  // Derive app origin for absolute URLs in emails
+  const origin = new URL(request.url).origin;
+
   if (!eventTypeId || !startTime || !clientName || !clientEmail) {
     return new Response(JSON.stringify({ error: "eventTypeId, startTime, clientName, clientEmail required" }), { status: 400 });
   }
@@ -72,7 +75,7 @@ export const POST: APIRoute = async ({ request }) => {
     eventTitle: evt.title,
     startTime: startStr,
     endTime: endStr,
-    cancellationUrl: `/cancel/${cancelToken}`,
+    cancellationUrl: `${origin}/cancel/${cancelToken}`,
   });
   await sendEmail({ to: clientEmail, ...clientEmailData });
 
@@ -92,7 +95,7 @@ export const POST: APIRoute = async ({ request }) => {
     bookingId,
     startTime: slotStart,
     endTime: slotEnd,
-    cancellationUrl: `/cancel/${cancelToken}`,
+    cancellationUrl: `${origin}/cancel/${cancelToken}`,
   }), {
     headers: { "content-type": "application/json" },
   });
