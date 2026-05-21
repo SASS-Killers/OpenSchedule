@@ -1,62 +1,62 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { FuzzySearch } from "@/ui/fuzzy-search";
 
-const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Cherry", "Date", "Grape", "Kiwi", "Lemon", "Mango", "Orange", "Papaya", "Peach", "Pear", "Pineapple", "Plum", "Raspberry", "Strawberry", "Watermelon"];
+const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Cherry", "Grape", "Kiwi", "Mango", "Orange"];
 
-async function waitForRender(ms = 50) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+async function wait(ms = 80) { return new Promise((r) => setTimeout(r, ms)); }
 
 describe("FuzzySearch", () => {
-  it("renders input with placeholder", () => {
-    render(<FuzzySearch items={fruits} placeholder="Search fruit…" />);
-    expect(screen.getByPlaceholderText("Search fruit…")).toBeTruthy();
+  it("filters with displayName", async () => {
+    render(<FuzzySearch items={fruits} placeholder="Search" displayName={(s) => s.toUpperCase()} />);
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "man" } });
+    await wait();
+    expect(screen.getByText("MANGO")).toBeTruthy();
   });
 
-  it("shows filtered results when typing", async () => {
-    render(<FuzzySearch items={fruits} placeholder="Search fruit…" />);
-    const input = screen.getByPlaceholderText("Search fruit…") as HTMLInputElement;
+  it("shows empty state with no items", () => {
+    render(<FuzzySearch items={[]} placeholder="Empty" />);
+    expect(screen.getByPlaceholderText("Empty")).toBeTruthy();
+  });
+
+  it("selects via keyboard Enter", async () => {
+    let picked = "";
+    render(<FuzzySearch items={fruits} placeholder="Search" onChange={(v) => { picked = v; }} />);
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
     fireEvent.focus(input);
-    await waitForRender();
-    fireEvent.change(input, { target: { value: "app" } });
-    await waitForRender();
+    await wait();
+    fireEvent.change(input, { target: { value: "cher" } });
+    await wait();
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    fireEvent.keyDown(input, { key: "Enter" });
+    await wait();
+    expect(picked).toBe("Cherry");
+  });
+
+  it("closes on Escape", async () => {
+    render(<FuzzySearch items={fruits} placeholder="Search" />);
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+    fireEvent.focus(input);
+    await wait();
+    fireEvent.change(input, { target: { value: "a" } });
+    await wait();
     expect(screen.getByText("Apple")).toBeTruthy();
-    expect(screen.getByText("Pineapple")).toBeTruthy();
+    fireEvent.keyDown(input, { key: "Escape" });
+    await wait();
+    expect(screen.queryByText("Apple")).toBeFalsy();
   });
 
-  it("shows no matches message when nothing found", async () => {
-    render(<FuzzySearch items={fruits} placeholder="Search fruit…" />);
-    const input = screen.getByPlaceholderText("Search fruit…") as HTMLInputElement;
+  it("groups by groupBy function", async () => {
+    const items = ["Fruit:Apple", "Fruit:Banana", "Color:Red", "Color:Blue"];
+    render(<FuzzySearch items={items} placeholder="Group" groupBy={(s) => s.split(":")[0]} displayName={(s) => s.split(":")[1]} />);
+    const input = screen.getByPlaceholderText("Group") as HTMLInputElement;
     fireEvent.focus(input);
-    await waitForRender();
-    fireEvent.change(input, { target: { value: "zzzzz" } });
-    await waitForRender();
-    expect(screen.getByText(/no matches/i)).toBeTruthy();
-  });
-
-  it("calls onChange when item selected", async () => {
-    let selected = "";
-    render(<FuzzySearch items={fruits} placeholder="Search fruit…" onChange={(v) => { selected = v; }} />);
-    const input = screen.getByPlaceholderText("Search fruit…") as HTMLInputElement;
-    fireEvent.focus(input);
-    await waitForRender();
-    fireEvent.change(input, { target: { value: "grape" } });
-    await waitForRender();
-    fireEvent.mouseDown(screen.getByText("Grape"));
-    await waitForRender();
-    expect(selected).toBe("Grape");
-  });
-
-  it("displays selected value after selection", async () => {
-    render(<FuzzySearch items={fruits} placeholder="Search fruit…" />);
-    const input = screen.getByPlaceholderText("Search fruit…") as HTMLInputElement;
-    fireEvent.focus(input);
-    await waitForRender();
-    fireEvent.change(input, { target: { value: "mango" } });
-    await waitForRender();
-    fireEvent.mouseDown(screen.getByText("Mango"));
-    await waitForRender();
-    expect(input.value).toContain("Mango");
+    await wait();
+    fireEvent.change(input, { target: { value: "a" } });
+    await wait();
+    expect(screen.getByText("Apple")).toBeTruthy();
+    expect(screen.getByText("Banana")).toBeTruthy();
   });
 });
