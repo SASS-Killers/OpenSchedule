@@ -23,47 +23,6 @@ const RED = "#f87171";
 const YELLOW = "#fbbf24";
 const FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
 
-// ── Typewriter Text Component ──────────────────────────────────────────
-function TypewriterText({
-  text,
-  frame,
-  startFrame = 0,
-  charsPerFrame = 0.33,
-  style,
-}: {
-  text: string;
-  frame: number;
-  startFrame?: number;
-  charsPerFrame?: number;
-  style?: React.CSSProperties;
-}) {
-  const f = Math.max(0, frame - startFrame);
-  const charsShown = Math.floor(f * charsPerFrame);
-  const visible = text.slice(0, Math.min(charsShown, text.length));
-  const done = charsShown >= text.length;
-  const cursorBlink = done
-    ? Math.floor((frame - startFrame) / 10) % 2 === 1
-    : true;
-
-  return (
-    <span style={style}>
-      {visible}
-      <span
-        style={{
-          display: "inline-block",
-          width: 3,
-          height: "0.85em",
-          background: ACCENT,
-          marginLeft: 3,
-          verticalAlign: "middle",
-          opacity: Number(cursorBlink),
-          borderRadius: 1,
-        }}
-      />
-    </span>
-  );
-}
-
 // ── Voiceover Configuration ────────────────────────────────────────────
 // Edit these [startFrame, endFrame] pairs after recording your voiceover.
 // Music ducks to VOICEVOL during these segments, with a 6-frame fade ramp.
@@ -293,34 +252,11 @@ function BookingWidgetScene({ frame }: { frame: number }) {
         padding: "40px 60px",
       }}
     >
-      <div
-        style={{
-          height: 120,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          maxWidth: 700,
-          marginBottom: 8,
-        }}
-      >
-        <h1
-          style={{
-            fontSize: 36,
-            fontWeight: 800,
-            color: FG,
-            margin: 0,
-            lineHeight: 1.3,
-          }}
-        >
-          <TypewriterText
-            text="Stop paying subscription fees every month to have simple scheduling. Ditch the SaaS treadmill."
-            frame={frame}
-            startFrame={5}
-            charsPerFrame={0.5}
-          />
-        </h1>
-      </div>
+      <Title
+        text="Book a Meeting"
+        subtitle="No login required — just pick a time"
+        frame={frame}
+      />
       <div
         style={{
           display: "flex",
