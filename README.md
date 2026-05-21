@@ -4,22 +4,19 @@ Stop paying monthly for simple scheduling. OpenSchedule is a 100% free, self-hos
 
 No subscriptions. No per-seat licenses. No surprise bills. Just you and your data.
 
-[Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
-
-
-
 https://github.com/user-attachments/assets/7cd623ff-f042-41c2-96f6-e12db0cf8097
 
 
-
 <p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-outro.png" alt="" width="45%" style="border-radius: 8px;" />
   <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="" width="45%" style="border-radius: 8px;" />
 </p>
 
 <p align="center">
   <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="" width="70%" style="border-radius: 8px;" />
 </p>
+
+[Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
+
 
 ---
 
