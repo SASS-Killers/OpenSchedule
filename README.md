@@ -52,16 +52,6 @@ It's a booking platform for your business or team. Clients pick a time from your
 
 ## Quick start
 
-The easiest way is the one-click installer:
-
-```bash
-npm run install-wizard
-```
-
-It walks you through setting up a free Cloudflare account, connects Brevo for email, and deploys the whole thing. Takes about 10 minutes.
-
-### Manual setup
-
 ```bash
 git clone https://github.com/SASS-Killers/OpenSchedule.git
 cd open-calendar
