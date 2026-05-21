@@ -4,8 +4,9 @@ import { FuzzySearch } from "@/ui/fuzzy-search";
 // Lazy init to avoid SSR module caching issues
 function getTimezones(): string[] {
   try {
-    return ((Intl as any).supportedValuesOf?.("timeZone") ?? [])
-      .filter((tz: string) => !tz.includes("/Etc/") && !tz.startsWith("System/"));
+    return ((Intl as any).supportedValuesOf?.("timeZone") ?? []).filter(
+      (tz: string) => !tz.includes("/Etc/") && !tz.startsWith("System/"),
+    );
   } catch {
     return [];
   }
@@ -29,22 +30,24 @@ export function TimezonePicker({ value, onChange }: { value: string; onChange?: 
     if (browser && browser !== selected && defaults.includes(selected)) {
       setSelected(browser);
       if (onChange) onChange(browser);
-      else fetch("/api/host/timezone", {
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        body: `timezone=${encodeURIComponent(browser)}`,
-      });
+      else
+        fetch("/api/host/timezone", {
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          body: `timezone=${encodeURIComponent(browser)}`,
+        });
     }
   }, []);
 
   const handleChange = (tz: string) => {
     setSelected(tz);
     if (onChange) onChange(tz);
-    else fetch("/api/host/timezone", {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: `timezone=${encodeURIComponent(tz)}`,
-    });
+    else
+      fetch("/api/host/timezone", {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body: `timezone=${encodeURIComponent(tz)}`,
+      });
   };
 
   const tzs = ready ? getTimezones() : [];

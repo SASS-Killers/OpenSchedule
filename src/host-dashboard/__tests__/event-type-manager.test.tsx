@@ -16,9 +16,24 @@ describe("EventTypeManager", () => {
   });
 
   it("loads and shows list of event types", async () => {
-    mockFetch.mockResolvedValueOnce(new Response(JSON.stringify([
-      { id: "1", title: "30 Min", slug: "30min", duration: 30, is_active: 1, description: null, buffer_before: 0, buffer_after: 0, minimum_notice: 4 },
-    ]), { status: 200 }));
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify([
+          {
+            id: "1",
+            title: "30 Min",
+            slug: "30min",
+            duration: 30,
+            is_active: 1,
+            description: null,
+            buffer_before: 0,
+            buffer_after: 0,
+            minimum_notice: 4,
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
     render(<EventTypeManager />);
     await waitFor(() => expect(screen.getByText("30 Min")).toBeTruthy());
   });
@@ -45,19 +60,19 @@ describe("EventTypeManager", () => {
     mockFetch.mockResolvedValueOnce(new Response("[]", { status: 200 }));
     render(<EventTypeManager />);
     fireEvent.click(screen.getByText("+ New Event Type"));
-    
+
     const titleInput = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "Test Call" } });
-    
+
     // Slug auto-generates from title
     const slugInput = screen.getByPlaceholderText("e.g. 30min") as HTMLInputElement;
     expect(slugInput.value).toBe("test-call");
-    
+
     fireEvent.click(screen.getByText("Create"));
     await waitFor(() => {
       // Find the POST call specifically
       const postCall = mockFetch.mock.calls.find(
-        (c: any) => (c[0] as string).includes("/event_types") && c[1]?.method === "POST"
+        (c: any) => (c[0] as string).includes("/event_types") && c[1]?.method === "POST",
       );
       expect(postCall).toBeTruthy();
     });
@@ -76,9 +91,24 @@ describe("EventTypeManager", () => {
 
   it("deletes an event type via DELETE", async () => {
     mockFetch
-      .mockResolvedValueOnce(new Response(JSON.stringify([
-        { id: "1", title: "Delete Me", slug: "del", duration: 15, is_active: 1, description: null, buffer_before: 0, buffer_after: 0, minimum_notice: 4 },
-      ]), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify([
+            {
+              id: "1",
+              title: "Delete Me",
+              slug: "del",
+              duration: 15,
+              is_active: 1,
+              description: null,
+              buffer_before: 0,
+              buffer_after: 0,
+              minimum_notice: 4,
+            },
+          ]),
+          { status: 200 },
+        ),
+      )
       .mockResolvedValueOnce(new Response("{}", { status: 200 }));
     render(<EventTypeManager />);
     await waitFor(() => expect(screen.getByText("Delete Me")).toBeTruthy());
@@ -90,30 +120,45 @@ describe("EventTypeManager", () => {
 
   it("edits an existing event type via PATCH", async () => {
     mockFetch
-      .mockResolvedValueOnce(new Response(JSON.stringify([
-        { id: "42", title: "Edit Me", slug: "edit-me", duration: 30, is_active: 1, description: null, buffer_before: 0, buffer_after: 0, minimum_notice: 4 },
-      ]), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify([
+            {
+              id: "42",
+              title: "Edit Me",
+              slug: "edit-me",
+              duration: 30,
+              is_active: 1,
+              description: null,
+              buffer_before: 0,
+              buffer_after: 0,
+              minimum_notice: 4,
+            },
+          ]),
+          { status: 200 },
+        ),
+      )
       .mockResolvedValueOnce(new Response("{}", { status: 200 }));
     render(<EventTypeManager />);
     await waitFor(() => expect(screen.getByText("Edit Me")).toBeTruthy());
-    
+
     // Click Edit
     fireEvent.click(screen.getByText("Edit"));
-    
+
     // Form should show "Update" button instead of "Create"
     expect(screen.getByText("Update")).toBeTruthy();
-    
+
     // Title should be pre-filled
     const titleInput = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     expect(titleInput.value).toBe("Edit Me");
-    
+
     // Slug should be preserved (not auto-generated)
     const slugInput = screen.getByPlaceholderText("e.g. 30min") as HTMLInputElement;
     expect(slugInput.value).toBe("edit-me");
-    
+
     // Change title
     fireEvent.change(titleInput, { target: { value: "Edited Title" } });
-    
+
     // Save
     fireEvent.click(screen.getByText("Update"));
     await waitFor(() => {
@@ -127,9 +172,24 @@ describe("EventTypeManager", () => {
   });
 
   it("shows inactive event type with reduced opacity", async () => {
-    mockFetch.mockResolvedValueOnce(new Response(JSON.stringify([
-      { id: "1", title: "Old Type", slug: "old", duration: 60, is_active: 0, description: null, buffer_before: 0, buffer_after: 0, minimum_notice: 4 },
-    ]), { status: 200 }));
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify([
+          {
+            id: "1",
+            title: "Old Type",
+            slug: "old",
+            duration: 60,
+            is_active: 0,
+            description: null,
+            buffer_before: 0,
+            buffer_after: 0,
+            minimum_notice: 4,
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
     render(<EventTypeManager />);
     await waitFor(() => {
       const item = screen.getByText("Old Type").closest("div")?.parentElement;
@@ -143,10 +203,10 @@ describe("EventTypeManager", () => {
     mockFetch.mockResolvedValueOnce(new Response("[]", { status: 200 }));
     render(<EventTypeManager />);
     fireEvent.click(screen.getByText("+ New Event Type"));
-    
+
     const titleInput = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "My Cool Event!!!" } });
-    
+
     const slugInput = screen.getByPlaceholderText("e.g. 30min") as HTMLInputElement;
     expect(slugInput.value).toBe("my-cool-event");
   });
@@ -155,13 +215,13 @@ describe("EventTypeManager", () => {
     mockFetch.mockResolvedValueOnce(new Response("[]", { status: 200 }));
     render(<EventTypeManager />);
     fireEvent.click(screen.getByText("+ New Event Type"));
-    
+
     const titleInput = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "My Event" } });
-    
+
     const slugInput = screen.getByPlaceholderText("e.g. 30min") as HTMLInputElement;
     expect(slugInput.value).toBe("my-event");
-    
+
     // Slug overridden when title changes (component always auto-generates when not editing)
     fireEvent.change(titleInput, { target: { value: "My Event Renamed" } });
     expect(slugInput.value).toBe("my-event-renamed");
@@ -171,13 +231,13 @@ describe("EventTypeManager", () => {
     mockFetch.mockResolvedValueOnce(new Response("[]", { status: 200 }));
     render(<EventTypeManager />);
     fireEvent.click(screen.getByText("+ New Event Type"));
-    
+
     const titleInput = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "Something" } });
-    
+
     fireEvent.click(screen.getByText("Cancel"));
     fireEvent.click(screen.getByText("+ New Event Type"));
-    
+
     // Form should be reset
     const titleInputAgain = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     expect(titleInputAgain.value).toBe("");
@@ -190,9 +250,24 @@ describe("EventTypeManager", () => {
   });
 
   it("populates description when editing", async () => {
-    mockFetch.mockResolvedValueOnce(new Response(JSON.stringify([
-      { id: "1", title: "Test", slug: "test", duration: 30, is_active: 1, description: "A test call", buffer_before: 0, buffer_after: 0, minimum_notice: 4 },
-    ]), { status: 200 }));
+    mockFetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify([
+          {
+            id: "1",
+            title: "Test",
+            slug: "test",
+            duration: 30,
+            is_active: 1,
+            description: "A test call",
+            buffer_before: 0,
+            buffer_after: 0,
+            minimum_notice: 4,
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
     render(<EventTypeManager />);
     await waitFor(() => expect(screen.getByText("Test")).toBeTruthy());
     fireEvent.click(screen.getByText("Edit"));
@@ -204,13 +279,15 @@ describe("EventTypeManager", () => {
     mockFetch.mockResolvedValueOnce(new Response("[]", { status: 200 }));
     render(<EventTypeManager />);
     fireEvent.click(screen.getByText("+ New Event Type"));
-    
+
     const titleInput = screen.getByPlaceholderText("e.g. 30 Minute Call") as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "No Desc" } });
-    
+
     fireEvent.click(screen.getByText("Create"));
     await waitFor(() => {
-      const call = mockFetch.mock.calls.find((c: any) => (c[0] as string).includes("/event_types") && c[1]?.method === "POST");
+      const call = mockFetch.mock.calls.find(
+        (c: any) => (c[0] as string).includes("/event_types") && c[1]?.method === "POST",
+      );
       const body = JSON.parse(call[1].body);
       expect(body.description).toBeNull();
     });

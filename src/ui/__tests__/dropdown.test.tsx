@@ -7,7 +7,7 @@ describe("Dropdown", () => {
     render(
       <Dropdown trigger={<button>Open</button>}>
         <div>Content</div>
-      </Dropdown>
+      </Dropdown>,
     );
     expect(screen.getByText("Open")).toBeTruthy();
   });
@@ -16,7 +16,7 @@ describe("Dropdown", () => {
     render(
       <Dropdown trigger={<button>Open</button>}>
         <div>Dropdown Content</div>
-      </Dropdown>
+      </Dropdown>,
     );
     fireEvent.click(screen.getByText("Open"));
     expect(screen.getByText("Dropdown Content")).toBeTruthy();
@@ -26,7 +26,7 @@ describe("Dropdown", () => {
     render(
       <Dropdown trigger={<button>Toggle</button>}>
         <div>Content</div>
-      </Dropdown>
+      </Dropdown>,
     );
     fireEvent.click(screen.getByText("Toggle"));
     expect(screen.getByText("Content")).toBeTruthy();

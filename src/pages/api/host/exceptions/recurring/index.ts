@@ -15,12 +15,12 @@ export const GET: APIRoute = async ({ request }) => {
   const userId = await getUserId(request);
   if (!userId) return new Response(null, { status: 401 });
 
-  const recurring = await query`
+  const recurring = (await query`
     SELECT id, exception_type, day_of_week, start_time, end_time, title, effective_start, effective_end, is_active
     FROM recurring_exceptions
     WHERE user_id = ${userId}
     ORDER BY day_of_week
-  ` as any[];
+  `) as any[];
 
   return new Response(JSON.stringify(recurring), {
     headers: { "content-type": "application/json" },

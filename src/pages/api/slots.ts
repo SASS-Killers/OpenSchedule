@@ -10,16 +10,16 @@ export const GET: APIRoute = async ({ url }) => {
     return new Response(JSON.stringify({ error: "hostId, eventTypeId, date required" }), { status: 400 });
   }
 
-  const [evt] = await query`
+  const [evt] = (await query`
     SELECT id, duration, buffer_before, buffer_after, minimum_notice, user_id
     FROM event_types WHERE id = ${eventTypeId} AND is_active = true LIMIT 1
-  ` as any[];
+  `) as any[];
   if (!evt) return new Response(JSON.stringify({ slots: [], date }));
 
   // Get host timezone
-  const [host] = await query`
+  const [host] = (await query`
     SELECT timezone FROM users WHERE id = ${hostId} AND is_active = true LIMIT 1
-  ` as any[];
+  `) as any[];
   if (!host) return new Response(JSON.stringify({ slots: [], date }));
 
   // Compute UTC offset for the host's timezone on this date
@@ -27,14 +27,16 @@ export const GET: APIRoute = async ({ url }) => {
   try {
     const opts: Intl.DateTimeFormatOptions = { timeZone: host.timezone, timeZoneName: "shortOffset" };
     const parts = new Intl.DateTimeFormat("en", opts).formatToParts(new Date(date + "T12:00:00Z"));
-    const tz = parts.find(p => p.type === "timeZoneName")?.value || "";
+    const tz = parts.find((p) => p.type === "timeZoneName")?.value || "";
     const m = tz.match(/GMT([+-]\d+)(?::(\d+))?/);
     if (m) {
       const h = parseInt(m[1]);
       const min = m[2] ? parseInt(m[2]) : 0;
       offsetMin = h * 60 + (h < 0 ? -min : min);
     }
-  } catch { /* fallback to 0 */ }
+  } catch {
+    /* fallback to 0 */
+  }
 
   const nowUnix = Math.floor(Date.now() / 1000);
   // dateStart = midnight in the host's timezone (as UTC timestamp)
@@ -47,30 +49,30 @@ export const GET: APIRoute = async ({ url }) => {
   // ── PHASE 1: Gather availability signals ──
 
   // Date-specific overrides
-  const overrides = await query`
+  const overrides = (await query`
     SELECT exception_type, start_time, end_time FROM date_overrides
     WHERE user_id = ${hostId} AND is_active = true
     AND start_date <= ${date} AND end_date >= ${date}
-  ` as any[];
+  `) as any[];
 
   // Full-day block check
   const fullDayBlock = overrides.find((o: any) => o.exception_type === "full_day_block");
   if (fullDayBlock) return new Response(JSON.stringify({ slots: [], date }));
 
   // Recurring exceptions for this day of week
-  const recurring = await query`
+  const recurring = (await query`
     SELECT exception_type, start_time, end_time FROM recurring_exceptions
     WHERE user_id = ${hostId} AND day_of_week = ${dbDay} AND is_active = true
     AND (effective_start IS NULL OR effective_start <= ${date})
     AND (effective_end IS NULL OR effective_end >= ${date})
-  ` as any[];
+  `) as any[];
 
   // Default schedule
-  const defaultBlocks = await query`
+  const defaultBlocks = (await query`
     SELECT start_time, end_time FROM schedules
     WHERE user_id = ${hostId} AND day_of_week = ${dbDay}
     ORDER BY start_time
-  ` as any[];
+  `) as any[];
 
   // ── PHASE 2: Build base available blocks ──
   let blocks: { start_time: string; end_time: string }[] = [];
@@ -85,7 +87,7 @@ export const GET: APIRoute = async ({ url }) => {
     // Apply recurring custom_hours
     const recurringCustom = recurring.filter((r: any) => r.exception_type === "custom_hours");
     for (const rc of recurringCustom) {
-      if (!blocks.some(b => b.start_time === rc.start_time && b.end_time === rc.end_time)) {
+      if (!blocks.some((b) => b.start_time === rc.start_time && b.end_time === rc.end_time)) {
         blocks.push({ start_time: rc.start_time, end_time: rc.end_time });
       }
     }
@@ -119,12 +121,12 @@ export const GET: APIRoute = async ({ url }) => {
   }
 
   // ── PHASE 4: Booked slots ──
-  const booked = await query`
+  const booked = (await query`
     SELECT b.start_time, b.end_time FROM bookings b
     JOIN event_types e ON b.event_type_id = e.id
     WHERE e.user_id = ${hostId} AND b.status = 'confirmed'
     AND b.start_time < ${dateEnd} AND b.end_time > ${dateStart}
-  ` as any[];
+  `) as any[];
 
   const durationSec = evt.duration * 60;
   const candidates: number[] = [];
@@ -149,7 +151,10 @@ export const GET: APIRoute = async ({ url }) => {
       for (const b of booked) {
         const busyStart = b.start_time - evt.buffer_before * 60;
         const busyEnd = b.end_time + evt.buffer_after * 60;
-        if (cursor < busyEnd && slotEnd > busyStart) { conflict = true; break; }
+        if (cursor < busyEnd && slotEnd > busyStart) {
+          conflict = true;
+          break;
+        }
       }
 
       if (!conflict) candidates.push(cursor);

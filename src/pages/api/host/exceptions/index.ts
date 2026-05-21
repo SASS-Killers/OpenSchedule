@@ -18,12 +18,12 @@ export const GET: APIRoute = async ({ url, request }) => {
   const from = url.searchParams.get("from") || "1970-01-01";
   const to = url.searchParams.get("to") || "2099-12-31";
 
-  const overrides = await query`
+  const overrides = (await query`
     SELECT id, exception_type, start_date, end_date, start_time, end_time, title, is_active
     FROM date_overrides
     WHERE user_id = ${userId} AND start_date <= ${to} AND end_date >= ${from}
     ORDER BY start_date DESC
-  ` as any[];
+  `) as any[];
 
   return new Response(JSON.stringify(overrides), {
     headers: { "content-type": "application/json" },

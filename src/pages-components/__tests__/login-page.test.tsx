@@ -4,7 +4,11 @@ import { AuthProvider } from "@/auth/auth-context";
 import { LoginPage } from "@/pages-components/login-page";
 
 function Wrapper() {
-  return <AuthProvider><LoginPage /></AuthProvider>;
+  return (
+    <AuthProvider>
+      <LoginPage />
+    </AuthProvider>
+  );
 }
 
 describe("LoginPage", () => {
@@ -28,7 +32,8 @@ describe("LoginPage", () => {
   });
 
   it("shows error on verify failure", async () => {
-    globalThis.fetch = vi.fn()
+    globalThis.fetch = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 })) // login
       .mockResolvedValueOnce(new Response(JSON.stringify({ error: "Invalid code" }), { status: 200 })); // verify
     render(<Wrapper />);

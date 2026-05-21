@@ -12,9 +12,15 @@ function TestAuth({ onMount }: { onMount?: (auth: any) => void } = {}) {
       <div data-testid="session">{session ? session.email : "none"}</div>
       <div data-testid="error">{error || ""}</div>
       <div data-testid="role">{session ? session.role : ""}</div>
-      <button data-testid="login-btn" onClick={() => login("t@t.com")}>Login</button>
-      <button data-testid="verify-btn" onClick={() => verifyCode("t@t.com", "123456")}>Verify</button>
-      <button data-testid="logout-btn" onClick={() => logout()}>Logout</button>
+      <button data-testid="login-btn" onClick={() => login("t@t.com")}>
+        Login
+      </button>
+      <button data-testid="verify-btn" onClick={() => verifyCode("t@t.com", "123456")}>
+        Verify
+      </button>
+      <button data-testid="logout-btn" onClick={() => logout()}>
+        Logout
+      </button>
     </div>
   );
 }
@@ -29,13 +35,21 @@ describe("AuthProvider", () => {
   });
 
   it("provides initial state", () => {
-    render(<AuthProvider><TestAuth /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
+    );
     expect(screen.getByTestId("loading").textContent).toBe("idle");
     expect(screen.getByTestId("session").textContent).toBe("none");
   });
 
   it("calls send-code on login", async () => {
-    render(<AuthProvider><TestAuth /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
+    );
     fireEvent.click(screen.getByTestId("login-btn"));
     await new Promise((r) => setTimeout(r, 100));
     expect(globalThis.fetch).toHaveBeenCalledWith(
@@ -45,21 +59,35 @@ describe("AuthProvider", () => {
   });
 
   it("handles verifyCode with successful response", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ userId: "u1", email: "t@t.com", name: "Test", role: "admin" }), { status: 200 })
-    );
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ userId: "u1", email: "t@t.com", name: "Test", role: "admin" }), { status: 200 }),
+      );
     const authRef: any = {};
-    render(<AuthProvider><TestAuth onMount={(a) => { Object.assign(authRef, a); }} /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth
+          onMount={(a) => {
+            Object.assign(authRef, a);
+          }}
+        />
+      </AuthProvider>,
+    );
     fireEvent.click(screen.getByTestId("verify-btn"));
     await new Promise((r) => setTimeout(r, 100));
     expect(HTMLFormElement.prototype.submit).toHaveBeenCalled();
   });
 
   it("handles verifyCode with error", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ error: "Invalid code" }), { status: 200 })
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ error: "Invalid code" }), { status: 200 }));
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
     );
-    render(<AuthProvider><TestAuth /></AuthProvider>);
     fireEvent.click(screen.getByTestId("verify-btn"));
     await new Promise((r) => setTimeout(r, 100));
     expect(screen.getByTestId("error").textContent).toContain("Invalid code");
@@ -67,7 +95,11 @@ describe("AuthProvider", () => {
 
   it("handles verifyCode with network error", async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
-    render(<AuthProvider><TestAuth /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
+    );
     fireEvent.click(screen.getByTestId("verify-btn"));
     await new Promise((r) => setTimeout(r, 100));
     expect(screen.getByTestId("error").textContent).toContain("Network error");
@@ -75,7 +107,11 @@ describe("AuthProvider", () => {
 
   it("handles login network error", async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error("offline"));
-    render(<AuthProvider><TestAuth /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
+    );
     fireEvent.click(screen.getByTestId("login-btn"));
     await new Promise((r) => setTimeout(r, 100));
     expect(screen.getByTestId("error").textContent).toContain("Network error");
@@ -85,7 +121,11 @@ describe("AuthProvider", () => {
     // Set a valid JWT-like cookie
     const payload = btoa(JSON.stringify({ userId: "u1", email: "t@t.com", name: "Test", userrole: "admin" }));
     document.cookie = `session=header.${payload}.sig; path=/`;
-    render(<AuthProvider><TestAuth /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
+    );
     expect(screen.getByTestId("session").textContent).toBe("t@t.com");
     expect(screen.getByTestId("role").textContent).toBe("admin");
   });
@@ -94,13 +134,14 @@ describe("AuthProvider", () => {
     // Mock window.location.href
     const orig = window.location;
     Object.defineProperty(window, "location", { value: { href: "" }, writable: true });
-    render(<AuthProvider><TestAuth /></AuthProvider>);
+    render(
+      <AuthProvider>
+        <TestAuth />
+      </AuthProvider>,
+    );
     fireEvent.click(screen.getByTestId("logout-btn"));
     await new Promise((r) => setTimeout(r, 100));
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/api/auth/logout"),
-      expect.any(Object),
-    );
+    expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/auth/logout"), expect.any(Object));
     Object.defineProperty(window, "location", { value: orig, writable: true });
   });
 });

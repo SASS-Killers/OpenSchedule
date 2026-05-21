@@ -13,7 +13,9 @@ if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect
       <a href="/hosts/me" class="app-btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;">← Back</a>
       <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Event Types</h1>
     </div>
-    <div style="padding: 1.5rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
+    <div
+      style="padding: 1.5rem; border-radius: 0.85rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+    >
       <EventTypeManager client:load />
     </div>
   </section>

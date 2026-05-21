@@ -29,7 +29,9 @@ export function EventTypeManager() {
     setTypes(await res.json());
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const save = async () => {
     setSaving(true);
@@ -96,7 +98,10 @@ export function EventTypeManager() {
   };
 
   const slugFromTitle = (t: string) =>
-    t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    t
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
@@ -110,7 +115,9 @@ export function EventTypeManager() {
         <div
           key={t.id}
           style={{
-            display: "flex", alignItems: "center", gap: "1rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
             padding: "0.85rem 1rem",
             borderRadius: "0.7rem",
             border: "1px solid var(--app-border)",
@@ -124,66 +131,117 @@ export function EventTypeManager() {
               {t.duration} min &middot; /{t.slug} {!t.is_active && "&middot; inactive"}
             </div>
           </div>
-          <button onClick={() => edit(t)} className="app-btn" style={{ padding: "0.35rem 0.75rem", fontSize: "0.8rem", minHeight: 0 }}>Edit</button>
-          <button onClick={() => remove(t.id)} className="app-btn" style={{ padding: "0.35rem 0.75rem", fontSize: "0.8rem", minHeight: 0, color: "#f87171" }}>Delete</button>
+          <button
+            onClick={() => edit(t)}
+            className="app-btn"
+            style={{ padding: "0.35rem 0.75rem", fontSize: "0.8rem", minHeight: 0 }}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => remove(t.id)}
+            className="app-btn"
+            style={{ padding: "0.35rem 0.75rem", fontSize: "0.8rem", minHeight: 0, color: "#f87171" }}
+          >
+            Delete
+          </button>
         </div>
       ))}
 
       {/* Form */}
       {showForm && (
-        <div style={{
-          display: "grid", gap: "0.75rem",
-          padding: "1.25rem", borderRadius: "0.7rem",
-          border: "1px solid var(--app-border)",
-          background: "rgba(255,255,255,0.03)",
-        }}>
+        <div
+          style={{
+            display: "grid",
+            gap: "0.75rem",
+            padding: "1.25rem",
+            borderRadius: "0.7rem",
+            border: "1px solid var(--app-border)",
+            background: "rgba(255,255,255,0.03)",
+          }}
+        >
           <div style={{ display: "grid", gap: "0.3rem" }}>
             <label style={{ fontSize: "0.8rem", color: "var(--app-text-muted)" }}>Title</label>
-            <input type="text" value={form.title} placeholder="e.g. 30 Minute Call"
-              onChange={(e) => setForm({ ...form, title: e.target.value, slug: editing ? form.slug : slugFromTitle(e.target.value) })}
-              style={inputStyle} />
+            <input
+              type="text"
+              value={form.title}
+              placeholder="e.g. 30 Minute Call"
+              onChange={(e) =>
+                setForm({ ...form, title: e.target.value, slug: editing ? form.slug : slugFromTitle(e.target.value) })
+              }
+              style={inputStyle}
+            />
           </div>
           <div style={{ display: "grid", gap: "0.3rem" }}>
             <label style={{ fontSize: "0.8rem", color: "var(--app-text-muted)" }}>URL Slug</label>
-            <input type="text" value={form.slug} placeholder="e.g. 30min"
+            <input
+              type="text"
+              value={form.slug}
+              placeholder="e.g. 30min"
               onChange={(e) => setForm({ ...form, slug: e.target.value })}
-              style={{ ...inputStyle, fontFamily: "monospace" }} />
+              style={{ ...inputStyle, fontFamily: "monospace" }}
+            />
           </div>
           <div style={{ display: "grid", gap: "0.3rem" }}>
             <label style={{ fontSize: "0.8rem", color: "var(--app-text-muted)" }}>Description (optional)</label>
-            <input type="text" value={form.description} placeholder="A quick call to catch up"
+            <input
+              type="text"
+              value={form.description}
+              placeholder="A quick call to catch up"
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              style={inputStyle} />
+              style={inputStyle}
+            />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
             <div style={{ display: "grid", gap: "0.3rem" }}>
               <label style={{ fontSize: "0.8rem", color: "var(--app-text-muted)" }}>Duration (min)</label>
-              <input type="number" value={form.duration} min={5} step={5}
+              <input
+                type="number"
+                value={form.duration}
+                min={5}
+                step={5}
                 onChange={(e) => setForm({ ...form, duration: parseInt(e.target.value) || 30 })}
-                style={inputStyle} />
+                style={inputStyle}
+              />
             </div>
             <div style={{ display: "grid", gap: "0.3rem" }}>
               <label style={{ fontSize: "0.8rem", color: "var(--app-text-muted)" }}>Min. Notice (hours)</label>
-              <input type="number" value={form.minimumNotice} min={0}
+              <input
+                type="number"
+                value={form.minimumNotice}
+                min={0}
                 onChange={(e) => setForm({ ...form, minimumNotice: parseInt(e.target.value) || 4 })}
-                style={inputStyle} />
+                style={inputStyle}
+              />
             </div>
           </div>
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-            <button onClick={save} disabled={!form.title || !form.slug || saving}
-              className="app-btn app-btn-primary" style={{ padding: "0.6rem 1.25rem" }}>
+            <button
+              onClick={save}
+              disabled={!form.title || !form.slug || saving}
+              className="app-btn app-btn-primary"
+              style={{ padding: "0.6rem 1.25rem" }}
+            >
               {saving ? "Saving..." : editing ? "Update" : "Create"}
             </button>
-            <button onClick={cancel} className="app-btn" style={{ padding: "0.6rem 1.25rem" }}>Cancel</button>
+            <button onClick={cancel} className="app-btn" style={{ padding: "0.6rem 1.25rem" }}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {!showForm && (
-        <button onClick={() => setShowForm(true)} className="app-btn" style={{
-          padding: "0.85rem", justifyContent: "center",
-          border: "1px dashed var(--app-border)", width: "100%",
-        }}>
+        <button
+          onClick={() => setShowForm(true)}
+          className="app-btn"
+          style={{
+            padding: "0.85rem",
+            justifyContent: "center",
+            border: "1px dashed var(--app-border)",
+            width: "100%",
+          }}
+        >
           + New Event Type
         </button>
       )}

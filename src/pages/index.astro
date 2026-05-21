@@ -5,23 +5,48 @@ import AppLayout from "@/layouts/app-layout.astro";
 <AppLayout title="OpenSchedule — Free, Self-Hosted Calendly Replacement">
   <!-- Hero -->
   <section style="padding: 7rem 1.5rem 5rem; max-width: 960px; margin: 0 auto; text-align: center;">
-    <div style="display: inline-flex; gap: 0.4rem; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; border: 1px solid rgba(99,102,241,0.25); background: rgba(99,102,241,0.08); font-size: 0.8rem; color: var(--app-primary); font-weight: 500; margin-bottom: 2.5rem;">
-      <span style="width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #34d399; display: inline-block; margin-right: 0.2rem;"></span>
+    <div
+      style="display: inline-flex; gap: 0.4rem; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; border: 1px solid rgba(99,102,241,0.25); background: rgba(99,102,241,0.08); font-size: 0.8rem; color: var(--app-primary); font-weight: 500; margin-bottom: 2.5rem;"
+    >
+      <span
+        style="width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #34d399; display: inline-block; margin-right: 0.2rem;"
+      ></span>
       Self-hosted · Free forever · Open source
     </div>
 
-    <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 auto 1rem; line-height: 1.1; max-width: 720px;">
-      Stop paying for Calendly.<br/>
-      <span style="background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Free for your whole team.</span>
+    <h1
+      style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.03em; margin: 0 auto 1rem; line-height: 1.1; max-width: 720px;"
+    >
+      Stop paying for Calendly.<br />
+      <span
+        style="background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"
+        >Free for your whole team.</span
+      >
     </h1>
-    <p style="font-size: 1.1rem; color: var(--app-text-muted); max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.7;">
-      Deploys on Cloudflare Pages with Neon PostgreSQL. No per-seat fees, no subscriptions. Free for small and medium companies.
+    <p
+      style="font-size: 1.1rem; color: var(--app-text-muted); max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.7;"
+    >
+      Deploys on Cloudflare Pages with Neon PostgreSQL. No per-seat fees, no subscriptions. Free for small and medium
+      companies.
     </p>
 
     <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-      <a href="/login" class="app-btn app-btn-primary" style="padding: 0.9rem 2.25rem; font-weight: 600; font-size: 1rem;">Get Started Free</a>
-      <a href="https://github.com/SASS-Killers/OpenSchedule" target="_blank" class="app-btn" style="padding: 0.9rem 2.25rem; font-weight: 600; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <a
+        href="/login"
+        class="app-btn app-btn-primary"
+        style="padding: 0.9rem 2.25rem; font-weight: 600; font-size: 1rem;">Get Started Free</a
+      >
+      <a
+        href="https://github.com/SASS-Killers/OpenSchedule"
+        target="_blank"
+        class="app-btn"
+        style="padding: 0.9rem 2.25rem; font-weight: 600; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;"
+      >
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"
+          ><path
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+          ></path></svg
+        >
         Star on GitHub
       </a>
     </div>
@@ -31,39 +56,91 @@ import AppLayout from "@/layouts/app-layout.astro";
   <div style="background: rgba(255,255,255,0.015);">
     <section style="padding: 5rem 1.5rem; max-width: 960px; margin: 0 auto;">
       <div style="text-align: center; margin-bottom: 3rem;">
-        <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.5rem;">Why OpenSchedule</div>
+        <div
+          style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.5rem;"
+        >
+          Why OpenSchedule
+        </div>
         <h2 style="font-size: 1.75rem; font-weight: 800; margin: 0;">Everything you need. Nothing you don't.</h2>
       </div>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-        <div style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;">💰</div>
+        <div
+          style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+        >
+          <div
+            style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;"
+          >
+            💰
+          </div>
           <h3 style="margin: 0 0 0.35rem; font-size: 1rem; font-weight: 700;">Free Forever</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">Runs on free-tier Neon and Cloudflare. No paid tiers, no surprise bills.</p>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">
+            Runs on free-tier Neon and Cloudflare. No paid tiers, no surprise bills.
+          </p>
         </div>
-        <div style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;">🔒</div>
+        <div
+          style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+        >
+          <div
+            style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;"
+          >
+            🔒
+          </div>
           <h3 style="margin: 0 0 0.35rem; font-size: 1rem; font-weight: 700;">Your Data Stays Yours</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">Self-hosted on your infrastructure. No third-party servers touching your clients.</p>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">
+            Self-hosted on your infrastructure. No third-party servers touching your clients.
+          </p>
         </div>
-        <div style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;">👥</div>
+        <div
+          style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+        >
+          <div
+            style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;"
+          >
+            👥
+          </div>
           <h3 style="margin: 0 0 0.35rem; font-size: 1rem; font-weight: 700;">Multi-User</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">Admin provisions hosts. Hosts set availability. Clients book. All in one system.</p>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">
+            Admin provisions hosts. Hosts set availability. Clients book. All in one system.
+          </p>
         </div>
-        <div style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;">📅</div>
+        <div
+          style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+        >
+          <div
+            style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;"
+          >
+            📅
+          </div>
           <h3 style="margin: 0 0 0.35rem; font-size: 1rem; font-weight: 700;">Smart Scheduling</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">Weekly hours, date overrides, buffers, minimum notice. No double-booking.</p>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">
+            Weekly hours, date overrides, buffers, minimum notice. No double-booking.
+          </p>
         </div>
-        <div style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;">🚀</div>
+        <div
+          style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+        >
+          <div
+            style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;"
+          >
+            🚀
+          </div>
           <h3 style="margin: 0 0 0.35rem; font-size: 1rem; font-weight: 700;">No Lock-In</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">Everything runs on PostgreSQL. Open source — you own the code. Migrate anytime.</p>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">
+            Everything runs on PostgreSQL. Open source — you own the code. Migrate anytime.
+          </p>
         </div>
-        <div style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;">⚡</div>
+        <div
+          style="padding: 2rem; border-radius: 1rem; border: 1px solid var(--app-border); background: rgba(255,255,255,0.02);"
+        >
+          <div
+            style="width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: rgba(99,102,241,0.12); display: grid; place-items: center; margin-bottom: 1rem; color: var(--app-primary); font-size: 1.25rem;"
+          >
+            ⚡
+          </div>
           <h3 style="margin: 0 0 0.35rem; font-size: 1rem; font-weight: 700;">One-Command Deploy</h3>
-          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">Deploy on any free VPS with a single curl command. No complex infrastructure.</p>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.6;">
+            Deploy on any free VPS with a single curl command. No complex infrastructure.
+          </p>
         </div>
       </div>
     </section>
@@ -72,24 +149,46 @@ import AppLayout from "@/layouts/app-layout.astro";
   <!-- How It Works -->
   <section style="padding: 5rem 1.5rem; max-width: 960px; margin: 0 auto;">
     <div style="text-align: center; margin-bottom: 3rem;">
-      <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.5rem;">How It Works</div>
+      <div
+        style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.5rem;"
+      >
+        How It Works
+      </div>
       <h2 style="font-size: 1.75rem; font-weight: 800; margin: 0;">From zero to booked in minutes</h2>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
       <div style="text-align: center; padding: 0 0.5rem;">
-        <div style="width: 3.5rem; height: 3.5rem; border-radius: 999px; background: rgba(99,102,241,0.1); display: grid; place-items: center; margin: 0 auto 1.25rem; font-weight: 800; font-size: 1.2rem; color: var(--app-primary);">1</div>
+        <div
+          style="width: 3.5rem; height: 3.5rem; border-radius: 999px; background: rgba(99,102,241,0.1); display: grid; place-items: center; margin: 0 auto 1.25rem; font-weight: 800; font-size: 1.2rem; color: var(--app-primary);"
+        >
+          1
+        </div>
         <h3 style="margin: 0 0 0.5rem; font-size: 1.05rem; font-weight: 700;">Deploy</h3>
-        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.7;">Run one command on any VPS. One PostgreSQL database replaces Redis, Elasticsearch, and your entire API layer.</p>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.7;">
+          Run one command on any VPS. One PostgreSQL database replaces Redis, Elasticsearch, and your entire API layer.
+        </p>
       </div>
       <div style="text-align: center; padding: 0 0.5rem; position: relative;">
-        <div style="width: 3.5rem; height: 3.5rem; border-radius: 999px; background: rgba(99,102,241,0.1); display: grid; place-items: center; margin: 0 auto 1.25rem; font-weight: 800; font-size: 1.2rem; color: var(--app-primary);">2</div>
+        <div
+          style="width: 3.5rem; height: 3.5rem; border-radius: 999px; background: rgba(99,102,241,0.1); display: grid; place-items: center; margin: 0 auto 1.25rem; font-weight: 800; font-size: 1.2rem; color: var(--app-primary);"
+        >
+          2
+        </div>
         <h3 style="margin: 0 0 0.5rem; font-size: 1.05rem; font-weight: 700;">Configure</h3>
-        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.7;">Set your weekly availability, create event types, configure buffers and notice periods.</p>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.7;">
+          Set your weekly availability, create event types, configure buffers and notice periods.
+        </p>
       </div>
       <div style="text-align: center; padding: 0 0.5rem;">
-        <div style="width: 3.5rem; height: 3.5rem; border-radius: 999px; background: rgba(99,102,241,0.1); display: grid; place-items: center; margin: 0 auto 1.25rem; font-weight: 800; font-size: 1.2rem; color: var(--app-primary);">3</div>
+        <div
+          style="width: 3.5rem; height: 3.5rem; border-radius: 999px; background: rgba(99,102,241,0.1); display: grid; place-items: center; margin: 0 auto 1.25rem; font-weight: 800; font-size: 1.2rem; color: var(--app-primary);"
+        >
+          3
+        </div>
         <h3 style="margin: 0 0 0.5rem; font-size: 1.05rem; font-weight: 700;">Get Booked</h3>
-        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.7;">Share your booking link. Clients pick a time. You get notified. No double-bookings.</p>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--app-text-muted); line-height: 1.7;">
+          Share your booking link. Clients pick a time. You get notified. No double-bookings.
+        </p>
       </div>
     </div>
   </section>
@@ -99,25 +198,59 @@ import AppLayout from "@/layouts/app-layout.astro";
     <section style="padding: 5rem 1.5rem; max-width: 960px; margin: 0 auto;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center;">
         <div>
-          <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.75rem;">Open Source</div>
+          <div
+            style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--app-primary); margin-bottom: 0.75rem;"
+          >
+            Open Source
+          </div>
           <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 0.75rem; line-height: 1.3;">
-            One database.<br/>No lock-in.
+            One database.<br />No lock-in.
           </h2>
-          <p style="font-size: 0.92rem; color: var(--app-text-muted); margin: 0 0 1.5rem; line-height: 1.7; max-width: 400px;">
-            No Redis, Elasticsearch, or message queues. PostgreSQL with extensions replaces them all. You own your data and your code.
+          <p
+            style="font-size: 0.92rem; color: var(--app-text-muted); margin: 0 0 1.5rem; line-height: 1.7; max-width: 400px;"
+          >
+            No Redis, Elasticsearch, or message queues. PostgreSQL with extensions replaces them all. You own your data
+            and your code.
           </p>
-          <a href="https://github.com/SASS-Killers/OpenSchedule" target="_blank" class="app-btn" style="padding: 0.75rem 1.5rem; gap: 0.5rem; display: inline-flex; align-items: center; transition: all 0.2s;">
-            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <a
+            href="https://github.com/SASS-Killers/OpenSchedule"
+            target="_blank"
+            class="app-btn"
+            style="padding: 0.75rem 1.5rem; gap: 0.5rem; display: inline-flex; align-items: center; transition: all 0.2s;"
+          >
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"
+              ><path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              ></path></svg
+            >
             View on GitHub
           </a>
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
-          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(99,102,241,0.2); background: rgba(99,102,241,0.06); font-size: 0.82rem; font-weight: 500; color: var(--app-primary);">Neon PostgreSQL</span>
-          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">PostgREST</span>
-          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">Astro</span>
-          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">Cloudflare Pages</span>
-          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">React</span>
-          <span style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);">Brevo</span>
+          <span
+            style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(99,102,241,0.2); background: rgba(99,102,241,0.06); font-size: 0.82rem; font-weight: 500; color: var(--app-primary);"
+            >Neon PostgreSQL</span
+          >
+          <span
+            style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);"
+            >PostgREST</span
+          >
+          <span
+            style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);"
+            >Astro</span
+          >
+          <span
+            style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);"
+            >Cloudflare Pages</span
+          >
+          <span
+            style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);"
+            >React</span
+          >
+          <span
+            style="padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(148,163,184,0.15); background: rgba(255,255,255,0.02); font-size: 0.82rem; color: var(--app-text-muted);"
+            >Brevo</span
+          >
         </div>
       </div>
     </section>

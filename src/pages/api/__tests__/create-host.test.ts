@@ -14,7 +14,8 @@ beforeAll(() => {
 describe("POST /api/admin/create-host", () => {
   it("returns 401 without auth", async () => {
     const req = new Request("http://localhost:6969/api/admin/create-host", {
-      method: "POST", headers: { "content-type": "application/json" },
+      method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: "Test", email: "t@t.com" }),
     });
     const resp = await createHost({ request: req } as any);

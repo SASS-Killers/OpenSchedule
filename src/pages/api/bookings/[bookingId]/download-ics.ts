@@ -5,7 +5,7 @@ import { generateIcs } from "@/lib/ics";
 export const GET: APIRoute = async ({ params }) => {
   const { bookingId } = params;
 
-  const [booking] = await query`
+  const [booking] = (await query`
     SELECT b.id, b.start_time, b.end_time, b.client_notes,
            c.name AS client_name, c.email AS client_email,
            u.name AS host_name, u.email AS host_email,
@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ params }) => {
     JOIN users u ON e.user_id = u.id
     WHERE b.id = ${bookingId} AND b.status = 'confirmed'
     LIMIT 1
-  ` as any[];
+  `) as any[];
 
   if (!booking) {
     return new Response("Not found", { status: 404 });

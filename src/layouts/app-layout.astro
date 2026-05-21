@@ -26,11 +26,11 @@ const session = match ? await verifySession(match[1]) : null;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <style is:global>
       @font-face {
-        font-family: 'Montserrat';
+        font-family: "Montserrat";
         font-style: normal;
         font-weight: 400 800;
         font-display: swap;
-        src: url('/fonts/Montserrat.woff2') format('woff2');
+        src: url("/fonts/Montserrat.woff2") format("woff2");
       }
       :root {
         color-scheme: dark;
@@ -44,11 +44,21 @@ const session = match ? await verifySession(match[1]) : null;
         --app-primary-2: #8b5cf6;
       }
 
-      * { box-sizing: border-box; }
-      html, body { margin: 0; min-height: 100%; }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
 
       body {
-        font-family: "Montserrat", system-ui, -apple-system, sans-serif;
+        font-family:
+          "Montserrat",
+          system-ui,
+          -apple-system,
+          sans-serif;
         background:
           radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 28%),
           radial-gradient(circle at top right, rgba(34, 211, 238, 0.14), transparent 24%),
@@ -56,10 +66,20 @@ const session = match ? await verifySession(match[1]) : null;
         color: var(--app-text);
       }
 
-      a { color: inherit; text-decoration: none; }
-      button, input, textarea, select { font: inherit; }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
 
-      .app-shell { min-height: 100vh; }
+      .app-shell {
+        min-height: 100vh;
+      }
 
       .app-topbar {
         position: sticky;
@@ -93,7 +113,9 @@ const session = match ? await verifySession(match[1]) : null;
         color: #fff;
       }
 
-      .app-brand-copy { min-width: 0; }
+      .app-brand-copy {
+        min-width: 0;
+      }
       .app-brand-title {
         font-size: 0.98rem;
         font-weight: 700;
@@ -112,11 +134,13 @@ const session = match ? await verifySession(match[1]) : null;
         color: var(--app-text-muted);
         padding: 0.35rem 0.6rem;
         border-radius: 0.4rem;
-        transition: color 0.2s, background 0.2s;
+        transition:
+          color 0.2s,
+          background 0.2s;
       }
       .nav-link:hover {
         color: var(--app-text);
-        background: rgba(255,255,255,0.04);
+        background: rgba(255, 255, 255, 0.04);
       }
 
       .hamburger {
@@ -137,10 +161,18 @@ const session = match ? await verifySession(match[1]) : null;
       }
 
       @media (max-width: 720px) {
-        .app-topbar { padding: 0.9rem 1rem; }
-        .profile-grid { grid-template-columns: 1fr !important; }
-        .profile-grid > * { order: 0 !important; }
-        .hamburger { display: block; }
+        .app-topbar {
+          padding: 0.9rem 1rem;
+        }
+        .profile-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .profile-grid > * {
+          order: 0 !important;
+        }
+        .hamburger {
+          display: block;
+        }
         .nav-drawer {
           display: none;
           position: absolute;
@@ -155,8 +187,12 @@ const session = match ? await verifySession(match[1]) : null;
           gap: 0.5rem;
           align-items: stretch;
         }
-        .nav-drawer.open { display: flex; }
-        .nav-drawer form { display: block !important; }
+        .nav-drawer.open {
+          display: flex;
+        }
+        .nav-drawer form {
+          display: block !important;
+        }
         .nav-drawer .nav-link {
           display: block;
           padding: 0.6rem 0.75rem;
@@ -198,9 +234,15 @@ const session = match ? await verifySession(match[1]) : null;
       }
 
       @media (max-width: 720px) {
-        .app-topbar { padding: 0.9rem 1rem; }
-        .profile-grid { grid-template-columns: 1fr !important; }
-        .profile-grid > * { order: 0 !important; }
+        .app-topbar {
+          padding: 0.9rem 1rem;
+        }
+        .profile-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .profile-grid > * {
+          order: 0 !important;
+        }
       }
     </style>
   </head>
@@ -217,22 +259,38 @@ const session = match ? await verifySession(match[1]) : null;
           <slot name="header-actions" />
           <button class="hamburger" id="hamburger-btn" aria-label="Menu">☰</button>
           <div class="nav-drawer" id="nav-drawer">
-            {!session && !Astro.url.pathname.startsWith("/login") && <a href="/login" class="nav-link">Log in →</a>}
-            {session && (
-              <>
-                {session.role === "admin" && (
-                  <a href="/admin" class="nav-link">Admin</a>
-                )}
-                {(session.role === "host" || session.role === "admin") && (
-                  <a href="/hosts/me" class="nav-link">My Profile</a>
-                )}
-                <form method="POST" action="/api/auth/logout" style="display:inline;">
-                  <button type="submit" class="nav-link" style="border:none;background:none;cursor:pointer;width:100%;text-align:left;">
-                    Log out →
-                  </button>
-                </form>
-              </>
-            )}
+            {
+              !session && !Astro.url.pathname.startsWith("/login") && (
+                <a href="/login" class="nav-link">
+                  Log in →
+                </a>
+              )
+            }
+            {
+              session && (
+                <>
+                  {session.role === "admin" && (
+                    <a href="/admin" class="nav-link">
+                      Admin
+                    </a>
+                  )}
+                  {(session.role === "host" || session.role === "admin") && (
+                    <a href="/hosts/me" class="nav-link">
+                      My Profile
+                    </a>
+                  )}
+                  <form method="POST" action="/api/auth/logout" style="display:inline;">
+                    <button
+                      type="submit"
+                      class="nav-link"
+                      style="border:none;background:none;cursor:pointer;width:100%;text-align:left;"
+                    >
+                      Log out →
+                    </button>
+                  </form>
+                </>
+              )
+            }
           </div>
         </div>
       </header>
@@ -246,7 +304,11 @@ const session = match ? await verifySession(match[1]) : null;
       btn?.addEventListener("click", () => drawer?.classList.toggle("open"));
       // Close on outside click
       document.addEventListener("click", (e) => {
-        if (drawer?.classList.contains("open") && !btn?.contains(e.target as Node) && !drawer?.contains(e.target as Node)) {
+        if (
+          drawer?.classList.contains("open") &&
+          !btn?.contains(e.target as Node) &&
+          !drawer?.contains(e.target as Node)
+        ) {
           drawer.classList.remove("open");
         }
       });

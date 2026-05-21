@@ -15,7 +15,8 @@ beforeAll(() => {
 describe("POST /api/host/timezone", () => {
   it("returns 401 without auth", async () => {
     const req = new Request("http://localhost:6969/api/host/timezone", {
-      method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" },
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ timezone: "UTC" }).toString(),
     });
     const resp = await timezone({ request: req } as any);

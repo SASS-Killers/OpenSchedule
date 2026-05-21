@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${jwt}`,
+      Authorization: `Bearer ${jwt}`,
     },
     body: JSON.stringify({ name, email, timezone, role: "host", is_active: true }),
   });

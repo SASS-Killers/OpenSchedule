@@ -14,7 +14,7 @@ export function getToken(): string {
 export function pgrst(path: string, opts: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(opts.headers as Record<string, string> || {}),
+    ...((opts.headers as Record<string, string>) || {}),
   };
   const token = getToken();
   if (token) headers["Authorization"] = `Bearer ${token}`;

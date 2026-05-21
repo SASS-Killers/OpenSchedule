@@ -56,8 +56,11 @@ export default {
     for (const b of bookings) {
       // Format time in host timezone
       const startStr = new Date(b.start_time * 1000).toLocaleString("en-US", {
-        weekday: "long", month: "long", day: "numeric",
-        hour: "numeric", minute: "2-digit",
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
       });
 
       const subject = `Reminder: ${b.event_title} with ${b.host_name} tomorrow`;

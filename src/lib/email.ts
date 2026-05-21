@@ -91,9 +91,21 @@ export function otpEmail(code: string) {
 }
 
 export function bookingConfirmationClientEmail({
-  clientName, hostName, eventTitle, startTime, endTime, cancellationUrl, icsUrl,
+  clientName,
+  hostName,
+  eventTitle,
+  startTime,
+  endTime,
+  cancellationUrl,
+  icsUrl,
 }: {
-  clientName: string; hostName: string; eventTitle: string; startTime: string; endTime: string; cancellationUrl: string; icsUrl?: string;
+  clientName: string;
+  hostName: string;
+  eventTitle: string;
+  startTime: string;
+  endTime: string;
+  cancellationUrl: string;
+  icsUrl?: string;
 }) {
   return {
     subject: `Confirmed: ${eventTitle} with ${hostName}`,
@@ -110,9 +122,19 @@ export function bookingConfirmationClientEmail({
 }
 
 export function bookingNotificationHostEmail({
-  hostName, clientName, clientEmail, eventTitle, startTime, endTime,
+  hostName,
+  clientName,
+  clientEmail,
+  eventTitle,
+  startTime,
+  endTime,
 }: {
-  hostName: string; clientName: string; clientEmail: string; eventTitle: string; startTime: string; endTime: string;
+  hostName: string;
+  clientName: string;
+  clientEmail: string;
+  eventTitle: string;
+  startTime: string;
+  endTime: string;
 }) {
   return {
     subject: `New booking: ${eventTitle} with ${clientName}`,
@@ -127,7 +149,15 @@ export function bookingNotificationHostEmail({
   };
 }
 
-export function cancellationEmail({ name, eventTitle, startTime }: { name: string; eventTitle: string; startTime: string }) {
+export function cancellationEmail({
+  name,
+  eventTitle,
+  startTime,
+}: {
+  name: string;
+  eventTitle: string;
+  startTime: string;
+}) {
   return {
     subject: `Cancelled: ${eventTitle}`,
     text: `Hi ${name},\n\nYour ${eventTitle} on ${startTime} has been cancelled.`,

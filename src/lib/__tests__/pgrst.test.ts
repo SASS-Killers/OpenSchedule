@@ -31,7 +31,7 @@ describe("pgrst", () => {
     await pgrst("/event_types");
     expect(captured?.headers).toMatchObject({
       "Content-Type": "application/json",
-      "Authorization": "Bearer test-token",
+      Authorization: "Bearer test-token",
     });
     globalThis.fetch = orig;
   });

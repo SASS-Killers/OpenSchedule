@@ -24,7 +24,10 @@ export function generateIcs({
 }): string {
   const fmt = (ts: number) => {
     const d = new Date(ts * 1000);
-    return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    return d
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
   };
 
   const lines = [

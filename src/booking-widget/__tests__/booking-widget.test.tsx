@@ -56,9 +56,7 @@ describe("BookingWidget", () => {
   });
 
   it("shows no available slots when fetch returns empty", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ slots: [] }), { status: 200 })
-    );
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ slots: [] }), { status: 200 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
     await waitFor(() => expect(screen.getByText(/No available slots/)).toBeTruthy(), { timeout: 3000 });
@@ -66,95 +64,121 @@ describe("BookingWidget", () => {
 
   it("displays slot times when available", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ slots: [ts] }), { status: 200 })
-    );
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("shows booking form when slot is selected", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ slots: [ts] }), { status: 200 })
-    );
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
     await waitFor(() => expect(screen.getByPlaceholderText("Your name")).toBeTruthy(), { timeout: 3000 });
   });
 
   it("disables confirm when name and email are empty", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ slots: [ts] }), { status: 200 })
-    );
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
-    await waitFor(() => {
-      const btn = screen.getByText("Confirm Booking") as HTMLButtonElement;
-      expect(btn.disabled).toBe(true);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
+    await waitFor(
+      () => {
+        const btn = screen.getByText("Confirm Booking") as HTMLButtonElement;
+        expect(btn.disabled).toBe(true);
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("completes full booking flow", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn()
+    globalThis.fetch = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }))
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ ok: true, startTime: ts, endTime: ts + 1800, cancellationUrl: "/cancel/tok123" }),
-        { status: 200 }
-      ));
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ ok: true, startTime: ts, endTime: ts + 1800, cancellationUrl: "/cancel/tok123" }),
+          { status: 200 },
+        ),
+      );
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
     await waitFor(() => expect(screen.getByPlaceholderText("Your name")).toBeTruthy(), { timeout: 3000 });
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Alice" } });
     fireEvent.change(screen.getByPlaceholderText("Your email"), { target: { value: "alice@test.com" } });
     fireEvent.click(screen.getByText("Confirm Booking"));
-    await waitFor(async () => {
-      expect(screen.getByText("Booking Confirmed")).toBeTruthy();
-    }, { timeout: 3000 });
+    await waitFor(
+      async () => {
+        expect(screen.getByText("Booking Confirmed")).toBeTruthy();
+      },
+      { timeout: 3000 },
+    );
     expect(globalThis.fetch).toHaveBeenCalledWith("/api/book", expect.objectContaining({ method: "POST" }));
   });
 
   it("shows cancellation URL after booking", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn()
+    globalThis.fetch = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }))
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ ok: true, startTime: ts, endTime: ts + 1800, cancellationUrl: "/cancel/tok999" }),
-        { status: 200 }
-      ));
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ ok: true, startTime: ts, endTime: ts + 1800, cancellationUrl: "/cancel/tok999" }),
+          { status: 200 },
+        ),
+      );
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
     await waitFor(() => expect(screen.getByPlaceholderText("Your name")).toBeTruthy(), { timeout: 3000 });
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Alice" } });
     fireEvent.change(screen.getByPlaceholderText("Your email"), { target: { value: "alice@test.com" } });
@@ -164,19 +188,22 @@ describe("BookingWidget", () => {
 
   it("shows error when booking fails", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn()
+    globalThis.fetch = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }))
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ error: "Slot taken" }), { status: 409 }
-      ));
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: "Slot taken" }), { status: 409 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
     await waitFor(() => expect(screen.getByPlaceholderText("Your name")).toBeTruthy(), { timeout: 3000 });
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Bob" } });
     fireEvent.change(screen.getByPlaceholderText("Your email"), { target: { value: "bob@test.com" } });
@@ -186,17 +213,22 @@ describe("BookingWidget", () => {
 
   it("shows network error when booking request throws", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn()
+    globalThis.fetch = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }))
       .mockRejectedValueOnce(new Error("Network error"));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
     await waitFor(() => expect(screen.getByPlaceholderText("Your name")).toBeTruthy(), { timeout: 3000 });
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Carol" } });
     fireEvent.change(screen.getByPlaceholderText("Your email"), { target: { value: "carol@test.com" } });
@@ -206,67 +238,84 @@ describe("BookingWidget", () => {
 
   it("sends notes with booking request", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn()
+    globalThis.fetch = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }))
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ ok: true, startTime: ts, endTime: ts + 1800, cancellationUrl: "/cancel/t" }),
-        { status: 200 }
-      ));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ ok: true, startTime: ts, endTime: ts + 1800, cancellationUrl: "/cancel/t" }), {
+          status: 200,
+        }),
+      );
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
     await waitFor(() => expect(screen.getByPlaceholderText("Your name")).toBeTruthy(), { timeout: 3000 });
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Dan" } });
     fireEvent.change(screen.getByPlaceholderText("Your email"), { target: { value: "dan@test.com" } });
     fireEvent.change(screen.getByPlaceholderText("Notes (optional)"), { target: { value: "Afternoon please" } });
     fireEvent.click(screen.getByText("Confirm Booking"));
-    await waitFor(() => {
-      const bookCall = (globalThis.fetch as any).mock.calls.find((c: any) => c[0] === "/api/book");
-      expect(bookCall).toBeTruthy();
-      const body = JSON.parse(bookCall[1].body);
-      expect(body.notes).toBe("Afternoon please");
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const bookCall = (globalThis.fetch as any).mock.calls.find((c: any) => c[0] === "/api/book");
+        expect(bookCall).toBeTruthy();
+        const body = JSON.parse(bookCall[1].body);
+        expect(body.notes).toBe("Afternoon please");
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("fetches slots via API when a date is selected", async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ slots: [] }), { status: 200 })
-    );
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ slots: [] }), { status: 200 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/slots?hostId=h1&eventTypeId=e1")
-      );
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/slots?hostId=h1&eventTypeId=e1"));
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("enables confirm button when form is filled", async () => {
     const ts = Math.floor(Date.now() / 1000) + 86400 * 5;
-    globalThis.fetch = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }));
+    globalThis.fetch = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ slots: [ts] }), { status: 200 }));
     render(<BookingWidget hostId="h1" eventTypeId="e1" />);
     gotoFutureDay(15);
-    await waitFor(() => {
-      const slotBtns = Array.from(document.querySelectorAll("button"))
-        .filter(b => /\d+:\d+[ap]/.test(b.textContent || ""));
-      if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
-      expect(slotBtns.length).toBeGreaterThan(0);
-    }, { timeout: 3000 });
-    await waitFor(() => {
-      const btn = screen.getByText("Confirm Booking") as HTMLButtonElement;
-      expect(btn.disabled).toBe(true);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const slotBtns = Array.from(document.querySelectorAll("button")).filter((b) =>
+          /\d+:\d+[ap]/.test(b.textContent || ""),
+        );
+        if (slotBtns.length > 0) fireEvent.click(slotBtns[0]);
+        expect(slotBtns.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
+    await waitFor(
+      () => {
+        const btn = screen.getByText("Confirm Booking") as HTMLButtonElement;
+        expect(btn.disabled).toBe(true);
+      },
+      { timeout: 3000 },
+    );
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Frank" } });
     fireEvent.change(screen.getByPlaceholderText("Your email"), { target: { value: "frank@test.com" } });
-    await waitFor(() => {
-      const btn = screen.getByText("Confirm Booking") as HTMLButtonElement;
-      expect(btn.disabled).toBe(false);
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        const btn = screen.getByText("Confirm Booking") as HTMLButtonElement;
+        expect(btn.disabled).toBe(false);
+      },
+      { timeout: 3000 },
+    );
   });
 });

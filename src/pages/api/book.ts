@@ -10,16 +10,18 @@ export const POST: APIRoute = async ({ request }) => {
   const origin = new URL(request.url).origin;
 
   if (!eventTypeId || !startTime || !clientName || !clientEmail) {
-    return new Response(JSON.stringify({ error: "eventTypeId, startTime, clientName, clientEmail required" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "eventTypeId, startTime, clientName, clientEmail required" }), {
+      status: 400,
+    });
   }
 
   // Get event type
-  const [evt] = await query`
+  const [evt] = (await query`
     SELECT e.id, e.duration, e.title, e.user_id, u.name AS host_name, u.email AS host_email
     FROM event_types e
     JOIN users u ON e.user_id = u.id
     WHERE e.id = ${eventTypeId} AND e.is_active = true LIMIT 1
-  ` as any[];
+  `) as any[];
   if (!evt) return new Response(JSON.stringify({ error: "Event type not found" }), { status: 404 });
 
   const slotStart = Math.floor(startTime);
@@ -27,21 +29,21 @@ export const POST: APIRoute = async ({ request }) => {
   const now = Math.floor(Date.now() / 1000);
 
   // Race condition check
-  const [conflict] = await query`
+  const [conflict] = (await query`
     SELECT b.id FROM bookings b
     JOIN event_types e ON b.event_type_id = e.id
     WHERE e.user_id = ${evt.user_id} AND b.status = 'confirmed'
     AND b.start_time < ${slotEnd} AND b.end_time > ${slotStart}
     LIMIT 1
-  ` as any[];
+  `) as any[];
   if (conflict) {
     return new Response(JSON.stringify({ error: "This slot is no longer available" }), { status: 409 });
   }
 
   // Auto-register client
-  let [client] = await query`
+  let [client] = (await query`
     SELECT id, name FROM clients WHERE email = ${clientEmail} LIMIT 1
-  ` as any[];
+  `) as any[];
 
   if (!client) {
     const clientId = crypto.randomUUID();
@@ -61,10 +63,14 @@ export const POST: APIRoute = async ({ request }) => {
   `;
 
   // Format times for email
-  const fmtDate = (ts: number) => new Date(ts * 1000).toLocaleString("en-US", {
-    weekday: "short", month: "short", day: "numeric",
-    hour: "numeric", minute: "2-digit",
-  });
+  const fmtDate = (ts: number) =>
+    new Date(ts * 1000).toLocaleString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
   const startStr = fmtDate(slotStart);
   const endStr = fmtDate(slotEnd);
 
@@ -92,13 +98,16 @@ export const POST: APIRoute = async ({ request }) => {
   });
   await sendEmail({ to: evt.host_email, emailType: "confirmation", ...hostEmailData });
 
-  return new Response(JSON.stringify({
-    ok: true,
-    bookingId,
-    startTime: slotStart,
-    endTime: slotEnd,
-    cancellationUrl: `${origin}/cancel/${cancelToken}`,
-  }), {
-    headers: { "content-type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      bookingId,
+      startTime: slotStart,
+      endTime: slotEnd,
+      cancellationUrl: `${origin}/cancel/${cancelToken}`,
+    }),
+    {
+      headers: { "content-type": "application/json" },
+    },
+  );
 };

@@ -41,9 +41,14 @@ export function Form({ fields, submitLabel, onSubmit, onSuccess }: Props) {
             value={values[f.name] || ""}
             onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
             style={{
-              width: "100%", padding: "0.75rem 1rem", borderRadius: "0.85rem",
-              border: "1px solid var(--app-border)", background: "rgba(255,255,255,0.03)",
-              color: "#fff", fontSize: "0.95rem", outline: "none",
+              width: "100%",
+              padding: "0.75rem 1rem",
+              borderRadius: "0.85rem",
+              border: "1px solid var(--app-border)",
+              background: "rgba(255,255,255,0.03)",
+              color: "#fff",
+              fontSize: "0.95rem",
+              outline: "none",
             }}
           />
         </div>

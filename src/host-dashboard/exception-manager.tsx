@@ -49,9 +49,14 @@ function emptyRecurring() {
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "0.5rem 0.7rem", borderRadius: "0.45rem",
-  border: "1px solid var(--app-border)", background: "rgba(0,0,0,0.2)",
-  color: "#fff", fontSize: "0.88rem", outline: "none",
+  width: "100%",
+  padding: "0.5rem 0.7rem",
+  borderRadius: "0.45rem",
+  border: "1px solid var(--app-border)",
+  background: "rgba(0,0,0,0.2)",
+  color: "#fff",
+  fontSize: "0.88rem",
+  outline: "none",
 };
 
 export function ExceptionManager() {
@@ -76,10 +81,14 @@ export function ExceptionManager() {
       ]);
       if (oRes.ok) setOverrides(await oRes.json());
       if (rRes.ok) setRecurrings(await rRes.json());
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const createOverride = async () => {
     setSaving(true);
@@ -134,10 +143,14 @@ export function ExceptionManager() {
 
   const typeLabel = (t: string) => {
     switch (t) {
-      case "full_day_block": return "🚫 Full day";
-      case "custom_hours": return "🕐 Custom hours";
-      case "window_block": return "✂️ Window block";
-      default: return t;
+      case "full_day_block":
+        return "🚫 Full day";
+      case "custom_hours":
+        return "🕐 Custom hours";
+      case "window_block":
+        return "✂️ Window block";
+      default:
+        return t;
     }
   };
 
@@ -152,72 +165,127 @@ export function ExceptionManager() {
         <p style={{ color: "var(--app-text-muted)", fontSize: "0.85rem" }}>No date-specific exceptions.</p>
       )}
       {overrides.map((o) => (
-        <div key={o.id} style={{
-          display: "flex", alignItems: "center", gap: "0.75rem",
-          padding: "0.7rem 0.85rem", borderRadius: "0.6rem",
-          border: "1px solid var(--app-border)",
-          opacity: o.is_active ? 1 : 0.45,
-        }}>
+        <div
+          key={o.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            padding: "0.7rem 0.85rem",
+            borderRadius: "0.6rem",
+            border: "1px solid var(--app-border)",
+            opacity: o.is_active ? 1 : 0.45,
+          }}
+        >
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 600, fontSize: "0.88rem" }}>
               {typeLabel(o.exception_type)} {o.title && `· ${o.title}`}
             </div>
             <div style={{ fontSize: "0.78rem", color: "var(--app-text-muted)" }}>
-              {o.start_date === o.end_date
-                ? o.start_date
-                : `${o.start_date} → ${o.end_date}`}
+              {o.start_date === o.end_date ? o.start_date : `${o.start_date} → ${o.end_date}`}
               {o.start_time && ` · ${o.start_time}–${o.end_time}`}
             </div>
           </div>
-          <button onClick={() => removeOverride(o.id)} className="app-btn"
-            style={{ padding: "0.3rem 0.6rem", fontSize: "0.78rem", minHeight: 0, color: "#f87171" }}>
+          <button
+            onClick={() => removeOverride(o.id)}
+            className="app-btn"
+            style={{ padding: "0.3rem 0.6rem", fontSize: "0.78rem", minHeight: 0, color: "#f87171" }}
+          >
             Delete
           </button>
         </div>
       ))}
 
       {showOverrideForm && (
-        <div style={{
-          display: "grid", gap: "0.6rem", padding: "1rem", borderRadius: "0.7rem",
-          border: "1px solid var(--app-border)", background: "rgba(255,255,255,0.03)",
-        }}>
-          <select value={form.exception_type} onChange={(e) => setForm({ ...form, exception_type: e.target.value })}
-            style={inputStyle}>
+        <div
+          style={{
+            display: "grid",
+            gap: "0.6rem",
+            padding: "1rem",
+            borderRadius: "0.7rem",
+            border: "1px solid var(--app-border)",
+            background: "rgba(255,255,255,0.03)",
+          }}
+        >
+          <select
+            value={form.exception_type}
+            onChange={(e) => setForm({ ...form, exception_type: e.target.value })}
+            style={inputStyle}
+          >
             <option value="full_day_block">Full-day block (vacation)</option>
             <option value="custom_hours">Custom hours</option>
             <option value="window_block">Window block (dentist)</option>
           </select>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-            <input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-              placeholder="Start date" style={inputStyle} />
-            <input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-              placeholder="End date" style={inputStyle} />
+            <input
+              type="date"
+              value={form.start_date}
+              onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+              placeholder="Start date"
+              style={inputStyle}
+            />
+            <input
+              type="date"
+              value={form.end_date}
+              onChange={(e) => setForm({ ...form, end_date: e.target.value })}
+              placeholder="End date"
+              style={inputStyle}
+            />
           </div>
           {form.exception_type !== "full_day_block" && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-              <input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-                style={inputStyle} />
-              <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })}
-                style={inputStyle} />
+              <input
+                type="time"
+                value={form.start_time}
+                onChange={(e) => setForm({ ...form, start_time: e.target.value })}
+                style={inputStyle}
+              />
+              <input
+                type="time"
+                value={form.end_time}
+                onChange={(e) => setForm({ ...form, end_time: e.target.value })}
+                style={inputStyle}
+              />
             </div>
           )}
-          <input type="text" value={form.title} placeholder="Title (e.g. Italy vacation)"
-            onChange={(e) => setForm({ ...form, title: e.target.value })} style={inputStyle} />
+          <input
+            type="text"
+            value={form.title}
+            placeholder="Title (e.g. Italy vacation)"
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            style={inputStyle}
+          />
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button onClick={createOverride} disabled={!form.start_date || !form.end_date || saving}
-              className="app-btn app-btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>
+            <button
+              onClick={createOverride}
+              disabled={!form.start_date || !form.end_date || saving}
+              className="app-btn app-btn-primary"
+              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}
+            >
               {saving ? "Saving..." : "Create"}
             </button>
-            <button onClick={() => setShowOverrideForm(false)} className="app-btn"
-              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>Cancel</button>
+            <button
+              onClick={() => setShowOverrideForm(false)}
+              className="app-btn"
+              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
       {!showOverrideForm && (
-        <button onClick={() => setShowOverrideForm(true)} className="app-btn" style={{
-          padding: "0.6rem", justifyContent: "center", border: "1px dashed var(--app-border)", width: "100%",
-          fontSize: "0.85rem",
-        }}>
+        <button
+          onClick={() => setShowOverrideForm(true)}
+          className="app-btn"
+          style={{
+            padding: "0.6rem",
+            justifyContent: "center",
+            border: "1px dashed var(--app-border)",
+            width: "100%",
+            fontSize: "0.85rem",
+          }}
+        >
           + Date Exception
         </button>
       )}
@@ -228,11 +296,17 @@ export function ExceptionManager() {
         <p style={{ color: "var(--app-text-muted)", fontSize: "0.85rem" }}>No recurring exceptions.</p>
       )}
       {recurrings.map((r) => (
-        <div key={r.id} style={{
-          display: "flex", alignItems: "center", gap: "0.75rem",
-          padding: "0.7rem 0.85rem", borderRadius: "0.6rem",
-          border: "1px solid var(--app-border)",
-        }}>
+        <div
+          key={r.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            padding: "0.7rem 0.85rem",
+            borderRadius: "0.6rem",
+            border: "1px solid var(--app-border)",
+          }}
+        >
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 600, fontSize: "0.88rem" }}>
               {typeLabel(r.exception_type)} {r.title && `· ${r.title}`}
@@ -241,55 +315,113 @@ export function ExceptionManager() {
               {dayLabel(r.day_of_week)} · {r.start_time}–{r.end_time}
             </div>
           </div>
-          <button onClick={() => removeRecurring(r.id)} className="app-btn"
-            style={{ padding: "0.3rem 0.6rem", fontSize: "0.78rem", minHeight: 0, color: "#f87171" }}>
+          <button
+            onClick={() => removeRecurring(r.id)}
+            className="app-btn"
+            style={{ padding: "0.3rem 0.6rem", fontSize: "0.78rem", minHeight: 0, color: "#f87171" }}
+          >
             Delete
           </button>
         </div>
       ))}
       {showRecurringForm && (
-        <div style={{
-          display: "grid", gap: "0.6rem", padding: "1rem", borderRadius: "0.7rem",
-          border: "1px solid var(--app-border)", background: "rgba(255,255,255,0.03)",
-        }}>
-          <select value={recForm.exception_type} onChange={(e) => setRecForm({ ...recForm, exception_type: e.target.value })}
-            style={inputStyle}>
+        <div
+          style={{
+            display: "grid",
+            gap: "0.6rem",
+            padding: "1rem",
+            borderRadius: "0.7rem",
+            border: "1px solid var(--app-border)",
+            background: "rgba(255,255,255,0.03)",
+          }}
+        >
+          <select
+            value={recForm.exception_type}
+            onChange={(e) => setRecForm({ ...recForm, exception_type: e.target.value })}
+            style={inputStyle}
+          >
             <option value="window_block">Window block</option>
             <option value="custom_hours">Custom hours</option>
           </select>
-          <select value={recForm.day_of_week} onChange={(e) => setRecForm({ ...recForm, day_of_week: parseInt(e.target.value) })}
-            style={inputStyle}>
-            {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
+          <select
+            value={recForm.day_of_week}
+            onChange={(e) => setRecForm({ ...recForm, day_of_week: parseInt(e.target.value) })}
+            style={inputStyle}
+          >
+            {DAYS.map((d, i) => (
+              <option key={i} value={i}>
+                {d}
+              </option>
+            ))}
           </select>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-            <input type="time" value={recForm.start_time} onChange={(e) => setRecForm({ ...recForm, start_time: e.target.value })}
-              style={inputStyle} />
-            <input type="time" value={recForm.end_time} onChange={(e) => setRecForm({ ...recForm, end_time: e.target.value })}
-              style={inputStyle} />
+            <input
+              type="time"
+              value={recForm.start_time}
+              onChange={(e) => setRecForm({ ...recForm, start_time: e.target.value })}
+              style={inputStyle}
+            />
+            <input
+              type="time"
+              value={recForm.end_time}
+              onChange={(e) => setRecForm({ ...recForm, end_time: e.target.value })}
+              style={inputStyle}
+            />
           </div>
-          <input type="text" value={recForm.title} placeholder="Title (e.g. Team standup)"
-            onChange={(e) => setRecForm({ ...recForm, title: e.target.value })} style={inputStyle} />
+          <input
+            type="text"
+            value={recForm.title}
+            placeholder="Title (e.g. Team standup)"
+            onChange={(e) => setRecForm({ ...recForm, title: e.target.value })}
+            style={inputStyle}
+          />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-            <input type="date" value={recForm.effective_start} placeholder="Effective from"
-              onChange={(e) => setRecForm({ ...recForm, effective_start: e.target.value })} style={inputStyle} />
-            <input type="date" value={recForm.effective_end} placeholder="Effective until"
-              onChange={(e) => setRecForm({ ...recForm, effective_end: e.target.value })} style={inputStyle} />
+            <input
+              type="date"
+              value={recForm.effective_start}
+              placeholder="Effective from"
+              onChange={(e) => setRecForm({ ...recForm, effective_start: e.target.value })}
+              style={inputStyle}
+            />
+            <input
+              type="date"
+              value={recForm.effective_end}
+              placeholder="Effective until"
+              onChange={(e) => setRecForm({ ...recForm, effective_end: e.target.value })}
+              style={inputStyle}
+            />
           </div>
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button onClick={createRecurring} disabled={!recForm.start_time || !recForm.end_time || saving}
-              className="app-btn app-btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>
+            <button
+              onClick={createRecurring}
+              disabled={!recForm.start_time || !recForm.end_time || saving}
+              className="app-btn app-btn-primary"
+              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}
+            >
               {saving ? "Saving..." : "Create"}
             </button>
-            <button onClick={() => setShowRecurringForm(false)} className="app-btn"
-              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>Cancel</button>
+            <button
+              onClick={() => setShowRecurringForm(false)}
+              className="app-btn"
+              style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
       {!showRecurringForm && (
-        <button onClick={() => setShowRecurringForm(true)} className="app-btn" style={{
-          padding: "0.6rem", justifyContent: "center", border: "1px dashed var(--app-border)", width: "100%",
-          fontSize: "0.85rem",
-        }}>
+        <button
+          onClick={() => setShowRecurringForm(true)}
+          className="app-btn"
+          style={{
+            padding: "0.6rem",
+            justifyContent: "center",
+            border: "1px dashed var(--app-border)",
+            width: "100%",
+            fontSize: "0.85rem",
+          }}
+        >
           + Recurring Exception
         </button>
       )}

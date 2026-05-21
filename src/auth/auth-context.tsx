@@ -38,7 +38,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const parts = m[1].split(".");
       const payload = JSON.parse(atob(parts[1]));
       setState({
-        session: { userId: payload.userId, email: payload.email, name: payload.name, role: payload.userrole || payload.role },
+        session: {
+          userId: payload.userId,
+          email: payload.email,
+          name: payload.name,
+          role: payload.userrole || payload.role,
+        },
         loading: false,
         error: null,
       });
@@ -103,11 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/login";
   };
 
-  return (
-    <AuthContext.Provider value={{ ...state, login, verifyCode, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ ...state, login, verifyCode, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextType {

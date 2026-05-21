@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { otpEmail, bookingConfirmationClientEmail, bookingNotificationHostEmail, cancellationEmail, welcomeHostEmail } from "@/lib/email";
+import {
+  otpEmail,
+  bookingConfirmationClientEmail,
+  bookingNotificationHostEmail,
+  cancellationEmail,
+  welcomeHostEmail,
+} from "@/lib/email";
 
 describe("email templates", () => {
   it("otpEmail includes the code", () => {

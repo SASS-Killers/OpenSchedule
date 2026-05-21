@@ -131,10 +131,7 @@ export function ScheduleEditor({ initial }: { initial: DaySlot[] }) {
       >
         <span style={{ fontWeight: 600, fontSize: "0.92rem" }}>{label}</span>
         {on ? (
-          <div
-            style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
             <TextField
               value={slot.startTime}
               display={displayTime(slot.startTime)}

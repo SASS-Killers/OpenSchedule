@@ -4,7 +4,9 @@ import { FuzzySearch } from "@/ui/fuzzy-search";
 
 const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Cherry", "Grape", "Kiwi", "Mango", "Orange"];
 
-async function wait(ms = 80) { return new Promise((r) => setTimeout(r, ms)); }
+async function wait(ms = 80) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 describe("FuzzySearch", () => {
   it("filters with displayName", async () => {
@@ -23,7 +25,15 @@ describe("FuzzySearch", () => {
 
   it("selects via keyboard Enter", async () => {
     let picked = "";
-    render(<FuzzySearch items={fruits} placeholder="Search" onChange={(v) => { picked = v; }} />);
+    render(
+      <FuzzySearch
+        items={fruits}
+        placeholder="Search"
+        onChange={(v) => {
+          picked = v;
+        }}
+      />,
+    );
     const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
     fireEvent.focus(input);
     await wait();
@@ -50,7 +60,14 @@ describe("FuzzySearch", () => {
 
   it("groups by groupBy function", async () => {
     const items = ["Fruit:Apple", "Fruit:Banana", "Color:Red", "Color:Blue"];
-    render(<FuzzySearch items={items} placeholder="Group" groupBy={(s) => s.split(":")[0]} displayName={(s) => s.split(":")[1]} />);
+    render(
+      <FuzzySearch
+        items={items}
+        placeholder="Group"
+        groupBy={(s) => s.split(":")[0]}
+        displayName={(s) => s.split(":")[1]}
+      />,
+    );
     const input = screen.getByPlaceholderText("Group") as HTMLInputElement;
     fireEvent.focus(input);
     await wait();

@@ -10,68 +10,95 @@ if (!session || session.role !== "admin") return Astro.redirect("/login");
 <AppLayout title="Add Host — OpenSchedule">
   <div style="display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 74px);">
     <div style="border-right: 1px solid var(--app-border); padding: 1.5rem 0;">
-      <a href="/admin" style="display:block; padding: 0.5rem 1rem; margin: 0 0.5rem; border-radius: 0.5rem; color: var(--app-text); font-size: 0.88rem; text-decoration:none;">
+      <a
+        href="/admin"
+        style="display:block; padding: 0.5rem 1rem; margin: 0 0.5rem; border-radius: 0.5rem; color: var(--app-text); font-size: 0.88rem; text-decoration:none;"
+      >
         Hosts
       </a>
-      <div style="padding: 0.5rem 1rem; margin: 0.25rem 0.5rem; border-radius: 0.5rem; color: var(--app-text-muted); font-size: 0.88rem; cursor: default;">
+      <div
+        style="padding: 0.5rem 1rem; margin: 0.25rem 0.5rem; border-radius: 0.5rem; color: var(--app-text-muted); font-size: 0.88rem; cursor: default;"
+      >
         Settings
       </div>
     </div>
     <section style="padding: 1.5rem; max-width: 480px;">
-      <a href="/admin" class="app-btn" style="padding: 0.35rem 0.75rem; min-height: 0; font-size: 0.82rem; display: inline-flex; margin-bottom: 1.5rem;">← Back</a>
+      <a
+        href="/admin"
+        class="app-btn"
+        style="padding: 0.35rem 0.75rem; min-height: 0; font-size: 0.82rem; display: inline-flex; margin-bottom: 1.5rem;"
+        >← Back</a
+      >
       <h1 style="margin: 0 0 1.5rem; font-size: 1.25rem; font-weight: 700;">Add Host</h1>
       <form id="add-host-form" style="display: grid; gap: 0.75rem;">
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Name</label>
-          <input type="text" id="field-name" required
-            style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;" />
+          <input
+            type="text"
+            id="field-name"
+            required
+            style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;"
+          />
         </div>
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Email</label>
-          <input type="email" id="field-email" required
-            style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;" />
+          <input
+            type="email"
+            id="field-email"
+            required
+            style="width:100%; padding:0.55rem 0.75rem; border-radius:0.7rem; border:1px solid var(--app-border); background:rgba(0,0,0,0.2); color:#fff; font-size:0.88rem; outline:none;"
+          />
         </div>
         <div style="display: grid; gap: 0.3rem;">
           <label style="font-size: 0.82rem; color: var(--app-text-muted);">Timezone</label>
-          <TimezonePicker value="America/New_York" client:load
-            onChange={(tz) => { (window as any).__hostTz = tz; }}
+          <TimezonePicker
+            value="America/New_York"
+            client:load
+            onChange={(tz) => {
+              (window as any).__hostTz = tz;
+            }}
           />
         </div>
         <div id="form-error" style="color:#f87171;font-size:0.85rem;display:none;"></div>
-        <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; margin-top: 0.5rem;">Create Host</button>
+        <button type="submit" class="app-btn app-btn-primary" style="justify-content: center; margin-top: 0.5rem;"
+          >Create Host</button
+        >
       </form>
     </section>
   </div>
 </AppLayout>
 
 <script>
-document.getElementById("add-host-form")!.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const errEl = document.getElementById("form-error")!;
-  errEl.style.display = "none";
+  document.getElementById("add-host-form")!.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("form-error")!;
+    errEl.style.display = "none";
 
-  const name = (document.getElementById("field-name") as HTMLInputElement).value;
-  const email = (document.getElementById("field-email") as HTMLInputElement).value;
-  const timezone = (window as any).__hostTz || "America/New_York";
+    const name = (document.getElementById("field-name") as HTMLInputElement).value;
+    const email = (document.getElementById("field-email") as HTMLInputElement).value;
+    const timezone = (window as any).__hostTz || "America/New_York";
 
-  const m = document.cookie.match(/session=([^;]+)/);
-  if (!m) { window.location.href = "/login"; return; }
-  const jwt = m[1];
+    const m = document.cookie.match(/session=([^;]+)/);
+    if (!m) {
+      window.location.href = "/login";
+      return;
+    }
+    const jwt = m[1];
 
-  const res = await fetch("/api/admin/create-host", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name, email, timezone: selectedTimezone }),
+    const res = await fetch("/api/admin/create-host", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, timezone: selectedTimezone }),
+    });
+
+    if (res.ok || res.status === 201) {
+      window.location.href = "/admin";
+    } else {
+      const data = await res.json();
+      errEl.textContent = data.message || "Failed to create host.";
+      errEl.style.display = "block";
+    }
   });
-
-  if (res.ok || res.status === 201) {
-    window.location.href = "/admin";
-  } else {
-    const data = await res.json();
-    errEl.textContent = data.message || "Failed to create host.";
-    errEl.style.display = "block";
-  }
-});
 </script>

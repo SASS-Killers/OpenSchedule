@@ -32,10 +32,7 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
   // Show internal state if set, otherwise prop value
   const displayValue = internalValue || value;
 
-  const filtered = useMemo(
-    () => (query ? items.filter((i) => fuzzyMatch(query, i)) : []),
-    [query, items],
-  );
+  const filtered = useMemo(() => (query ? items.filter((i) => fuzzyMatch(query, i)) : []), [query, items]);
 
   const grouped = useMemo(() => {
     if (!groupBy) return { "": filtered };
@@ -57,10 +54,18 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (!open) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setHighlightIdx((i) => Math.min(i + 1, filtered.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setHighlightIdx((i) => Math.max(i - 1, 0)); }
-    else if (e.key === "Enter" && filtered[highlightIdx]) { e.preventDefault(); select(filtered[highlightIdx]); }
-    else if (e.key === "Escape") { setOpen(false); }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightIdx((i) => Math.min(i + 1, filtered.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightIdx((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && filtered[highlightIdx]) {
+      e.preventDefault();
+      select(filtered[highlightIdx]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -79,13 +84,25 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
         type="text"
         placeholder={placeholder}
         value={open ? query : fmt(displayValue)}
-        onFocus={() => { setOpen(true); setQuery(""); }}
-        onChange={(e) => { setQuery(e.target.value); setHighlightIdx(0); if (!open) setOpen(true); }}
+        onFocus={() => {
+          setOpen(true);
+          setQuery("");
+        }}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setHighlightIdx(0);
+          if (!open) setOpen(true);
+        }}
         onKeyDown={onKeyDown}
         style={{
-          width: "100%", padding: "0.55rem 0.75rem", borderRadius: "0.7rem",
-          border: "1px solid var(--app-border)", background: "rgba(0,0,0,0.2)",
-          color: "#fff", fontSize: "0.85rem", outline: "none",
+          width: "100%",
+          padding: "0.55rem 0.75rem",
+          borderRadius: "0.7rem",
+          border: "1px solid var(--app-border)",
+          background: "rgba(0,0,0,0.2)",
+          color: "#fff",
+          fontSize: "0.85rem",
+          outline: "none",
         }}
       />
       <Dropdown open={open} onOpenChange={setOpen}>
@@ -93,7 +110,16 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
           {Object.entries(grouped).map(([region, regionItems]) => (
             <div key={region}>
               {region && (
-                <div style={{ fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--app-text-muted)", padding: "0.4rem 0.6rem 0.2rem" }}>
+                <div
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    color: "var(--app-text-muted)",
+                    padding: "0.4rem 0.6rem 0.2rem",
+                  }}
+                >
                   {region}
                 </div>
               )}
@@ -102,10 +128,16 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
                 return (
                   <div
                     key={item}
-                    onMouseDown={(e) => { e.preventDefault(); select(item); }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      select(item);
+                    }}
                     onMouseEnter={() => setHighlightIdx(globalIdx)}
                     style={{
-                      padding: "0.4rem 0.6rem", borderRadius: "0.4rem", cursor: "pointer", fontSize: "0.85rem",
+                      padding: "0.4rem 0.6rem",
+                      borderRadius: "0.4rem",
+                      cursor: "pointer",
+                      fontSize: "0.85rem",
                       background: globalIdx === highlightIdx ? "rgba(99,102,241,0.15)" : "transparent",
                       color: globalIdx === highlightIdx ? "#fff" : "var(--app-text)",
                     }}
@@ -117,7 +149,9 @@ export function FuzzySearch({ items, value = "", onChange, placeholder = "Search
             </div>
           ))}
           {query && filtered.length === 0 && (
-            <div style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.85rem", color: "var(--app-text-muted)" }}>
+            <div
+              style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.85rem", color: "var(--app-text-muted)" }}
+            >
               No matches for "{query}"
             </div>
           )}

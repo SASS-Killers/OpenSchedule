@@ -37,7 +37,9 @@ export function Avatar({ userId, name, size = "3.5rem" }: { userId: string; name
           }
         }}
         style={{
-          width: "100%", height: "100%", borderRadius: "999px",
+          width: "100%",
+          height: "100%",
+          borderRadius: "999px",
           objectFit: "cover",
           background: "linear-gradient(135deg, var(--app-primary), var(--app-primary-2))",
         }}
@@ -45,11 +47,15 @@ export function Avatar({ userId, name, size = "3.5rem" }: { userId: string; name
       <div
         ref={fallbackRef}
         style={{
-          position: "absolute", inset: 0,
+          position: "absolute",
+          inset: 0,
           borderRadius: "999px",
           background: "linear-gradient(135deg, var(--app-primary), var(--app-primary-2))",
-          display: "none", placeItems: "center",
-          fontWeight: 700, fontSize: `calc(${size} * 0.35)`, color: "#fff",
+          display: "none",
+          placeItems: "center",
+          fontWeight: 700,
+          fontSize: `calc(${size} * 0.35)`,
+          color: "#fff",
         }}
       >
         {name.charAt(0)}

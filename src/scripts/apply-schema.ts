@@ -19,20 +19,21 @@ const stmts = schema
   .map((s) => s.trim())
   .filter((s) => s.length > 0 && !s.startsWith("--"));
 
-let ok = 0, fail = 0;
+let ok = 0,
+  fail = 0;
 for (const stmt of stmts) {
   try {
     await exec(stmt);
-    console.log(`  ✓ ${stmt.split('\n')[0].trim()}`);
+    console.log(`  ✓ ${stmt.split("\n")[0].trim()}`);
     ok++;
   } catch (e: any) {
     const msg = e.message || "";
     if (msg.includes("already exists")) {
-      console.log(`  ~ ${stmt.split('\n')[0].trim()} (exists)`);
+      console.log(`  ~ ${stmt.split("\n")[0].trim()} (exists)`);
       ok++;
     } else {
-      console.error(`  ✗ ${stmt.split('\n')[0].trim()}`);
-      console.error(`    ${msg.split('\n')[0]}`);
+      console.error(`  ✗ ${stmt.split("\n")[0].trim()}`);
+      console.error(`    ${msg.split("\n")[0]}`);
       fail++;
     }
   }
@@ -46,7 +47,7 @@ if (!existing) {
   const now = Math.floor(Date.now() / 1000);
   await sql.query(
     "INSERT INTO users (id, email, name, slug, role, timezone, is_active, created_at) VALUES ($1, $2, $3, $4, 'admin', 'America/New_York', true, $5)",
-    [id, "augmentedmike@gmail.com", "Michael ONeal", slug, now]
+    [id, "augmentedmike@gmail.com", "Michael ONeal", slug, now],
   );
   console.log("  ✓ Seeded admin user");
 } else {

@@ -13,14 +13,15 @@ beforeEach(() => {
 
 describe("POST /api/book edge cases", () => {
   const validBody = { eventTypeId: "et1", startTime: 9999999999, clientName: "Alice", clientEmail: "a@a.com" };
-  const mockEventType = [{ id: "et1", duration: 30, title: "Call", user_id: "u1", host_name: "Host", host_email: "h@h.com" }];
+  const mockEventType = [
+    { id: "et1", duration: 30, title: "Call", user_id: "u1", host_name: "Host", host_email: "h@h.com" },
+  ];
 
   it("detects double-booking conflict", async () => {
-    mockQuery
-      .mockResolvedValueOnce(mockEventType)
-      .mockResolvedValueOnce([{ id: "existing" }]); // Conflict exists
+    mockQuery.mockResolvedValueOnce(mockEventType).mockResolvedValueOnce([{ id: "existing" }]); // Conflict exists
     const req = new Request("http://localhost:6969/api/book", {
-      method: "POST", headers: { "content-type": "application/json" },
+      method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify(validBody),
     });
     const resp = await book({ request: req } as any);
@@ -36,7 +37,8 @@ describe("POST /api/book edge cases", () => {
       .mockResolvedValueOnce([{ id: "existing-client", name: "Alice" }]) // Client exists
       .mockResolvedValueOnce([]); // Insert booking
     const req = new Request("http://localhost:6969/api/book", {
-      method: "POST", headers: { "content-type": "application/json" },
+      method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify(validBody),
     });
     const resp = await book({ request: req } as any);
@@ -52,7 +54,8 @@ describe("POST /api/book edge cases", () => {
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([]);
     const req = new Request("http://localhost:6969/api/book", {
-      method: "POST", headers: { "content-type": "application/json" },
+      method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify(validBody),
     });
     await book({ request: req } as any);

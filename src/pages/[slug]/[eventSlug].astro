@@ -5,35 +5,49 @@ import { BookingWidget } from "@/booking-widget/booking-widget";
 
 const { slug, eventSlug } = Astro.params;
 
-const [user] = await query`
+const [user] = (await query`
   SELECT id, name FROM users WHERE slug = ${slug} AND is_active = true LIMIT 1
-` as any[];
+`) as any[];
 if (!user) return Astro.redirect("/");
 
-const [evt] = await query`
+const [evt] = (await query`
   SELECT id, title, description, duration, user_id FROM event_types
   WHERE user_id = ${user.id} AND slug = ${eventSlug} AND is_active = true LIMIT 1
-` as any[];
+`) as any[];
 if (!evt) return Astro.redirect(`/${slug}`);
 ---
 
 <AppLayout title={`${evt.title} — ${user.name}`}>
   <section style="padding: 2rem 1.5rem; max-width: 520px; margin: 0 auto;">
-    <a href={`/${slug}`} class="app-btn" style="display: inline-flex; padding: 0.35rem 0.85rem; font-size: 0.8rem; margin-bottom: 1.25rem; min-height: 0;">
+    <a
+      href={`/${slug}`}
+      class="app-btn"
+      style="display: inline-flex; padding: 0.35rem 0.85rem; font-size: 0.8rem; margin-bottom: 1.25rem; min-height: 0;"
+    >
       ← Back
     </a>
 
     <h1 style="margin: 0 0 0.15rem; font-size: 1.2rem; font-weight: 700;">{evt.title}</h1>
     <p style="margin: 0 0 1.5rem; color: var(--app-text-muted); font-size: 0.85rem;">
       {evt.duration} min
-      {evt.description && <><br/>{evt.description}</>}
+      {
+        evt.description && (
+          <>
+            <br />
+            {evt.description}
+          </>
+        )
+      }
     </p>
 
-    <div style={{
-      padding: "1.25rem", borderRadius: "0.85rem",
-      border: "1px solid var(--app-border)",
-      background: "rgba(255,255,255,0.02)",
-    }}>
+    <div
+      style={{
+        padding: "1.25rem",
+        borderRadius: "0.85rem",
+        border: "1px solid var(--app-border)",
+        background: "rgba(255,255,255,0.02)",
+      }}
+    >
       <BookingWidget hostId={user.id} eventTypeId={evt.id} client:load />
     </div>
   </section>

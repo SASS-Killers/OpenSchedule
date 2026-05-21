@@ -8,13 +8,13 @@ import { TimezonePicker } from "@/host-dashboard/timezone-picker";
 const session = await requireSession(Astro.request);
 if (!session || !["admin", "host"].includes(session.role)) return Astro.redirect("/login");
 
-const [user] = await query`
+const [user] = (await query`
   SELECT slug, timezone FROM users WHERE id = ${session.userId} LIMIT 1
-` as any[];
+`) as any[];
 
 // Fetch upcoming bookings for agenda
 const now = Math.floor(Date.now() / 1000);
-const bookings = await query`
+const bookings = (await query`
   SELECT b.id, b.start_time, b.end_time, b.status, b.client_notes,
          c.name AS client_name, c.email AS client_email,
          e.title AS event_title, e.duration
@@ -26,7 +26,7 @@ const bookings = await query`
     AND b.status = 'confirmed'
   ORDER BY b.start_time ASC
   LIMIT 50
-` as any[];
+`) as any[];
 
 // Group by date
 const groups: Record<string, any[]> = {};
@@ -40,68 +40,87 @@ for (const b of bookings) {
 
 <AppLayout title="My Settings — OpenSchedule">
   <section style="padding: 2rem 1.5rem; max-width: 960px; margin: 0 auto;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;"
-      class="profile-grid">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;" class="profile-grid">
       <!-- Right column first in source order: Bookings (shows first on mobile) -->
       <div style="order: 0;">
         <h2 style="margin: 0 0 1rem; font-size: 1.1rem; font-weight: 700;">Upcoming Bookings</h2>
 
-        {bookings.length === 0 && (
-          <div style="text-align: center; padding: 2rem 0; color: var(--app-text-muted); font-size: 0.9rem; border: 1px dashed var(--app-border); border-radius: 0.85rem;">
-            No upcoming bookings.
-          </div>
-        )}
+        {
+          bookings.length === 0 && (
+            <div style="text-align: center; padding: 2rem 0; color: var(--app-text-muted); font-size: 0.9rem; border: 1px dashed var(--app-border); border-radius: 0.85rem;">
+              No upcoming bookings.
+            </div>
+          )
+        }
 
-        {Object.entries(groups).map(([date, slots]) => (
-          <div style="margin-bottom: 1.25rem;">
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--app-text-muted); margin-bottom: 0.5rem;">
-              {date}
-            </div>
-            <div style="display: grid; gap: 0.5rem;">
-              {slots.map((b: any) => {
-                const start = new Date(b.start_time * 1000);
-                const end = new Date(b.end_time * 1000);
-                const time = start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-                const endTime = end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-                const isPast = b.end_time < Math.floor(Date.now() / 1000);
-                return (
-                  <div style={{
-                    display: "flex", gap: "0.75rem", alignItems: "flex-start",
-                    padding: "0.85rem 1rem",
-                    borderRadius: "0.7rem",
-                    border: "1px solid var(--app-border)",
-                    background: isPast ? "transparent" : "rgba(99,102,241,0.04)",
-                    opacity: isPast ? 0.5 : 1,
-                  }}>
-                    <div style={{ minWidth: "4rem", textAlign: "center", paddingTop: "0.15rem" }}>
-                      <div style={{ fontSize: "0.92rem", fontWeight: 700, fontFamily: "monospace" }}>{time}</div>
-                      <div style={{ fontSize: "0.72rem", color: "var(--app-text-muted)" }}>{endTime}</div>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: "0.92rem" }}>{b.event_title}</div>
-                      <div style={{ fontSize: "0.82rem", color: "var(--app-text-muted)" }}>
-                        {b.client_name} &middot; {b.client_email}
+        {
+          Object.entries(groups).map(([date, slots]) => (
+            <div style="margin-bottom: 1.25rem;">
+              <div style="font-size: 0.85rem; font-weight: 600; color: var(--app-text-muted); margin-bottom: 0.5rem;">
+                {date}
+              </div>
+              <div style="display: grid; gap: 0.5rem;">
+                {slots.map((b: any) => {
+                  const start = new Date(b.start_time * 1000);
+                  const end = new Date(b.end_time * 1000);
+                  const time = start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+                  const endTime = end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+                  const isPast = b.end_time < Math.floor(Date.now() / 1000);
+                  return (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.75rem",
+                        alignItems: "flex-start",
+                        padding: "0.85rem 1rem",
+                        borderRadius: "0.7rem",
+                        border: "1px solid var(--app-border)",
+                        background: isPast ? "transparent" : "rgba(99,102,241,0.04)",
+                        opacity: isPast ? 0.5 : 1,
+                      }}
+                    >
+                      <div style={{ minWidth: "4rem", textAlign: "center", paddingTop: "0.15rem" }}>
+                        <div style={{ fontSize: "0.92rem", fontWeight: 700, fontFamily: "monospace" }}>{time}</div>
+                        <div style={{ fontSize: "0.72rem", color: "var(--app-text-muted)" }}>{endTime}</div>
                       </div>
-                      {b.client_notes && (
-                        <div style={{ fontSize: "0.8rem", color: "var(--app-text-muted)", marginTop: "0.25rem", fontStyle: "italic" }}>
-                          "{b.client_notes}"
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: "0.92rem" }}>{b.event_title}</div>
+                        <div style={{ fontSize: "0.82rem", color: "var(--app-text-muted)" }}>
+                          {b.client_name} &middot; {b.client_email}
                         </div>
-                      )}
+                        {b.client_notes && (
+                          <div
+                            style={{
+                              fontSize: "0.8rem",
+                              color: "var(--app-text-muted)",
+                              marginTop: "0.25rem",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            "{b.client_notes}"
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "0.7rem",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: "999px",
+                          background: isPast ? "rgba(148,163,184,0.1)" : "rgba(52,211,153,0.15)",
+                          color: isPast ? "var(--app-text-muted)" : "#34d399",
+                        }}
+                      >
+                        {isPast ? "Past" : "Upcoming"}
+                      </span>
                     </div>
-                    <span style={{
-                      fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase",
-                      padding: "0.2rem 0.5rem", borderRadius: "999px",
-                      background: isPast ? "rgba(148,163,184,0.1)" : "rgba(52,211,153,0.15)",
-                      color: isPast ? "var(--app-text-muted)" : "#34d399",
-                    }}>
-                      {isPast ? "Past" : "Upcoming"}
-                    </span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
 
       <!-- Left column second in source: Profile & Settings (shows second on mobile) -->
@@ -117,7 +136,12 @@ for (const b of bookings) {
         <div style="display: grid; gap: 0.75rem; margin-bottom: 1.5rem;">
           <label class="app-btn" style="justify-content: center; cursor: pointer;">
             Upload Avatar
-            <input type="file" id="avatar-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display: none;" />
+            <input
+              type="file"
+              id="avatar-input"
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              style="display: none;"
+            />
           </label>
           <div id="avatar-status" style="font-size: 0.82rem; color: var(--app-text-muted); text-align: center;"></div>
           <div style="display: flex; flex-direction: column; gap: 0.25rem;">
@@ -127,71 +151,98 @@ for (const b of bookings) {
         </div>
 
         <div style="display: grid; gap: 0.75rem;">
-          <a href="/hosts/me/event-types" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+          <a
+            href="/hosts/me/event-types"
+            class="app-btn"
+            style="justify-content: flex-start; padding: 1rem; text-decoration: none;"
+          >
             <span style="font-weight: 600;">Event Types</span>
-            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Meeting types you offer →</span>
+            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);"
+              >Meeting types you offer →</span
+            >
           </a>
-          <a href="/hosts/me/schedule" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+          <a
+            href="/hosts/me/schedule"
+            class="app-btn"
+            style="justify-content: flex-start; padding: 1rem; text-decoration: none;"
+          >
             <span style="font-weight: 600;">Schedule</span>
-            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Your availability →</span>
+            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Your availability →</span
+            >
           </a>
-          <a href="/hosts/me/exceptions" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
+          <a
+            href="/hosts/me/exceptions"
+            class="app-btn"
+            style="justify-content: flex-start; padding: 1rem; text-decoration: none;"
+          >
             <span style="font-weight: 600;">Exceptions</span>
-            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Vacations, blockouts →</span>
+            <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);"
+              >Vacations, blockouts →</span
+            >
           </a>
-          {user && (
-            <a href={`/hosts/${user.slug}`} target="_blank" class="app-btn" style="justify-content: flex-start; padding: 1rem; text-decoration: none;">
-              <span style="font-weight: 600;">View Your Profile</span>
-              <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">Open in new tab →</span>
-            </a>
-          )}
+          {
+            user && (
+              <a
+                href={`/hosts/${user.slug}`}
+                target="_blank"
+                class="app-btn"
+                style="justify-content: flex-start; padding: 1rem; text-decoration: none;"
+              >
+                <span style="font-weight: 600;">View Your Profile</span>
+                <span style="margin-left: auto; font-size: 0.85rem; color: var(--app-text-muted);">
+                  Open in new tab →
+                </span>
+              </a>
+            )
+          }
         </div>
       </div>
     </div>
+  </section>
+
+  <script>
+    const input = document.getElementById("avatar-input")!;
+    const status = document.getElementById("avatar-status")!;
+
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      status.textContent = "Processing...";
+
+      // Resize to 200x200 on the client
+      const canvas = document.createElement("canvas");
+      canvas.width = 200;
+      canvas.height = 200;
+      const ctx = canvas.getContext("2d")!;
+      const url = URL.createObjectURL(file);
+
+      await new Promise<void>((resolve) => {
+        const image = new Image();
+        image.onload = () => {
+          ctx.drawImage(image, 0, 0, 200, 200);
+          URL.revokeObjectURL(url);
+          resolve();
+        };
+        image.src = url;
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+
+      const res = await fetch("/api/avatar", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ data: dataUrl }),
+      });
+
+      if (res.ok) {
+        // Trigger avatar component to reload
+        if ((window as any).__avatarReload) (window as any).__avatarReload();
+        status.textContent = "Avatar updated.";
+      } else {
+        const err = await res.json();
+        status.textContent = err.error || "Upload failed.";
+      }
+    });
+  </script>
 </AppLayout>
-
-<script>
-const input = document.getElementById("avatar-input")!;
-const status = document.getElementById("avatar-status")!;
-
-input.addEventListener("change", async () => {
-  const file = input.files?.[0];
-  if (!file) return;
-
-  status.textContent = "Processing...";
-
-  // Resize to 200x200 on the client
-  const canvas = document.createElement("canvas");
-  canvas.width = 200;
-  canvas.height = 200;
-  const ctx = canvas.getContext("2d")!;
-  const url = URL.createObjectURL(file);
-
-  await new Promise<void>((resolve) => {
-    const image = new Image();
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, 200, 200);
-      URL.revokeObjectURL(url);
-      resolve();
-    };
-    image.src = url;
-  });
-
-  const dataUrl = canvas.toDataURL("image/png");
-
-  const res = await fetch("/api/avatar", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ data: dataUrl }),
-  });
-
-  if (res.ok) {
-    // Trigger avatar component to reload
-    if ((window as any).__avatarReload) (window as any).__avatarReload();
-    status.textContent = "Avatar updated.";
-  } else {
-    const err = await res.json();
-    status.textContent = err.error || "Upload failed.";
-  }
-});
-</script>

@@ -48,9 +48,9 @@ export const GET: APIRoute = async ({ url }) => {
   const userId = url.searchParams.get("userId");
   if (!userId) return new Response(null, { status: 400 });
 
-  const rows = await query`
+  const rows = (await query`
     SELECT encode(avatar, 'base64') AS b64 FROM users WHERE id = ${userId} AND avatar IS NOT NULL LIMIT 1
-  ` as any[];
+  `) as any[];
 
   if (!rows || rows.length === 0) return new Response(null, { status: 404 });
 

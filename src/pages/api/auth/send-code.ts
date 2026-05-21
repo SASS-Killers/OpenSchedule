@@ -20,13 +20,15 @@ export const POST: APIRoute = async ({ request }) => {
 
   // 60-second resend throttle
   const sixtySecondsAgo = Math.floor(Date.now() / 1000) - 60;
-  const [recent] = await query`
+  const [recent] = (await query`
     SELECT id FROM verification_codes
     WHERE email = ${email} AND created_at > ${sixtySecondsAgo}
     LIMIT 1
-  ` as any[];
+  `) as any[];
   if (recent) {
-    return new Response(JSON.stringify({ error: "Please wait 60 seconds before requesting a new code" }), { status: 429 });
+    return new Response(JSON.stringify({ error: "Please wait 60 seconds before requesting a new code" }), {
+      status: 429,
+    });
   }
 
   // Call PostgREST to generate and store the code

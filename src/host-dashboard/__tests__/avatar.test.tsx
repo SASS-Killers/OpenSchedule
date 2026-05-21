@@ -22,7 +22,7 @@ describe("Avatar", () => {
     // The fallback div starts with display:none
     const allDivs = document.querySelectorAll("div");
     const fallbackDiv = Array.from(allDivs).find(
-      d => (d as HTMLElement).style.display === "none" && d.textContent === "J"
+      (d) => (d as HTMLElement).style.display === "none" && d.textContent === "J",
     );
     expect(fallbackDiv).toBeTruthy();
   });

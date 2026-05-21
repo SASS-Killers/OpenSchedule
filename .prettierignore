@@ -1,0 +1,11 @@
+node_modules
+dist
+.turbo
+coverage
+.env
+.env.*
+*.lock
+*.png
+*.jpg
+*.svg
+.wrangler

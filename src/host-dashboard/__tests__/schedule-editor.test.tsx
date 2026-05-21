@@ -29,13 +29,11 @@ describe("ScheduleEditor", () => {
   });
 
   it("uses initial data when provided", () => {
-    render(<ScheduleEditor initial={[
-      { dayOfWeek: 0, startTime: "08:00", endTime: "14:00" },
-    ]} />);
+    render(<ScheduleEditor initial={[{ dayOfWeek: 0, startTime: "08:00", endTime: "14:00" }]} />);
     const inputs = document.querySelectorAll("input[type='text']");
     // Monday should show 8:00a (displayTime format)
-    const displayValues = Array.from(inputs).map(i => (i as HTMLInputElement).value);
-    expect(displayValues.some(v => v.startsWith("8:00"))).toBe(true);
+    const displayValues = Array.from(inputs).map((i) => (i as HTMLInputElement).value);
+    expect(displayValues.some((v) => v.startsWith("8:00"))).toBe(true);
   });
 
   it("toggles a day on and off", () => {
@@ -118,7 +116,7 @@ describe("ScheduleEditor", () => {
   it("parses various time formats on blur", () => {
     render(<ScheduleEditor initial={[{ dayOfWeek: 0, startTime: "09:00", endTime: "17:00" }]} />);
     const inputs = document.querySelectorAll("input[type='text']");
-    
+
     // Test "3pm" → should show display "3:00p", raw "15:00"
     fireEvent.change(inputs[0], { target: { value: "3pm" } });
     fireEvent.blur(inputs[0]);
@@ -170,9 +168,7 @@ describe("ScheduleEditor", () => {
   });
 
   it("sends correct body format on save", async () => {
-    render(<ScheduleEditor initial={[
-      { dayOfWeek: 0, startTime: "09:00", endTime: "17:00" },
-    ]} />);
+    render(<ScheduleEditor initial={[{ dayOfWeek: 0, startTime: "09:00", endTime: "17:00" }]} />);
     fireEvent.click(screen.getByText("Save"));
     await waitFor(() => {
       const call = (globalThis.fetch as any).mock.calls.find((c: any) => c[0] === "/api/host/schedule");
@@ -187,12 +183,12 @@ describe("ScheduleEditor", () => {
     render(<ScheduleEditor initial={[{ dayOfWeek: 0, startTime: "09:00", endTime: "17:00" }]} />);
     // Get initial count of time inputs
     const before = document.querySelectorAll("input[type='text']").length;
-    
+
     // Toggle Monday off
     fireEvent.click(screen.getByText("Monday"));
     const afterOff = document.querySelectorAll("input[type='text']").length;
     expect(afterOff).toBe(before - 2); // 2 inputs removed
-    
+
     // Toggle Monday back on
     fireEvent.click(screen.getByText("Monday"));
     const afterOn = document.querySelectorAll("input[type='text']").length;

@@ -26,7 +26,14 @@ describe("TimezonePicker", () => {
 
   it("selects timezone on click", async () => {
     let selected = "";
-    render(<TimezonePicker value="America/New_York" onChange={(tz: string) => { selected = tz; }} />);
+    render(
+      <TimezonePicker
+        value="America/New_York"
+        onChange={(tz: string) => {
+          selected = tz;
+        }}
+      />,
+    );
     const input = document.querySelector("input")!;
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "los" } });

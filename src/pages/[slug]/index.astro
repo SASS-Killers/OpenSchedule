@@ -4,53 +4,68 @@ import { query } from "@/db/neon";
 
 const { slug } = Astro.params;
 
-const [user] = await query`
+const [user] = (await query`
   SELECT id, name, timezone FROM users WHERE slug = ${slug} AND is_active = true LIMIT 1
-` as any[];
+`) as any[];
 
 if (!user) return Astro.redirect("/");
 
-const types = await query`
+const types = (await query`
   SELECT id, title, slug, description, duration FROM event_types WHERE user_id = ${user.id} AND is_active = true ORDER BY duration
-` as any[];
+`) as any[];
 ---
 
 <AppLayout title={`Book with ${user.name} — OpenSchedule`}>
   <section style="padding: 3rem 1.5rem; max-width: 480px; margin: 0 auto; text-align: center;">
-    <div style="
+    <div
+      style="
       width: 4rem; height: 4rem; border-radius: 999px; margin: 0 auto 1rem;
       background: linear-gradient(135deg, var(--app-primary), var(--app-primary-2));
       display: grid; place-items: center;
       font-weight: 800; font-size: 1.5rem; color: #fff;
-    ">{user.name.charAt(0)}</div>
+    "
+    >
+      {user.name.charAt(0)}
+    </div>
 
     <h1 style="margin: 0 0 2rem; font-size: 1.3rem; font-weight: 700;">Book with {user.name}</h1>
 
     <div style="display: grid; gap: 0.75rem; text-align: left;">
-      {types.length === 0 && (
-        <p style="color: var(--app-text-muted); font-size: 0.9rem;">No event types available yet.</p>
-      )}
-      {types.map((t: any) => (
-        <a
-          href={`/${slug}/${t.slug}`}
-          style={{
-            display: "flex", alignItems: "center", gap: "1rem",
-            padding: "1rem 1.25rem",
-            borderRadius: "0.85rem",
-            border: "1px solid var(--app-border)",
-            background: "rgba(255,255,255,0.02)",
-            cursor: "pointer", textDecoration: "none",
-          }}
-        >
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{t.title}</div>
-            {t.description && (
-              <div style={{ fontSize: "0.82rem", color: "var(--app-text-muted)", marginTop: "0.15rem" }}>{t.description}</div>
-            )}
-          </div>
-          <span style={{ fontSize: "0.85rem", color: "var(--app-text-muted)", whiteSpace: "nowrap" }}>{t.duration} min</span>
-        </a>
-      ))}
+      {
+        types.length === 0 && (
+          <p style="color: var(--app-text-muted); font-size: 0.9rem;">No event types available yet.</p>
+        )
+      }
+      {
+        types.map((t: any) => (
+          <a
+            href={`/${slug}/${t.slug}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              padding: "1rem 1.25rem",
+              borderRadius: "0.85rem",
+              border: "1px solid var(--app-border)",
+              background: "rgba(255,255,255,0.02)",
+              cursor: "pointer",
+              textDecoration: "none",
+            }}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>{t.title}</div>
+              {t.description && (
+                <div style={{ fontSize: "0.82rem", color: "var(--app-text-muted)", marginTop: "0.15rem" }}>
+                  {t.description}
+                </div>
+              )}
+            </div>
+            <span style={{ fontSize: "0.85rem", color: "var(--app-text-muted)", whiteSpace: "nowrap" }}>
+              {t.duration} min
+            </span>
+          </a>
+        ))
+      }
     </div>
   </section>
 </AppLayout>
