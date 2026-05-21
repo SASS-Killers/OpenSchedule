@@ -8,11 +8,11 @@ https://github.com/user-attachments/assets/7cd623ff-f042-41c2-96f6-e12db0cf8097
 
 
 <p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="" width="45%" style="border-radius: 8px;" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="" width="80%" style="border-radius: 8px;" />
 </p>
 
 <p align="center">
-  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="" width="70%" style="border-radius: 8px;" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="" width="80%" style="border-radius: 8px;" />
 </p>
 
 [Get started](#quick-start) · [Report a bug](https://github.com/SASS-Killers/OpenSchedule/issues)
