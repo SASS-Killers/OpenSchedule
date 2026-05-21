@@ -11,13 +11,11 @@
 No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
 
 <p align="center">
-  <video src="./demo.mp4" controls width="700" style="max-width: 100%; border-radius: 12px;">
-    <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
-      <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Watch the OpenSchedule demo" width="700" style="border-radius: 12px;" />
-    </a>
-  </video>
+  <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
+    <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Click to watch the OpenSchedule demo video" width="700" style="border-radius: 12px; max-width: 100%;" />
+  </a>
   <br/>
-  <em><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">Download the demo video (3.2 MB MP4)</a></em>
+  <sub><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">▶ Play demo video (3.2 MB MP4)</a></sub>
 </p>
 
 [Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
