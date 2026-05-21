@@ -11,9 +11,13 @@
 No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
 
 <p align="center">
-  <video src="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4" controls width="800" poster="public/images/sass-killers.png">
-    Your browser does not support the video tag. <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">Download the demo</a>.
+  <video src="./demo.mp4" controls width="700" style="max-width: 100%; border-radius: 12px;">
+    <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">
+      <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Watch the OpenSchedule demo" width="700" style="border-radius: 12px;" />
+    </a>
   </video>
+  <br/>
+  <em><a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">Download the demo video (3.2 MB MP4)</a></em>
 </p>
 
 [Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
@@ -22,15 +26,46 @@ No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL
 
 ## Features
 
-- **Free Forever** — No paid tiers, no hidden costs. Runs entirely on free-tier Neon (PostgreSQL), Cloudflare Pages, and Brevo.
-- **Self-Hosted** — Your data on your infrastructure. No third-party scheduling services processing your clients' information.
-- **Multi-User** — Admin provisions hosts. Hosts configure their availability. Clients book meetings. All in one system.
-- **Passwordless Auth** — Secure OTP codes via email. No passwords to manage or leak.
-- **Smart Scheduling** — Configurable weekly hours, date-specific overrides, buffer times, and minimum notice.
-- **Double-Booking Protection** — Real-time conflict detection. No external calendar API required.
-- **Client Auto-Registration** — Clients are registered automatically on first booking. No signup forms.
-- **Role-Based Access** — Admin and Host roles with appropriate permissions.
-- **Responsive** — Desktop and mobile friendly.
+### 🆓 Free Forever
+No paid tiers, no hidden costs. Runs entirely on free-tier Neon (PostgreSQL), Cloudflare Pages, and Brevo.
+
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-hosting.png" alt="Free hosting stack" width="80%" style="border-radius: 8px;" />
+</p>
+
+### 🔐 Self-Hosted & Passwordless Auth
+Your data on your infrastructure. No third-party scheduling services processing your clients' information. Secure OTP codes via email — no passwords to manage or leak.
+
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="Public booking calendar" width="80%" style="border-radius: 8px;" />
+</p>
+
+### 👥 Multi-User & Role-Based Access
+Admin provisions hosts. Hosts configure their availability. Clients book meetings. All in one system with Admin and Host roles.
+
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-dashboard.png" alt="Host dashboard with settings and bookings" width="80%" style="border-radius: 8px;" />
+</p>
+
+### 📅 Smart Scheduling & Double-Booking Protection
+Configurable weekly hours, date-specific overrides, buffer times, and minimum notice. Real-time conflict detection — no external calendar API required.
+
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-exceptions.png" alt="Availability exceptions management" width="80%" style="border-radius: 8px;" />
+</p>
+
+### 🛠️ Admin Console & Email Telemetry
+Provision host accounts, monitor email usage, and manage your deployment from a single dashboard.
+
+<p align="center">
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-admin.png" alt="Admin dashboard with email telemetry" width="80%" style="border-radius: 8px;" />
+</p>
+
+### 👤 Client Auto-Registration
+Clients are registered automatically on first booking. No signup forms, no friction.
+
+### 📱 Responsive
+Desktop and mobile friendly.
 
 ## Tech Stack
 
