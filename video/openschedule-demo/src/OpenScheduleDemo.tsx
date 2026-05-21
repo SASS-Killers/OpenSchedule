@@ -9,6 +9,8 @@ import {
   staticFile,
 } from "remotion";
 import { Audio } from "@remotion/media";
+import { CameraMotionBlur } from "@remotion/motion-blur";
+import { noise3D } from "@remotion/noise";
 
 // ── Constants ──────────────────────────────────────────────────────────
 const FPS = 30;
@@ -21,6 +23,47 @@ const GREEN = "#34d399";
 const RED = "#f87171";
 const YELLOW = "#fbbf24";
 const FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+
+// ── Typewriter Text Component ──────────────────────────────────────────
+function TypewriterText({
+  text,
+  frame,
+  startFrame = 0,
+  charsPerFrame = 0.33,
+  style,
+}: {
+  text: string;
+  frame: number;
+  startFrame?: number;
+  charsPerFrame?: number;
+  style?: React.CSSProperties;
+}) {
+  const f = Math.max(0, frame - startFrame);
+  const charsShown = Math.floor(f * charsPerFrame);
+  const visible = text.slice(0, Math.min(charsShown, text.length));
+  const done = charsShown >= text.length;
+  const cursorBlink = done
+    ? Math.floor((frame - startFrame) / 10) % 2 === 1
+    : true;
+
+  return (
+    <span style={style}>
+      {visible}
+      <span
+        style={{
+          display: "inline-block",
+          width: 3,
+          height: "0.85em",
+          background: ACCENT,
+          marginLeft: 3,
+          verticalAlign: "middle",
+          opacity: Number(cursorBlink),
+          borderRadius: 1,
+        }}
+      />
+    </span>
+  );
+}
 
 // ── Voiceover Configuration ────────────────────────────────────────────
 // Edit these [startFrame, endFrame] pairs after recording your voiceover.
@@ -45,7 +88,52 @@ const SCENES = [
   { name: "Outro", start: 1410, end: 1500 },
 ];
 
-// ── Ducking helper ─────────────────────────────────────────────────────
+// ── Cinematic Noise Overlay ────────────────────────────────────────────
+function NoiseOverlay() {
+  const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+  const dots: React.ReactNode[] = [];
+
+  // Subtle 3% opacity dot grid that drifts slowly
+  for (let x = 0; x < width; x += 6) {
+    for (let y = 0; y < height; y += 6) {
+      const dx = noise3D("x", x / 200, y / 200, frame * 0.02) * 2;
+      const dy = noise3D("y", x / 200, y / 200, frame * 0.02) * 2;
+      const opacity = interpolate(
+        noise3D("opacity", x, y, frame * 0.03),
+        [-1, 1],
+        [0, 0.04],
+      );
+      if (opacity > 0.01) {
+        dots.push(
+          <circle
+            key={`${x}-${y}`}
+            cx={x + dx}
+            cy={y + dy}
+            r={0.5}
+            fill="#fff"
+            opacity={opacity}
+          />,
+        );
+      }
+    }
+  }
+
+  return (
+    <svg
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 9999,
+      }}
+    >
+      {dots}
+    </svg>
+  );
+}
 // Fill in the [startFrame, endFrame] pairs that overlap your voiceover.
 // Music volume smoothly ramps down/up over FADE_FRAMES around each edge.
 const VOICEOVER_SEGMENTS: [number, number][] = [
@@ -203,11 +291,34 @@ function BookingWidgetScene({ frame }: { frame: number }) {
         padding: "40px 60px",
       }}
     >
-      <Title
-        text="Book a Meeting"
-        subtitle="No login required — just pick a time"
-        frame={frame}
-      />
+      <div
+        style={{
+          height: 120,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          maxWidth: 700,
+          marginBottom: 8,
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 36,
+            fontWeight: 800,
+            color: FG,
+            margin: 0,
+            lineHeight: 1.3,
+          }}
+        >
+          <TypewriterText
+            text="Stop paying subscription fees every month to have simple scheduling. Ditch the SaaS treadmill."
+            frame={frame}
+            startFrame={5}
+            charsPerFrame={0.5}
+          />
+        </h1>
+      </div>
       <div
         style={{
           display: "flex",
@@ -1977,42 +2088,49 @@ export const OpenScheduleDemo: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: BG }}>
-      <Sequence durationInFrames={S5}>
-        <BookingWidgetScene frame={frame} />
-      </Sequence>
-      <Sequence from={s[1]} durationInFrames={S4}>
-        <ConfirmationScene frame={frame - s[1]} />
-      </Sequence>
-      <Sequence from={s[2]} durationInFrames={S4}>
-        <LoginScene frame={frame - s[2]} />
-      </Sequence>
-      <Sequence from={s[3]} durationInFrames={S5}>
-        <HostDashboardScene frame={frame - s[3]} />
-      </Sequence>
-      <Sequence from={s[4]} durationInFrames={S4}>
-        <ScheduleScene frame={frame - s[4]} />
-      </Sequence>
-      <Sequence from={s[5]} durationInFrames={S4}>
-        <ExceptionsScene frame={frame - s[5]} />
-      </Sequence>
-      <Sequence from={s[6]} durationInFrames={S4}>
-        <EventTypesScene frame={frame - s[6]} />
-      </Sequence>
-      <Sequence from={s[7]} durationInFrames={S5}>
-        <AdminDashboardScene frame={frame - s[7]} />
-      </Sequence>
-      <Sequence from={s[8]} durationInFrames={S5}>
-        <InstallScene frame={frame - s[8]} />
-      </Sequence>
-      <Sequence from={s[9]} durationInFrames={S4}>
-        <HostingStackScene frame={frame - s[9]} />
-      </Sequence>
-      <Sequence from={s[10]} durationInFrames={S3}>
-        <FeaturesScene frame={frame - s[10]} />
-      </Sequence>
-      <Sequence from={s[11]} durationInFrames={S3}>
-        <OutroScene frame={frame - s[11]} />
-      </Sequence>
+      <CameraMotionBlur shutterAngle={60} samples={6}>
+        <AbsoluteFill style={{ background: BG }}>
+          <Sequence durationInFrames={S5}>
+            <BookingWidgetScene frame={frame} />
+          </Sequence>
+          <Sequence from={s[1]} durationInFrames={S4}>
+            <ConfirmationScene frame={frame - s[1]} />
+          </Sequence>
+          <Sequence from={s[2]} durationInFrames={S4}>
+            <LoginScene frame={frame - s[2]} />
+          </Sequence>
+          <Sequence from={s[3]} durationInFrames={S5}>
+            <HostDashboardScene frame={frame - s[3]} />
+          </Sequence>
+          <Sequence from={s[4]} durationInFrames={S4}>
+            <ScheduleScene frame={frame - s[4]} />
+          </Sequence>
+          <Sequence from={s[5]} durationInFrames={S4}>
+            <ExceptionsScene frame={frame - s[5]} />
+          </Sequence>
+          <Sequence from={s[6]} durationInFrames={S4}>
+            <EventTypesScene frame={frame - s[6]} />
+          </Sequence>
+          <Sequence from={s[7]} durationInFrames={S5}>
+            <AdminDashboardScene frame={frame - s[7]} />
+          </Sequence>
+          <Sequence from={s[8]} durationInFrames={S5}>
+            <InstallScene frame={frame - s[8]} />
+          </Sequence>
+          <Sequence from={s[9]} durationInFrames={S4}>
+            <HostingStackScene frame={frame - s[9]} />
+          </Sequence>
+          <Sequence from={s[10]} durationInFrames={S3}>
+            <FeaturesScene frame={frame - s[10]} />
+          </Sequence>
+          <Sequence from={s[11]} durationInFrames={S3}>
+            <OutroScene frame={frame - s[11]} />
+          </Sequence>
+        </AbsoluteFill>
+      </CameraMotionBlur>
+
+      {/* Cinematic noise overlay */}
+      <NoiseOverlay />
 
       {/* ── Background music with voiceover ducking ── */}
       <Audio
