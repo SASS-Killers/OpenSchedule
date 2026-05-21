@@ -4,9 +4,17 @@
   <img src="public/images/sass-killers.png" alt="SASS Killers Logo" width="200" />
 </p>
 
+# OpenSchedule
+
 **A 100% free, self-hosted, multi-user scheduling platform — a complete Calendly replacement.**
 
 No subscriptions, no monthly fees, no data leaving your control. Just PostgreSQL and a few serverless functions running on the free tier.
+
+<p align="center">
+  <video src="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4" controls width="800" poster="public/images/sass-killers.png">
+    Your browser does not support the video tag. <a href="https://github.com/SASS-Killers/OpenSchedule/raw/main/demo.mp4">Download the demo</a>.
+  </video>
+</p>
 
 [Get Started](https://github.com/SASS-Killers/OpenSchedule#quick-start) · [Report a Bug](https://github.com/SASS-Killers/OpenSchedule/issues) · [Contribute](https://github.com/SASS-Killers/OpenSchedule/pulls)
 
