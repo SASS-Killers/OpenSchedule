@@ -1,7 +1,7 @@
 # OpenSchedule
 
 <p align="center">
-  <img src="public/images/sass-killers.png" alt="SASS Killers Logo" width="200" />
+  <img src="https://github.com/SASS-Killers/OpenSchedule/raw/main/public/images/scene-booking.png" alt="OpenSchedule" width="600" style="border-radius: 12px;" />
 </p>
 
 # OpenSchedule
